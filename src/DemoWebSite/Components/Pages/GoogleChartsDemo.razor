@@ -6,7 +6,7 @@
 <h1>Google Combo Chart</h1>
 
 <p class="text-muted">
-    Exemples de graphiques <code>GoogleComboChart</code> avec des séries en ligne, colonnes et mixées.
+    Examples of <code>GoogleComboChart</code> with line, column, and mixed series.
 </p>
 
 <div class="card mt-3">
@@ -29,7 +29,7 @@
 
 <div class="card mt-3">
     <div class="card-header">
-        Mixe
+        Mixed
     </div>
     <div class="card-body">
         <GoogleComboChart Columns="_mixedColumns" Data="_mixedData" Options="_mixedOptions" />
@@ -39,9 +39,9 @@
 @code {
     private readonly List<GoogleChartColumn> _lineColumns =
     [
-        new GoogleChartColumn { Label = "Mois", Type = "date" },
-        new GoogleChartColumn { Label = "Ventes", Type = "number" },
-        new GoogleChartColumn { Label = "Objectif", Type = "number" }
+        new GoogleChartColumn { Label = "Month", Type = "date" },
+        new GoogleChartColumn { Label = "Sales", Type = "number" },
+        new GoogleChartColumn { Label = "Target", Type = "number" }
     ];
 
     private readonly List<GoogleChartDataRow> _lineData =
@@ -56,10 +56,10 @@
 
     private readonly GoogleChartOptions _lineOptions = new()
     {
-        Title = "Ventes vs objectif",
+        Title = "Sales vs Target",
         DefaultSeriesType = GoogleChartSeriesType.Line,
-        HAxisTitle = "Mois",
-        VAxisTitle = "Montant (k€)",
+        HAxisTitle = "Month",
+        VAxisTitle = "Amount (k€)",
         Height = "320",
         ShowCrosshair = true,
         ChartAreaBackgroundColor = "#f5f5f5",
@@ -74,9 +74,9 @@
 
     private readonly List<GoogleChartColumn> _columnColumns =
     [
-        new GoogleChartColumn { Label = "Mois", Type = "date" },
-        new GoogleChartColumn { Label = "Tickets entrants", Type = "number" },
-        new GoogleChartColumn { Label = "Tickets clos", Type = "number" }
+        new GoogleChartColumn { Label = "Month", Type = "date" },
+        new GoogleChartColumn { Label = "Incoming Tickets", Type = "number" },
+        new GoogleChartColumn { Label = "Closed Tickets", Type = "number" }
     ];
 
     private readonly List<GoogleChartDataRow> _columnData =
@@ -91,9 +91,9 @@
 
     private readonly GoogleChartOptions _columnOptions = new()
     {
-        Title = "Support - tickets mensuels",
+        Title = "Support - Monthly Tickets",
         DefaultSeriesType = GoogleChartSeriesType.Columns,
-        HAxisTitle = "Mois",
+        HAxisTitle = "Month",
         VAxisTitle = "Tickets",
         Height = "320",
         BarGroupWidth = "70%",
@@ -109,9 +109,9 @@
 
     private readonly List<GoogleChartColumn> _mixedColumns =
     [
-        new GoogleChartColumn { Label = "Mois", Type = "date" },
-        new GoogleChartColumn { Label = "Revenus", Type = "number" },
-        new GoogleChartColumn { Label = "Taux de conversion", Type = "number" }
+        new GoogleChartColumn { Label = "Month", Type = "date" },
+        new GoogleChartColumn { Label = "Revenue", Type = "number" },
+        new GoogleChartColumn { Label = "Conversion Rate", Type = "number" }
     ];
 
     private readonly List<GoogleChartDataRow> _mixedData =
@@ -126,10 +126,10 @@
 
     private readonly GoogleChartOptions _mixedOptions = new()
     {
-        Title = "Revenus et conversion",
+        Title = "Revenue and Conversion",
         DefaultSeriesType = GoogleChartSeriesType.Columns,
-        HAxisTitle = "Mois",
-        VAxisTitle = "Revenus (k€)",
+        HAxisTitle = "Month",
+        VAxisTitle = "Revenue (k€)",
         VAxis2Title = "Conversion",
         VAxis2Format = "percent",
         Height = "320",

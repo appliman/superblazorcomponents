@@ -12,21 +12,21 @@
 
 <div class="card mt-3">
     <div class="card-header">
-        Ouvrir une modale dynamique
+        Open a dynamic modal
     </div>
     <div class="card-body">
         <div class="d-flex flex-wrap gap-2">
-            <SuperButton Text="Ouvrir (default)" Style="SuperButtonStyle.Primary" Click="@OpenDefaultAsync" />
-            <SuperButton Text="Ouvrir (large + height)" Style="SuperButtonStyle.Secondary" Click="@OpenLargeAsync" />
+            <SuperButton Text="Open (default)" Style="SuperButtonStyle.Primary" Click="@OpenDefaultAsync" />
+            <SuperButton Text="Open (large + height)" Style="SuperButtonStyle.Secondary" Click="@OpenLargeAsync" />
         </div>
 
         @if (!string.IsNullOrWhiteSpace(_result))
         {
-            <div class="alert alert-success mt-3 mb-0">Résultat: @_result</div>
+            <div class="alert alert-success mt-3 mb-0">Result: @_result</div>
         }
         else if (_resultWasSet)
         {
-            <div class="alert alert-warning mt-3 mb-0">Résultat: null</div>
+            <div class="alert alert-warning mt-3 mb-0">Result: null</div>
         }
     </div>
 </div>
@@ -42,7 +42,7 @@
         _result = null;
 
         var result = await DialogService.OpenAsync<DialogServiceDemoDialog>(
-            "Démo modale",
+            "Modal Demo",
             new Dictionary<string, object>
             {
                 [nameof(DialogServiceDemoDialog.Message)] = "Hello"
@@ -58,10 +58,10 @@
         _result = null;
 
         var result = await DialogService.OpenAsync<DialogServiceDemoDialog>(
-            "Démo modale (large)",
+            "Modal Demo (large)",
             new Dictionary<string, object>
             {
-                [nameof(DialogServiceDemoDialog.Message)] = "Modale large"
+                [nameof(DialogServiceDemoDialog.Message)] = "Large modal"
             },
             new DialogOptions
             {

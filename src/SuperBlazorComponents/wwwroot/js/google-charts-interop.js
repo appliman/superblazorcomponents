@@ -1,5 +1,5 @@
 ﻿// google-charts-interop.js
-// Gestion de l'interopérabilité avec Google Charts pour Blazor
+// Google Charts interop for Blazor
 
 let charts = {};
 let googleChartsLoaded = false;

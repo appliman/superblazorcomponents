@@ -13,35 +13,35 @@
 <h1>SuperDateRangeDialog</h1>
 
 <p class="text-muted">
-    Démonstration du sélecteur de période affiché dans une modale dynamique via <code>DialogService</code>.
+    Demonstration of the period selector displayed in a dynamic modal via <code>DialogService</code>.
 </p>
 
 <div class="card mt-3">
     <div class="card-header">
-        Ouvrir la modale
+        Open Modal
     </div>
     <div class="card-body d-flex flex-column gap-3">
         <div class="d-flex flex-wrap gap-2">
-            <SuperButton Text="Choisir une période" Style="SuperButtonStyle.Primary" Click="OpenDialogAsync" />
-            <SuperButton Text="Autoriser les dates futures" Style="SuperButtonStyle.Secondary" Click="OpenDialogWithFutureDatesAsync" />
+            <SuperButton Text="Choose a period" Style="SuperButtonStyle.Primary" Click="OpenDialogAsync" />
+            <SuperButton Text="Allow future dates" Style="SuperButtonStyle.Secondary" Click="OpenDialogWithFutureDatesAsync" />
         </div>
 
         <div class="row g-3">
             <div class="col-md-3">
                 <div class="border rounded p-3 h-100 bg-body-tertiary">
-                    <div class="small text-body-secondary">Période</div>
+                    <div class="small text-body-secondary">Period</div>
                     <div class="fw-semibold">@GetSummaryText(_selectedRange)</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="border rounded p-3 h-100 bg-body-tertiary">
-                    <div class="small text-body-secondary">Date de début</div>
+                    <div class="small text-body-secondary">Start Date</div>
                     <div class="fw-semibold">@GetDateText(_selectedRange?.StartDate)</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="border rounded p-3 h-100 bg-body-tertiary">
-                    <div class="small text-body-secondary">Date de fin</div>
+                    <div class="small text-body-secondary">End Date</div>
                     <div class="fw-semibold">@GetDateText(_selectedRange?.EndDate)</div>
                 </div>
             </div>
@@ -56,14 +56,14 @@
 </div>
 
 @code {
-    private static readonly CultureInfo FrCulture = CultureInfo.GetCultureInfo("fr-FR");
+    private static readonly CultureInfo FrCulture = CultureInfo.GetCultureInfo("en-US");
 
     private SuperDateRangeSelection? _selectedRange = new(null, null, SuperDateRangePreset.AllTime);
 
     private async Task OpenDialogAsync()
     {
         _selectedRange = await DialogService.OpenDateRangeDialogAsync(
-            "Sélectionner une période",
+            "Select a Period",
             _selectedRange,
             displayWeekNumbers: true,
             disableFutureDates: true);
@@ -72,7 +72,7 @@
     private async Task OpenDialogWithFutureDatesAsync()
     {
         _selectedRange = await DialogService.OpenDateRangeDialogAsync(
-            "Sélectionner une période",
+            "Select a Period",
             _selectedRange,
             displayWeekNumbers: true,
             disableFutureDates: false);
@@ -80,34 +80,34 @@
 
     private static string GetDateText(DateTime? date)
     {
-        return date?.ToString("d MMM yyyy", FrCulture) ?? "Non définie";
+        return date?.ToString("d MMM yyyy", FrCulture) ?? "Not set";
     }
 
     private static string GetPresetText(SuperDateRangePreset? preset)
     {
         if (!preset.HasValue)
         {
-            return "Aucun";
+            return "None";
         }
 
         return preset.Value switch
         {
-            SuperDateRangePreset.Today => "Aujourd'hui",
-            SuperDateRangePreset.Yesterday => "Hier",
-            SuperDateRangePreset.ThisWeek => "Cette semaine (lun. - aujourd'hui)",
-            SuperDateRangePreset.LastWeek => "La semaine dernière (lun. - dim.)",
-            SuperDateRangePreset.Last7Days => "7 derniers jours",
-            SuperDateRangePreset.Last14Days => "14 derniers jours",
-            SuperDateRangePreset.Last30Days => "30 derniers jours",
-            SuperDateRangePreset.Last90Days => "90 derniers jours",
-            SuperDateRangePreset.ThisMonth => "Ce mois-ci",
-            SuperDateRangePreset.LastMonth => "Le mois dernier",
-            SuperDateRangePreset.ThisQuarter => "Ce trimestre",
-            SuperDateRangePreset.LastQuarter => "Le trimestre dernier",
-            SuperDateRangePreset.ThisYear => "Cette année",
-            SuperDateRangePreset.LastYear => "L'année dernière",
-            SuperDateRangePreset.AllTime => "Toute la période",
-            _ => "Personnalisée"
+            SuperDateRangePreset.Today => "Today",
+            SuperDateRangePreset.Yesterday => "Yesterday",
+            SuperDateRangePreset.ThisWeek => "This Week (Mon. - today)",
+            SuperDateRangePreset.LastWeek => "Last Week (Mon. - Sun.)",
+            SuperDateRangePreset.Last7Days => "Last 7 Days",
+            SuperDateRangePreset.Last14Days => "Last 14 Days",
+            SuperDateRangePreset.Last30Days => "Last 30 Days",
+            SuperDateRangePreset.Last90Days => "Last 90 Days",
+            SuperDateRangePreset.ThisMonth => "This Month",
+            SuperDateRangePreset.LastMonth => "Last Month",
+            SuperDateRangePreset.ThisQuarter => "This Quarter",
+            SuperDateRangePreset.LastQuarter => "Last Quarter",
+            SuperDateRangePreset.ThisYear => "This Year",
+            SuperDateRangePreset.LastYear => "Last Year",
+            SuperDateRangePreset.AllTime => "All Time",
+            _ => "Custom"
         };
     }
 
@@ -115,7 +115,7 @@
     {
         if (range is null)
         {
-            return "Annulé";
+            return "Cancelled";
         }
 
         if (!string.IsNullOrWhiteSpace(range.PeriodName))
@@ -130,7 +130,7 @@
 
         if (range.StartDate is null && range.EndDate is null)
         {
-            return "Toute la période";
+            return "All Time";
         }
 
         if (range.StartDate is not null && range.EndDate is not null)
@@ -145,9 +145,9 @@
 
         if (range.StartDate is not null)
         {
-            return $"Depuis le {range.StartDate.Value.ToString("d MMM yyyy", FrCulture)}";
+            return $"Since {range.StartDate.Value.ToString("d MMM yyyy", FrCulture)}";
         }
 
-        return $"Jusqu'au {range.EndDate!.Value.ToString("d MMM yyyy", FrCulture)}";
+        return $"Until {range.EndDate!.Value.ToString("d MMM yyyy", FrCulture)}";
     }
 }

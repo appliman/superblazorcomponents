@@ -12,7 +12,7 @@
 
 <div class="card mt-3">
     <div class="card-header">
-        Démo
+        Demo
     </div>
     <div class="card-body">
         <div class="d-flex flex-wrap gap-2">
@@ -23,7 +23,7 @@
         @if (_lastResult is not null)
         {
             <div class="alert alert-info mt-3 mb-0">
-                Résultat: <strong>@(_lastResult.Value ? "OK" : "Annulé")</strong>
+                Result: <strong>@(_lastResult.Value ? "OK" : "Cancelled")</strong>
             </div>
         }
     </div>
@@ -37,19 +37,19 @@
     {
         _lastResult = await DialogService.Confirm(
             "Confirmation",
-            "Voulez-vous continuer ?",
+            "Do you want to continue?",
             new ConfirmOptions());
     }
 
     private async Task ConfirmCustomAsync()
     {
         _lastResult = await DialogService.Confirm(
-            "Suppression",
-            "Confirmez-vous la suppression ?",
+            "Deletion",
+            "Do you confirm the deletion?",
             new ConfirmOptions
             {
-                OkButtonText = "Oui",
-                CancelButtonText = "Non"
+                OkButtonText = "Yes",
+                CancelButtonText = "No"
             });
     }
 }

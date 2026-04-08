@@ -19,6 +19,7 @@
 - **Date Range Picker** — calendar-based date range selection with presets
 - **Rich Button Collection** — buttons, split buttons, toggle buttons, link buttons, and confirmation buttons
 - **Breadcrumb Navigation** — customizable breadcrumbs with back navigation support
+- **Dark/Light Theme Toggle** — one-click theme switching with system preference detection and localStorage persistence
 - **Font Awesome Icon Support** — configurable icon styles (Solid, Regular, Light, Thin, Duotone)
 
 ---
@@ -110,6 +111,8 @@ A high-performance virtualized data grid component with enterprise-grade feature
 ### 🖼️ SuperLayout (`Components/SuperLayout`)
 
 A responsive application layout system built on Bootstrap 5.3 with collapsible sidebar and chat panel.
+
+> **📖 [Full SuperLayout Documentation](SUPERLAYOUT.md)** — Complete API reference with 16 detailed usage examples (sidebar navigation, chat panel, custom themes, responsive behavior, programmatic control, and more).
 
 | Component / Class | Description |
 |---|---|
@@ -276,6 +279,43 @@ Sidebar menu item component for use inside `SuperSidebar`.
 
 ---
 
+### 🌗 Theme Toggle (`Components/Themes`)
+
+A dark/light theme toggle button that uses Bootstrap 5.3's `data-bs-theme` attribute. The selected theme is persisted in `localStorage` and automatically detected from the user's system preference on first visit.
+
+| Component / File | Description |
+|---|---|
+| `ThemeToggle` | Button component that switches between dark and light themes with a sun/moon icon |
+| `ThemeToggle.razor.js` | Isolated JS module handling theme detection, persistence (`localStorage`), and toggling |
+
+**Key features:**
+- One-click toggle between dark and light modes
+- Automatic system preference detection (`prefers-color-scheme`)
+- Theme persisted in `localStorage` across sessions
+- Font Awesome sun/moon icons with dynamic tooltip
+- Zero configuration required — just drop the component into your layout
+
+**Usage:**
+
+```razor
+@using SuperBlazorComponents.Components.Themes
+
+<ThemeToggle />
+```
+
+Typically placed inside the `SuperHeader` component:
+
+```razor
+<SuperHeader>
+    <div class="d-flex align-items-center gap-2">
+        <span>My App</span>
+        <ThemeToggle />
+    </div>
+</SuperHeader>
+```
+
+---
+
 ### 🖼️ Images (`Components/Images`)
 
 Placeholder image components.
@@ -357,7 +397,8 @@ src/
 │   │   ├── SuperDateRange/         # Date range picker
 │   │   ├── SuperLayout/            # Responsive app layout
 │   │   ├── SuperSplitter/          # Resizable split panels
-│   │   └── SuperTabs/              # Tabbed interface
+│   │   ├── SuperTabs/              # Tabbed interface
+│   │   └── Themes/                 # Dark/light theme toggle
 │   ├── Configuration/              # Global configuration
 │   └── Services/                   # Dialog & notification services
 └── DemoWebSite/                    # Demo application

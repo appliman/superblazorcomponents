@@ -1,7 +1,8 @@
 <Solution>
   <Folder Name="/Solution Items/">
     <File Path="README.md" />
+    <File Path="SUPERDATAGRID.md" />
   </Folder>
-  <Project Path="src/DemoWebSite/DemoWebSize.csproj" />
+  <Project Path="src/DemoWebSite/DemoWebSite.csproj" />
   <Project Path="src/SuperBlazorComponents/SuperBlazorComponents.csproj" />
 </Solution>

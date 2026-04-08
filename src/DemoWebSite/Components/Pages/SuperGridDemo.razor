@@ -148,7 +148,7 @@
                     <span>Avg: @(_filteredCount > 0 ? (_totalScore / _filteredCount).ToString("F2") : "-")</span>
                 </FooterTemplate>
             </DataGridColumn>
-            <DataGridColumn For="@(p => p.Coordinates)" Title="Coordonnées" Width="100px" FormatString="{0:F2}" TextAlign="SuperTextAlignment.Right">
+            <DataGridColumn For="@(p => p.Coordinates)" Title="Coordinates" Width="100px" FormatString="{0:F2}" TextAlign="SuperTextAlignment.Right">
                 <Template>
                     @context.Coordinates
                 </Template>
@@ -477,10 +477,10 @@
 
         _lastActionMessage = selectedAction.ActionName switch
         {
-            "ping" => $"Action 'ping' exécutée sur {selectedCount} ligne(s) sélectionnée(s).",
-            "selectAll" => $"Action 'selectAll' exécutée ({selectedCount} ligne(s) sélectionnée(s)).",
-            "clear" => "Action 'clear' exécutée (sélection effacée).",
-            _ => $"Action '{selectedAction.ActionName}' exécutée ({selectedCount} ligne(s) sélectionnée(s))."
+            "ping" => $"Action 'ping' executed on {selectedCount} selected row(s).",
+            "selectAll" => $"Action 'selectAll' executed ({selectedCount} selected row(s)).",
+            "clear" => "Action 'clear' executed (selection cleared).",
+            _ => $"Action '{selectedAction.ActionName}' executed ({selectedCount} selected row(s))."
         };
 
         return Task.CompletedTask;

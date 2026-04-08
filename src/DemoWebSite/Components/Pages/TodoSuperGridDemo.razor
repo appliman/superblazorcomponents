@@ -6,34 +6,34 @@
 
 <h1>Todo List</h1>
 <p class="text-muted">
-    Démonstration de <code>SuperDataGrid</code> en mode édition <strong>par ligne</strong>.
-    Double-cliquez sur une ligne pour l'éditer, ou utilisez les boutons d'action.
-    Les données restent en mémoire pour la démo.
+    Demonstration of <code>SuperDataGrid</code> in <strong>row-level</strong> edit mode.
+    Double-click a row to edit it, or use the action buttons.
+    Data is kept in memory for the demo.
 </p>
 
 <div class="card mb-3">
-    <div class="card-header">Nouvelle tâche</div>
+    <div class="card-header">New Task</div>
     <div class="card-body">
         <div class="row g-2 align-items-end">
             <div class="col-md-6">
-                <label class="form-label">Titre</label>
+                <label class="form-label">Title</label>
                 <input type="text"
                        class="form-control"
-                       placeholder="Nom de la tâche…"
+                       placeholder="Task name…"
                        @bind="_newTitle"
                        @bind:event="oninput"
                        @onkeydown="OnNewTitleKeyDownAsync" />
             </div>
             <div class="col-md-3">
-                <label class="form-label">Priorité</label>
+                <label class="form-label">Priority</label>
                 <select class="form-select" @bind="_newPriority">
-                    <option value="Basse">Basse</option>
-                    <option value="Normale">Normale</option>
-                    <option value="Haute">Haute</option>
+                    <option value="Low">Low</option>
+                    <option value="Normal">Normal</option>
+                    <option value="High">High</option>
                 </select>
             </div>
             <div class="col-md-3">
-                <SuperButton Text="Ajouter"
+                <SuperButton Text="Add"
                              Icon="fa-plus"
                              Style="SuperButtonStyle.Primary"
                              Click="AddTaskAsync"
@@ -68,14 +68,14 @@
                              Style="SuperButtonStyle.Success"
                              Size="SuperButtonSize.Small"
                              AllowCollapse="false"
-                             title="Valider"
+                             title="Confirm"
                              Click="@(async _ => await _grid!.EndEditAsync(item))" />
                 <SuperButton Icon="fa-xmark"
                              Text=""
                              Style="SuperButtonStyle.Secondary"
                              Size="SuperButtonSize.Small"
                              AllowCollapse="false"
-                             title="Annuler"
+                             title="Cancel"
                              Click="@(async _ => await _grid!.CancelEditAsync(item))" />
             }
             else
@@ -85,21 +85,21 @@
                              Style="SuperButtonStyle.Primary"
                              Size="SuperButtonSize.Small"
                              AllowCollapse="false"
-                             title="Modifier"
+                             title="Edit"
                              Click="@(async _ => await _grid!.BeginEditAsync(item))" />
                 <SuperButton Icon="fa-trash"
                              Text=""
                              Style="SuperButtonStyle.Danger"
                              Size="SuperButtonSize.Small"
                              AllowCollapse="false"
-                             title="Supprimer"
+                             title="Delete"
                              Click="@(async _ => await DeleteTaskAsync(item))" />
             }
         </ActionsTemplate>
 
         <ChildContent>
 
-            <DataGridColumn TItem="TodoItem" Property="Title" Title="Tâche" Width="550px">
+            <DataGridColumn TItem="TodoItem" Property="Title" Title="Task" Width="550px">
                 <EditTemplate>
                     <input type="text"
                            class="form-control form-control-sm"
@@ -108,33 +108,33 @@
                 </EditTemplate>
             </DataGridColumn>
 
-            <DataGridColumn TItem="TodoItem" Property="Priority" Title="Priorité" Width="160px" TextAlign="SuperTextAlignment.Center">
+            <DataGridColumn TItem="TodoItem" Property="Priority" Title="Priority" Width="160px" TextAlign="SuperTextAlignment.Center">
                 <EditTemplate>
                     <select class="form-select form-select-sm"
                             value="@context.Priority"
-                            @onchange="@(e => context.Priority = e.Value?.ToString() ?? "Normale")">
-                        <option value="Basse">Basse</option>
-                        <option value="Normale">Normale</option>
-                        <option value="Haute">Haute</option>
+                            @onchange="@(e => context.Priority = e.Value?.ToString() ?? "Normal")">
+                        <option value="Low">Low</option>
+                        <option value="Normal">Normal</option>
+                        <option value="High">High</option>
                     </select>
                 </EditTemplate>
                 <Template>
                     @switch (context.Priority)
                     {
-                        case "Haute":
-                            <span class="badge text-bg-danger">Haute</span>
+                        case "High":
+                            <span class="badge text-bg-danger">High</span>
                             break;
-                        case "Basse":
-                            <span class="badge text-bg-success">Basse</span>
+                        case "Low":
+                            <span class="badge text-bg-success">Low</span>
                             break;
                         default:
-                            <span class="badge text-bg-warning text-dark">Normale</span>
+                            <span class="badge text-bg-warning text-dark">Normal</span>
                             break;
                     }
                 </Template>
             </DataGridColumn>
 
-            <DataGridColumn TItem="TodoItem" Property="IsCompleted" Title="Terminée" Width="110px" TextAlign="SuperTextAlignment.Center">
+            <DataGridColumn TItem="TodoItem" Property="IsCompleted" Title="Completed" Width="110px" TextAlign="SuperTextAlignment.Center">
                 <EditTemplate>
                     <input type="checkbox"
                            class="form-check-input"
@@ -144,22 +144,22 @@
                 <Template>
                     @if (context.IsCompleted)
                     {
-                        <span class="badge text-bg-success">Terminée</span>
+                        <span class="badge text-bg-success">Completed</span>
                     }
                     else
                     {
-                        <span class="badge text-bg-secondary">En cours</span>
+                        <span class="badge text-bg-secondary">In progress</span>
                     }
                 </Template>
             </DataGridColumn>
 
-            <DataGridColumn TItem="TodoItem" Property="CreatedAt" Title="Créée le" Width="160px" FormatString="{0:dd/MM/yyyy HH:mm}" />
+            <DataGridColumn TItem="TodoItem" Property="CreatedAt" Title="Created on" Width="160px" FormatString="{0:dd/MM/yyyy HH:mm}" />
 
         </ChildContent>
 
         <FooterTemplate>
             <span>
-                @_items.Count tâche(s) — @_items.Count(i => i.IsCompleted) terminée(s) — @_items.Count(i => !i.IsCompleted) en cours
+                @_items.Count task(s) — @_items.Count(i => i.IsCompleted) completed — @_items.Count(i => !i.IsCompleted) in progress
             </span>
         </FooterTemplate>
 
@@ -170,18 +170,18 @@
     private SuperDataGrid<TodoItem>? _grid;
     private List<TodoItem> _items = [];
     private string _newTitle = string.Empty;
-    private string _newPriority = "Normale";
+    private string _newPriority = "Normal";
     private int _nextId = 1;
 
     protected override void OnInitialized()
     {
         _items =
         [
-            new TodoItem { Id = _nextId++, Title = "Préparer la réunion de lundi", Priority = "Haute", IsCompleted = false, CreatedAt = DateTime.Now.AddDays(-2) },
-            new TodoItem { Id = _nextId++, Title = "Mettre à jour la documentation", Priority = "Normale", IsCompleted = false, CreatedAt = DateTime.Now.AddDays(-1) },
-            new TodoItem { Id = _nextId++, Title = "Corriger le bug #1234", Priority = "Haute", IsCompleted = true, CreatedAt = DateTime.Now.AddDays(-3) },
-            new TodoItem { Id = _nextId++, Title = "Déployer la version 2.1", Priority = "Normale", IsCompleted = false, CreatedAt = DateTime.Now.AddHours(-5) },
-            new TodoItem { Id = _nextId++, Title = "Archiver les anciennes tâches", Priority = "Basse", IsCompleted = false, CreatedAt = DateTime.Now.AddHours(-1) },
+            new TodoItem { Id = _nextId++, Title = "Prepare Monday's meeting", Priority = "High", IsCompleted = false, CreatedAt = DateTime.Now.AddDays(-2) },
+            new TodoItem { Id = _nextId++, Title = "Update the documentation", Priority = "Normal", IsCompleted = false, CreatedAt = DateTime.Now.AddDays(-1) },
+            new TodoItem { Id = _nextId++, Title = "Fix bug #1234", Priority = "High", IsCompleted = true, CreatedAt = DateTime.Now.AddDays(-3) },
+            new TodoItem { Id = _nextId++, Title = "Deploy version 2.1", Priority = "Normal", IsCompleted = false, CreatedAt = DateTime.Now.AddHours(-5) },
+            new TodoItem { Id = _nextId++, Title = "Archive old tasks", Priority = "Low", IsCompleted = false, CreatedAt = DateTime.Now.AddHours(-1) },
     ];
     }
 
@@ -189,7 +189,7 @@
     {
         var query = _items.AsEnumerable();
 
-        // Filtres texte
+        // Text filters
         foreach (var filter in request.Filters)
         {
             if (string.IsNullOrWhiteSpace(filter.PropertyValue))
@@ -205,7 +205,7 @@
             };
         }
 
-        // Tri
+        // Sort
         query = (request.SortColumn, request.SortDirection) switch
         {
             (nameof(TodoItem.Title), SortDirection.Ascending)         => query.OrderBy(t => t.Title),
@@ -245,7 +245,7 @@
         });
 
         _newTitle = string.Empty;
-        _newPriority = "Normale";
+        _newPriority = "Normal";
 
         if (_grid is not null)
         {
@@ -275,7 +275,7 @@
     {
         public int Id { get; set; }
         public string Title { get; set; } = string.Empty;
-        public string Priority { get; set; } = "Normale";
+        public string Priority { get; set; } = "Normal";
         public bool IsCompleted { get; set; }
         public DateTime CreatedAt { get; set; }
     }

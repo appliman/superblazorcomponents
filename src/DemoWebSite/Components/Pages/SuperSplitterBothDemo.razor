@@ -1,9 +1,9 @@
 ﻿@page "/splitter-demo/both"
 @using SuperBlazorComponents.Components.SuperSplitter
 
-<PageTitle>SuperSplitter - Les 2</PageTitle>
+<PageTitle>SuperSplitter - Both</PageTitle>
 
-<h1>SuperSplitter - Les 2</h1>
+<h1>SuperSplitter - Both</h1>
 
 <SuperSplitter Orientation="@SuperSplitterOrientation.Vertical"
                 FirstPaneSize="@VerticalFirstPaneSize"
@@ -20,13 +20,13 @@
                        PersistenceKey="AdminBlazorApp:SuperSplitterDemo:Both:Horizontal">
             <SplitPane>
                 <div class="h-100 p-3" style="background-color: var(--bs-tertiary-bg);">
-                    <h5 class="mb-2">Panneau 1</h5>
-                    <p class="mb-0">Taille: <strong>@HorizontalFirstPaneSize.ToString("0")%</strong></p>
+                    <h5 class="mb-2">Pane 1</h5>
+                    <p class="mb-0">Size: <strong>@HorizontalFirstPaneSize.ToString("0")%</strong></p>
                 </div>
             </SplitPane>
             <SplitPane>
                 <div class="h-100 p-3">
-                    <h5 class="mb-2">Panneau 2</h5>
+                    <h5 class="mb-2">Pane 2</h5>
                     <p class="mb-0">Orientation: <strong>Horizontal</strong></p>
                 </div>
             </SplitPane>
@@ -34,7 +34,7 @@
     </SplitPane>
     <SplitPane>
         <div class="h-100 p-3">
-            <h5 class="mb-2">Panneau 3</h5>
+            <h5 class="mb-2">Pane 3</h5>
             <p class="mb-0">Orientation: <strong>Vertical</strong></p>
         </div>
     </SplitPane>

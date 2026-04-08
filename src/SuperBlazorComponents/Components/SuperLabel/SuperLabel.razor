@@ -1,0 +1,24 @@
+﻿@using System.Globalization
+@code {
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object> CapturedAttributes { get; set; } = new();
+
+    string text = null!;
+
+    protected override void OnParametersSet()
+    {
+        // Parse the captured attributes to extract the "culture" attribute and select the appropriate culture for display the text
+        var culture = CultureInfo.CurrentCulture;
+
+        foreach (var kvp in CapturedAttributes)
+        {
+            if (kvp.Key.Equals(culture.TwoLetterISOLanguageName, StringComparison.InvariantCultureIgnoreCase)
+                || kvp.Key.Equals(culture.ThreeLetterISOLanguageName, StringComparison.InvariantCultureIgnoreCase))
+            {
+                text = $"{kvp.Value}";
+                break;
+            }
+        }
+    }
+}
+<span @attributes="@CapturedAttributes">@text</span>

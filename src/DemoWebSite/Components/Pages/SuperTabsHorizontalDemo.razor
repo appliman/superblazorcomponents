@@ -8,17 +8,17 @@
 <h1>SuperTabs - Horizontal</h1>
 
 <div class="mb-3">
-    <button class="btn btn-primary me-2" @onclick="AddTab">Ajouter un onglet</button>
-    <button class="btn btn-outline-secondary me-2" @onclick="SelectNext">Onglet suivant</button>
-    <button class="btn btn-outline-secondary me-2" @onclick="SelectPrevious">Onglet précédent</button>
-    <button class="btn btn-outline-danger me-2" @onclick="CloseCurrent" disabled="@(!_tabs.Any(t => t.Closable) || _selectedIndex < 0)">Fermer l'onglet courant</button>
-    <button class="btn btn-outline-warning" @onclick="ToggleUnsaved">Basculer "modifications non sauvegardées"</button>
+    <button class="btn btn-primary me-2" @onclick="AddTab">Add a tab</button>
+    <button class="btn btn-outline-secondary me-2" @onclick="SelectNext">Next tab</button>
+    <button class="btn btn-outline-secondary me-2" @onclick="SelectPrevious">Previous tab</button>
+    <button class="btn btn-outline-danger me-2" @onclick="CloseCurrent" disabled="@(!_tabs.Any(t => t.Closable) || _selectedIndex < 0)">Close current tab</button>
+    <button class="btn btn-outline-warning" @onclick="ToggleUnsaved">Toggle "unsaved changes"</button>
 </div>
 
 <div class="mb-3">
     <div><strong>Instance:</strong> <code>@_instanceId</code></div>
     <div><strong>SelectedIndex:</strong> <code>@_selectedIndex</code></div>
-    <div><strong>Onglet courant:</strong> <code>@(TabsService.GetCurrentTabTitle(_instanceId) ?? "(aucun)")</code></div>
+    <div><strong>Current tab:</strong> <code>@(TabsService.GetCurrentTabTitle(_instanceId) ?? "(none)")</code></div>
 </div>
 
 <SuperTabs InstanceId="@_instanceId"
@@ -40,11 +40,11 @@
 </SuperTabs>
 
 <div class="mt-3">
-    <h2 class="h5">Journal</h2>
+    <h2 class="h5">Log</h2>
     <div class="border rounded p-2" style="min-height: 120px; max-height: 260px; overflow: auto; background: var(--bs-body-bg)">
         @if (_events.Count == 0)
         {
-            <div class="text-muted">Aucun évènement pour l'instant.</div>
+            <div class="text-muted">No events yet.</div>
         }
         else
         {
@@ -74,18 +74,18 @@
         _tabs.Add(new SuperTabItem
         {
             Id = "overview",
-            Title = "Aperçu",
+            Title = "Overview",
             Icon = "fa-solid fa-compass",
             IconColor = "var(--bs-primary)",
-            BadgeText = "Nouveau",
+            BadgeText = "New",
             BadgeClass = "badge-primary",
             Content = builder =>
             {
                 var i = 0;
                 builder.OpenElement(i++, "div");
-                builder.AddMarkupContent(i++, "<h3>Aperçu</h3>");
-                builder.AddMarkupContent(i++, "<p>Exemples: badges, onglets désactivés/masqués, fermeture, lazy-load, persistance (URL + localStorage), navigation clavier.</p>");
-                builder.AddMarkupContent(i++, "<ul><li>Clavier: flèches, Home/End, Ctrl+1..9</li><li>Persistance URL: paramètre <code>?tab=</code></li><li>Persistance localStorage: <code>PersistenceKey</code></li></ul>");
+                builder.AddMarkupContent(i++, "<h3>Overview</h3>");
+                builder.AddMarkupContent(i++, "<p>Examples: badges, disabled/hidden tabs, closing, lazy-load, persistence (URL + localStorage), keyboard navigation.</p>");
+                builder.AddMarkupContent(i++, "<ul><li>Keyboard: arrows, Home/End, Ctrl+1..9</li><li>URL persistence: <code>?tab=</code> parameter</li><li>localStorage persistence: <code>PersistenceKey</code></li></ul>");
                 builder.CloseElement();
             }
         });
@@ -96,13 +96,13 @@
             Title = "Lazy",
             Icon = "fa-solid fa-bolt",
             LazyLoad = true,
-            Tooltip = "Contenu rendu au premier affichage",
+            Tooltip = "Content rendered on first display",
             Content = builder =>
             {
                 var i = 0;
                 builder.OpenElement(i++, "div");
                 builder.AddMarkupContent(i++, "<h3>Lazy loading</h3>");
-                builder.AddContent(i++, $"Ce contenu est rendu lors de la première sélection. Date/heure: {DateTimeOffset.Now:O}");
+                builder.AddContent(i++, $"This content is rendered on first selection. Date/time: {DateTimeOffset.Now:O}");
                 builder.CloseElement();
             }
         });
@@ -110,16 +110,16 @@
         _tabs.Add(new SuperTabItem
         {
             Id = "disabled",
-            Title = "Désactivé",
+            Title = "Disabled",
             Icon = "fa-solid fa-ban",
             Disabled = true,
-            Tooltip = "Onglet visible mais non sélectionnable",
+            Tooltip = "Tab is visible but cannot be selected",
             Content = builder =>
             {
                 var i = 0;
                 builder.OpenElement(i++, "div");
-                builder.AddMarkupContent(i++, "<h3>Désactivé</h3>");
-                builder.AddMarkupContent(i++, "<p>Vous ne devriez pas pouvoir sélectionner cet onglet.</p>");
+                builder.AddMarkupContent(i++, "<h3>Disabled</h3>");
+                builder.AddMarkupContent(i++, "<p>You should not be able to select this tab.</p>");
                 builder.CloseElement();
             }
         });
@@ -127,7 +127,7 @@
         _tabs.Add(new SuperTabItem
         {
             Id = "closable",
-            Title = "Fermable",
+            Title = "Closable",
             Icon = "fa-solid fa-xmark",
             Closable = true,
             BadgeText = "1",
@@ -136,8 +136,8 @@
             {
                 var i = 0;
                 builder.OpenElement(i++, "div");
-                builder.AddMarkupContent(i++, "<h3>Fermeture</h3>");
-                builder.AddMarkupContent(i++, "<p>Vous pouvez fermer cet onglet via la croix ou le bouton au-dessus.</p>");
+                builder.AddMarkupContent(i++, "<h3>Close</h3>");
+                builder.AddMarkupContent(i++, "<p>You can close this tab via the cross or the button above.</p>");
                 builder.CloseElement();
             }
         });
@@ -145,18 +145,18 @@
         _tabs.Add(new SuperTabItem
         {
             Id = "unsaved",
-            Title = "Édition",
+            Title = "Editing",
             Icon = "fa-solid fa-pen-to-square",
             Closable = true,
             HasUnsavedChanges = true,
-            ConfirmLeaveMessage = "Des modifications ne sont pas sauvegardées. Voulez-vous quitter cet onglet ?",
+            ConfirmLeaveMessage = "There are unsaved changes. Do you want to leave this tab?",
             Content = builder =>
             {
                 var i = 0;
                 builder.OpenElement(i++, "div");
-                builder.AddMarkupContent(i++, "<h3>Modifications non sauvegardées</h3>");
-                builder.AddMarkupContent(i++, "<p>En quittant ou en fermant cet onglet, une confirmation doit être affichée.</p>");
-                builder.AddContent(i++, $"Statut: {(_tabs.First(t => t.Id == "unsaved").HasUnsavedChanges ? "Non sauvegardé" : "OK")}");
+                builder.AddMarkupContent(i++, "<h3>Unsaved Changes</h3>");
+                builder.AddMarkupContent(i++, "<p>When leaving or closing this tab, a confirmation should be displayed.</p>");
+                builder.AddContent(i++, $"Status: {(_tabs.First(t => t.Id == "unsaved").HasUnsavedChanges ? "Unsaved" : "OK")}");
                 builder.CloseElement();
             }
         });
@@ -164,14 +164,14 @@
         _tabs.Add(new SuperTabItem
         {
             Id = "hidden",
-            Title = "Masqué",
+            Title = "Hidden",
             Visible = false,
             Content = builder =>
             {
                 var i = 0;
                 builder.OpenElement(i++, "div");
-                builder.AddMarkupContent(i++, "<h3>Masqué</h3>");
-                builder.AddMarkupContent(i++, "<p>Cet onglet n'est pas visible.</p>");
+                builder.AddMarkupContent(i++, "<h3>Hidden</h3>");
+                builder.AddMarkupContent(i++, "<p>This tab is not visible.</p>");
                 builder.CloseElement();
             }
         });
@@ -192,7 +192,7 @@
         var tab = new SuperTabItem
         {
             Id = id,
-            Title = $"Dynamique {n}",
+            Title = $"Dynamic {n}",
             Icon = "fa-solid fa-layer-group",
             Closable = true,
             BadgeText = n.ToString(),
@@ -201,10 +201,10 @@
             {
                 var i = 0;
                 builder.OpenElement(i++, "div");
-                builder.AddMarkupContent(i++, "<h3>Onglet dynamique</h3>");
+                builder.AddMarkupContent(i++, "<h3>Dynamic Tab</h3>");
                 builder.AddContent(i++, $"Id: {id}");
                 builder.AddMarkupContent(i++, "<br />");
-                builder.AddContent(i++, $"Créé: {DateTimeOffset.Now:O}");
+                builder.AddContent(i++, $"Created: {DateTimeOffset.Now:O}");
                 builder.CloseElement();
             }
         };
@@ -280,7 +280,7 @@
         if (args.Tab?.Id == "overview")
         {
             args.Cancel = true;
-            AddEvent("Fermeture refusée: l'onglet \"Aperçu\" est protégé");
+            AddEvent("Close denied: the \"Overview\" tab is protected");
         }
 
         return Task.CompletedTask;

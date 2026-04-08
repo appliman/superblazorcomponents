@@ -104,7 +104,7 @@ public partial class SuperDateRangePicker : ComponentBase, IAsyncDisposable
         {
             _jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
                 "import",
-                "./_content/SuperBlazorComponents/Components/SuperDateRangePicker/SuperDateRangePicker.razor.js");
+                "./_content/SuperBlazorComponents/Components/SuperDateRange/SuperDateRangePicker.razor.js");
         }
 
         if (_jsModule is null)

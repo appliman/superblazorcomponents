@@ -2,9 +2,9 @@
 
 @using SuperBlazorComponents.Components.SuperTabs
 
-<PageTitle>SuperTabs déclaratif</PageTitle>
+<PageTitle>SuperTabs declarative</PageTitle>
 
-<h1>SuperTabs - Déclaratif</h1>
+<h1>SuperTabs - Declarative</h1>
 
 <p class="text-muted">Exemple: <code>&lt;SuperTabs&gt;&lt;Tabs&gt;&lt;TabItem&gt;...&lt;/TabItem&gt;&lt;/Tabs&gt;&lt;/SuperTabs&gt;</code></p>
 
@@ -16,17 +16,17 @@
            EnableKeyboardNavigation="true"
            Height="240px">
     <Tabs>
-        <TabItem Id="decl-1" Title="Déclaratif 1" Icon="fa-solid fa-cube" BadgeText="A" BadgeClass="badge-primary">
-            <h2 class="h5">Déclaratif 1</h2>
-            <p>Contenu défini directement dans <code>TabItem</code>.</p>
+        <TabItem Id="decl-1" Title="Declarative 1" Icon="fa-solid fa-cube" BadgeText="A" BadgeClass="badge-primary">
+            <h2 class="h5">Declarative 1</h2>
+            <p>Content defined directly in <code>TabItem</code>.</p>
         </TabItem>
-        <TabItem Id="decl-2" Title="Déclaratif 2" Icon="fa-solid fa-cubes" Closable="true" BadgeText="2" BadgeClass="badge-secondary">
-            <h2 class="h5">Déclaratif 2</h2>
-            <p>Onglet fermable en mode déclaratif.</p>
+        <TabItem Id="decl-2" Title="Declarative 2" Icon="fa-solid fa-cubes" Closable="true" BadgeText="2" BadgeClass="badge-secondary">
+            <h2 class="h5">Declarative 2</h2>
+            <p>Closable tab in declarative mode.</p>
         </TabItem>
-        <TabItem Id="decl-3" Title="Lazy" Icon="fa-solid fa-bolt" LazyLoad="true" Tooltip="Rendu au premier affichage">
-            <h2 class="h5">Lazy (déclaratif)</h2>
-            <p>Rendu à la première sélection. Date/heure: @DateTimeOffset.Now</p>
+        <TabItem Id="decl-3" Title="Lazy" Icon="fa-solid fa-bolt" LazyLoad="true" Tooltip="Rendered on first display">
+            <h2 class="h5">Lazy (declarative)</h2>
+            <p>Rendered on first selection. Date/time: @DateTimeOffset.Now</p>
         </TabItem>
     </Tabs>
 </SuperTabs>

@@ -7,7 +7,7 @@
 <h1>SuperButton Demo</h1>
 
 <p class="text-muted">
-    Cette page permet de tester les variantes Bootstrap via <code>Style</code> et le mode busy via <code>BusyText</code>.
+    This page lets you test Bootstrap variants via <code>Style</code> and the busy mode via <code>BusyText</code>.
 </p>
 
 <div class="card mt-3">
@@ -23,17 +23,17 @@
         </div>
         <div class="card-body">
             <p class="text-muted mb-2">
-                Le click est exécuté uniquement si l'utilisateur confirme.
+                The click is executed only if the user confirms.
             </p>
 
             <div class="d-flex flex-wrap align-items-center gap-2">
-                <SuperConfirmationButton Text="Supprimer" Icon="fa-solid fa-trash" Style="SuperButtonStyle.Danger"
-                                         ConfirmationContent="Voulez-vous vraiment supprimer ?"
+                <SuperConfirmationButton Text="Delete" Icon="fa-solid fa-trash" Style="SuperButtonStyle.Danger"
+                                         ConfirmationContent="Are you sure you want to delete?"
                                          Click="@SimulateFiveSecondsAsync" />
 
-                <SuperConfirmationButton Text="Lancer" Icon="fa-solid fa-play" Style="SuperButtonStyle.Primary"
+                <SuperConfirmationButton Text="Launch" Icon="fa-solid fa-play" Style="SuperButtonStyle.Primary"
                                          ConfirmationTitle="Confirmation"
-                                         ConfirmationContent="Confirmer l'action ?"
+                                         ConfirmationContent="Confirm the action?"
                                          Click="@SimulateFiveSecondsAsync" />
             </div>
         </div>
@@ -61,7 +61,7 @@
     </div>
     <div class="card-body">
         <p class="text-muted mb-2">
-            Exemple de container <code>SuperSplitButton</code>.
+            Example of a <code>SuperSplitButton</code> container.
         </p>
 
         <SuperSplitButton Text="Primary" Style="SuperButtonStyle.Primary" Icon="fa-solid fa-bolt" ActionSelected="OnSplitActionSelected">
@@ -77,7 +77,7 @@
         @if (!string.IsNullOrWhiteSpace(_lastSplitActionName))
         {
             <div class="alert alert-info mt-3 mb-0">
-                Action sélectionnée : <strong>@_lastSplitActionName</strong>
+                Selected action: <strong>@_lastSplitActionName</strong>
             </div>
         }
     </div>
@@ -93,13 +93,13 @@
         </p>
 
         <div class="d-flex flex-wrap align-items-center gap-2">
-            <SuperLinkButton Text="Accueil" Href="/" Icon="fa-house" Style="SuperButtonStyle.Primary" />
+            <SuperLinkButton Text="Home" Href="/" Icon="fa-house" Style="SuperButtonStyle.Primary" />
             <SuperLinkButton Text="Messages" Href="/messages" Icon="fa-envelope" Style="SuperButtonStyle.Secondary" Outline="true" />
-            <SuperLinkButton Text="Paramètres" Href="/settings" Icon="fa-gear" Style="SuperButtonStyle.Info" Size="SuperButtonSize.Small" />
-            <SuperLinkButton Text="Aide" Href="/help" Icon="fa-circle-question" Style="SuperButtonStyle.Success" BadgeText="Nouveau" />
+            <SuperLinkButton Text="Settings" Href="/settings" Icon="fa-gear" Style="SuperButtonStyle.Info" Size="SuperButtonSize.Small" />
+            <SuperLinkButton Text="Help" Href="/help" Icon="fa-circle-question" Style="SuperButtonStyle.Success" BadgeText="New" />
             <SuperLinkButton Text="OpenAI" Href="https://openai.com" Icon="fa-globe" Style="SuperButtonStyle.Dark" OpenInNewTab="true" />
             <SuperLinkButton Text="" Href="https://openai.com" Icon="fa-arrow-up-right-from-square" Style="SuperButtonStyle.Link" OpenInNewTab="true" title="OpenAI" aria-label="OpenAI" />
-            <SuperLinkButton Text="Lien désactivé" Href="/disabled" Icon="fa-ban" Style="SuperButtonStyle.Danger" Disabled="true" />
+            <SuperLinkButton Text="Disabled link" Href="/disabled" Icon="fa-ban" Style="SuperButtonStyle.Danger" Disabled="true" />
         </div>
     </div>
 </div>
@@ -110,7 +110,7 @@
     </div>
     <div class="card-body">
         <p class="text-muted mb-2">
-            Pour afficher un popover Bootstrap, renseigne <code>PopoverTitle</code> et <code>PopoverContent</code>.
+            To display a Bootstrap popover, set <code>PopoverTitle</code> and <code>PopoverContent</code>.
         </p>
 
         <div class="d-flex flex-wrap align-items-center gap-2">
@@ -129,17 +129,17 @@
     </div>
     <div class="card-body">
         <p class="text-muted mb-2">
-            Le click est exécuté uniquement si l'utilisateur confirme.
+            The click is executed only if the user confirms.
         </p>
 
         <div class="d-flex flex-wrap align-items-center gap-2">
-            <SuperConfirmationButton Text="Supprimer" Icon="fa-solid fa-trash" Style="SuperButtonStyle.Danger"
-                                     ConfirmationContent="Voulez-vous vraiment supprimer ?"
+            <SuperConfirmationButton Text="Delete" Icon="fa-solid fa-trash" Style="SuperButtonStyle.Danger"
+                                     ConfirmationContent="Are you sure you want to delete?"
                                      Click="@SimulateFiveSecondsAsync" />
 
-            <SuperConfirmationButton Text="Lancer" Icon="fa-solid fa-play" Style="SuperButtonStyle.Primary"
+            <SuperConfirmationButton Text="Launch" Icon="fa-solid fa-play" Style="SuperButtonStyle.Primary"
                                      ConfirmationTitle="Confirmation"
-                                     ConfirmationContent="Confirmer l'action ?"
+                                     ConfirmationContent="Confirm the action?"
                                      Click="@SimulateFiveSecondsAsync" />
         </div>
     </div>
@@ -208,7 +208,7 @@
             <SuperToggleButton Text="Outline" Style="SuperButtonStyle.Secondary" Outline="true" />
             <SuperToggleButton Text="Outline active" Style="SuperButtonStyle.Secondary" Outline="true" Active="true" />
 
-            <SuperToggleButton Text="Busy 5s" Style="SuperButtonStyle.Success" Icon="fa-solid fa-rotate" BusyText="Traitement..." Click="@SimulateFiveSecondsAsync" />
+            <SuperToggleButton Text="Busy 5s" Style="SuperButtonStyle.Success" Icon="fa-solid fa-rotate" BusyText="Processing..." Click="@SimulateFiveSecondsAsync" />
         </div>
     </div>
 </div>
@@ -263,16 +263,16 @@
 
 <div class="card mt-3">
     <div class="card-header">
-        Click + loader (5 secondes)
+        Click + loader (5 seconds)
     </div>
     <div class="card-body">
         <div class="d-flex flex-wrap align-items-center gap-2">
-            <SuperButton Text="Simuler 5s" Icon="fa-solid fa-play" Style="SuperButtonStyle.Primary" BusyText="Traitement..." Click="@SimulateFiveSecondsAsync" />
+            <SuperButton Text="Simulate 5s" Icon="fa-solid fa-play" Style="SuperButtonStyle.Primary" BusyText="Processing..." Click="@SimulateFiveSecondsAsync" />
 
-            <SuperButton Text="Simuler 5s (Danger)" Icon="fa-solid fa-trash" Style="SuperButtonStyle.Danger" BusyText="Suppression..." Click="@SimulateFiveSecondsAsync" />
+            <SuperButton Text="Simulate 5s (Danger)" Icon="fa-solid fa-trash" Style="SuperButtonStyle.Danger" BusyText="Deleting..." Click="@SimulateFiveSecondsAsync" />
 
-            <SuperButton Style="SuperButtonStyle.Success" BusyText="Sauvegarde..." Icon="fa-solid fa-floppy-disk" Click="@SimulateFiveSecondsAsync">
-                Sauvegarder (ChildContent)
+            <SuperButton Style="SuperButtonStyle.Success" BusyText="Saving..." Icon="fa-solid fa-floppy-disk" Click="@SimulateFiveSecondsAsync">
+                Save (ChildContent)
             </SuperButton>
         </div>
 
@@ -298,8 +298,8 @@
 
     private async Task SimulateFiveSecondsAsync(MouseEventArgs _)
     {
-        _lastClickMessage = $"Click reçu à {DateTime.Now:HH:mm:ss}. Attente 5 secondes...";
+        _lastClickMessage = $"Click received at {DateTime.Now:HH:mm:ss}. Waiting 5 seconds...";
         await Task.Delay(TimeSpan.FromSeconds(5));
-        _lastClickMessage = $"Terminé à {DateTime.Now:HH:mm:ss}.";
+        _lastClickMessage = $"Completed at {DateTime.Now:HH:mm:ss}.";
     }
 }

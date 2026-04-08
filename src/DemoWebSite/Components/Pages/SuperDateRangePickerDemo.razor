@@ -8,12 +8,12 @@
 <h1>SuperDateRangePicker</h1>
 
 <p class="text-muted">
-    Sélecteur de période inspiré de Google Ads avec périodes prédéfinies, sélection personnalisée et bornes nullables.
+    Period selector inspired by Google Ads with predefined periods, custom selection, and nullable bounds.
 </p>
 
 <div class="card mt-3">
     <div class="card-header">
-        Démonstration
+        Demonstration
     </div>
     <div class="card-body">
         <div class="d-flex flex-column gap-3 align-items-start">
@@ -28,19 +28,19 @@
                 </div>
                 <div class="col-md-3">
                     <div class="border rounded p-3 h-100 bg-body-tertiary">
-                        <div class="small text-body-secondary">Date de début</div>
+                        <div class="small text-body-secondary">Start Date</div>
                         <div class="fw-semibold">@GetDateText(_selectedRange.StartDate)</div>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="border rounded p-3 h-100 bg-body-tertiary">
-                        <div class="small text-body-secondary">Date de fin</div>
+                        <div class="small text-body-secondary">End Date</div>
                         <div class="fw-semibold">@GetDateText(_selectedRange.EndDate)</div>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="border rounded p-3 h-100 bg-body-tertiary">
-                        <div class="small text-body-secondary">Dernière validation</div>
+                        <div class="small text-body-secondary">Last Applied</div>
                         <div class="fw-semibold">@_lastAppliedSummary</div>
                     </div>
                 </div>
@@ -50,10 +50,10 @@
 </div>
 
 @code {
-    private static readonly CultureInfo FrCulture = CultureInfo.GetCultureInfo("fr-FR");
+    private static readonly CultureInfo FrCulture = CultureInfo.GetCultureInfo("en-US");
 
     private SuperDateRangeSelection _selectedRange = new(null, null, SuperDateRangePreset.AllTime);
-    private string _lastAppliedSummary = "Toute la période";
+    private string _lastAppliedSummary = "All Time";
 
     private Task OnAppliedAsync(SuperDateRangeSelection range)
     {
@@ -63,14 +63,14 @@
 
     private static string GetDateText(DateTime? value)
     {
-        return value?.ToString("d MMM yyyy", FrCulture) ?? "Non définie";
+        return value?.ToString("d MMM yyyy", FrCulture) ?? "Not set";
     }
 
     private static string GetSummaryText(SuperDateRangeSelection range)
     {
         if (range.StartDate is null && range.EndDate is null)
         {
-            return "Toute la période";
+            return "All Time";
         }
 
         if (range.StartDate is not null && range.EndDate is not null)
@@ -85,32 +85,32 @@
 
         if (range.StartDate is not null)
         {
-            return $"Depuis le {range.StartDate.Value.ToString("d MMM yyyy", FrCulture)}";
+            return $"Since {range.StartDate.Value.ToString("d MMM yyyy", FrCulture)}";
         }
 
-        return $"Jusqu'au {range.EndDate!.Value.ToString("d MMM yyyy", FrCulture)}";
+        return $"Until {range.EndDate!.Value.ToString("d MMM yyyy", FrCulture)}";
     }
 
     private static string GetPresetLabel(SuperDateRangePreset preset)
     {
         return preset switch
         {
-            SuperDateRangePreset.Today => "Aujourd'hui",
-            SuperDateRangePreset.Yesterday => "Hier",
-            SuperDateRangePreset.ThisWeek => "Cette semaine",
-            SuperDateRangePreset.LastWeek => "Semaine dernière",
-            SuperDateRangePreset.Last7Days => "7 derniers jours",
-            SuperDateRangePreset.Last14Days => "14 derniers jours",
-            SuperDateRangePreset.Last30Days => "30 derniers jours",
-            SuperDateRangePreset.Last90Days => "90 derniers jours",
-            SuperDateRangePreset.ThisMonth => "Ce mois-ci",
-            SuperDateRangePreset.LastMonth => "Mois dernier",
-            SuperDateRangePreset.ThisQuarter => "Ce trimestre",
-            SuperDateRangePreset.LastQuarter => "Trimestre dernier",
-            SuperDateRangePreset.ThisYear => "Cette année",
-            SuperDateRangePreset.LastYear => "Année dernière",
-            SuperDateRangePreset.AllTime => "Toute la période",
-            _ => "Personnalisée"
+            SuperDateRangePreset.Today => "Today",
+            SuperDateRangePreset.Yesterday => "Yesterday",
+            SuperDateRangePreset.ThisWeek => "This Week",
+            SuperDateRangePreset.LastWeek => "Last Week",
+            SuperDateRangePreset.Last7Days => "Last 7 Days",
+            SuperDateRangePreset.Last14Days => "Last 14 Days",
+            SuperDateRangePreset.Last30Days => "Last 30 Days",
+            SuperDateRangePreset.Last90Days => "Last 90 Days",
+            SuperDateRangePreset.ThisMonth => "This Month",
+            SuperDateRangePreset.LastMonth => "Last Month",
+            SuperDateRangePreset.ThisQuarter => "This Quarter",
+            SuperDateRangePreset.LastQuarter => "Last Quarter",
+            SuperDateRangePreset.ThisYear => "This Year",
+            SuperDateRangePreset.LastYear => "Last Year",
+            SuperDateRangePreset.AllTime => "All Time",
+            _ => "Custom"
         };
     }
 }

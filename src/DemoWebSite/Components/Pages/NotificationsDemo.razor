@@ -11,11 +11,11 @@
 <h1>Notifications</h1>
 
 <p class="text-muted">
-    Démo des toasts via <code>NotificationService.Notify</code>.
+    Toast demo via <code>NotificationService.Notify</code>.
 </p>
 
 <div class="card mt-3">
-    <div class="card-header">Déclenchement</div>
+    <div class="card-header">Trigger</div>
     <div class="card-body">
         <div class="d-flex flex-wrap gap-2">
             <SuperButton Text="Info" Style="SuperButtonStyle.Info" Icon="fa-solid fa-circle-info" Click="@NotifyInfoAsync" />
@@ -31,22 +31,22 @@
 {
     private Task NotifyInfoAsync()
     {
-        return NotificationService.Notify(NotificationSeverity.Info, "Info", "Notification d'information", 3000);
+        return NotificationService.Notify(NotificationSeverity.Info, "Info", "Information notification", 3000);
     }
 
     private Task NotifySuccessAsync()
     {
-        return NotificationService.Notify(NotificationSeverity.Success, "Succès", "Opération réussie", 3000);
+        return NotificationService.Notify(NotificationSeverity.Success, "Success", "Operation succeeded", 3000);
     }
 
     private Task NotifyWarningAsync()
     {
-        return NotificationService.Notify(NotificationSeverity.Warning, "Avertissement", "Attention à ce point", 5000);
+        return NotificationService.Notify(NotificationSeverity.Warning, "Warning", "Pay attention to this", 5000);
     }
 
     private Task NotifyDangerAsync()
     {
-        return NotificationService.Notify(NotificationSeverity.Error, "Erreur", "Quelque chose s'est mal passé", 0);
+        return NotificationService.Notify(NotificationSeverity.Error, "Error", "Something went wrong", 0);
     }
 
     private Task NotifyClickableAsync()
@@ -54,7 +54,7 @@
         return NotificationService.Notify(
             NotificationSeverity.Info,
             "Action",
-            "Cliquez pour fermer.",
+            "Click to close.",
             duration: 0,
             click: _ => { },
             closeOnClick: true);

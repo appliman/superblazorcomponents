@@ -2,13 +2,13 @@
 @using SuperBlazorComponents.Components.Buttons
 @using SuperBlazorComponents.Components.SuperDataGrid
 
-<PageTitle>SuperGrid – Démo Verticale</PageTitle>
+<PageTitle>SuperGrid – Vertical Demo</PageTitle>
 
-<h1>SuperGrid – Orientation Verticale</h1>
+<h1>SuperGrid – Vertical Orientation</h1>
 <p class="text-muted">
-    En mode <code>Vertical</code>, chaque enregistrement est affiché sous forme de grille de propriétés
-    avec 3 colonnes : <strong>#</strong> (numéro), <strong>Propriété</strong> (titre) et <strong>Valeur</strong>.
-    Double-cliquez sur un item ou utilisez le bouton <i class="fa-solid fa-pencil"></i> pour l'éditer.
+    In <code>Vertical</code> mode, each record is displayed as a property grid
+    with 3 columns: <strong>#</strong> (number), <strong>Property</strong> (title) and <strong>Value</strong>.
+    Double-click an item or use the <i class="fa-solid fa-pencil"></i> button to edit it.
 </p>
 
 <div class="row">
@@ -39,14 +39,14 @@
                                      Style="SuperButtonStyle.Success"
                                      Size="SuperButtonSize.Small"
                                      AllowCollapse="false"
-                                     title="Valider"
+                                     title="Confirm"
                                      Click="@(async _ => await _gridVertical!.EndEditAsync(item))" />
                         <SuperButton Icon="fa-xmark"
                                      Text=""
                                      Style="SuperButtonStyle.Secondary"
                                      Size="SuperButtonSize.Small"
                                      AllowCollapse="false"
-                                     title="Annuler"
+                                     title="Cancel"
                                      Click="@(async _ => await _gridVertical!.CancelEditAsync(item))" />
                     }
                     else
@@ -56,43 +56,43 @@
                                      Style="SuperButtonStyle.Primary"
                                      Size="SuperButtonSize.Small"
                                      AllowCollapse="false"
-                                     title="Modifier"
+                                     title="Edit"
                                      Click="@(async _ => await _gridVertical!.BeginEditAsync(item))" />
                     }
                 </ActionsTemplate>
                 <ChildContent>
-                    <DataGridColumn TItem="Produit" For="@(p => p.Reference)" Title="Référence">
+                    <DataGridColumn TItem="Produit" For="@(p => p.Reference)" Title="Reference">
                         <EditTemplate>
                             <input type="text" class="form-control form-control-sm"
                                    value="@context.Reference"
                                    @onchange="@(e => context.Reference = e.Value?.ToString() ?? string.Empty)" />
                         </EditTemplate>
                     </DataGridColumn>
-                    <DataGridColumn TItem="Produit" For="@(p => p.Nom)" Title="Nom">
+                    <DataGridColumn TItem="Produit" For="@(p => p.Nom)" Title="Name">
                         <EditTemplate>
                             <input type="text" class="form-control form-control-sm"
                                    value="@context.Nom"
                                    @onchange="@(e => context.Nom = e.Value?.ToString() ?? string.Empty)" />
                         </EditTemplate>
                     </DataGridColumn>
-                    <DataGridColumn TItem="Produit" For="@(p => p.Categorie)" Title="Catégorie">
+                    <DataGridColumn TItem="Produit" For="@(p => p.Categorie)" Title="Category">
                         <EditTemplate>
                             <select class="form-select form-select-sm"
                                     value="@context.Categorie"
                                     @onchange="@(e => context.Categorie = e.Value?.ToString() ?? string.Empty)">
-                                <option>Accessoires</option>
+                                <option>Accessories</option>
                                 <option>Audio</option>
-                                <option>Énergie</option>
-                                <option>Mobilier</option>
-                                <option>Moniteurs</option>
-                                <option>Périphériques</option>
+                                <option>Energy</option>
+                                <option>Furniture</option>
+                                <option>Monitors</option>
+                                <option>Peripherals</option>
                                 <option>Protection</option>
-                                <option>Stockage</option>
-                                <option>Vidéo</option>
+                                <option>Storage</option>
+                                <option>Video</option>
                             </select>
                         </EditTemplate>
                     </DataGridColumn>
-                    <DataGridColumn TItem="Produit" For="@(p => p.PrixUnitaire)" Title="Prix unitaire" FormatString="{0:C}">
+                    <DataGridColumn TItem="Produit" For="@(p => p.PrixUnitaire)" Title="Unit Price" FormatString="{0:C}">
                         <EditTemplate>
                             <input type="number" class="form-control form-control-sm"
                                    value="@context.PrixUnitaire"
@@ -106,15 +106,15 @@
                                    @onchange="@(e => context.Stock = int.TryParse(e.Value?.ToString(), out var v) ? v : context.Stock)" />
                         </EditTemplate>
                     </DataGridColumn>
-                    <DataGridColumn TItem="Produit" For="@(p => p.Actif)" Title="Actif">
+                    <DataGridColumn TItem="Produit" For="@(p => p.Actif)" Title="Active">
                         <Template>
                             @if (context.Actif)
                             {
-                                <span class="badge text-bg-success">Oui</span>
+                                <span class="badge text-bg-success">Yes</span>
                             }
                             else
                             {
-                                <span class="badge text-bg-secondary">Non</span>
+                                <span class="badge text-bg-secondary">No</span>
                             }
                         </Template>
                         <EditTemplate>
@@ -129,8 +129,8 @@
     </div>
 
     <div class="col-md-6">
-        <h4 class="mt-3">Horizontal (classique)</h4>
-        <p class="text-muted">Même jeu de données, orientation par défaut.</p>
+        <h4 class="mt-3">Horizontal (classic)</h4>
+        <p class="text-muted">Same dataset, default orientation.</p>
         <div style="height: 500px;">
             <SuperDataGrid TItem="Produit"
                            ItemsProvider="LoadProduitsAsync"
@@ -143,20 +143,20 @@
                            DisplayColumnVisibilityToggle="false"
                            TableCssClass="table-striped table-hover table-bordered">
                 <ChildContent>
-                    <DataGridColumn TItem="Produit" For="@(p => p.Reference)" Title="Référence" Width="120px" />
-                    <DataGridColumn TItem="Produit" For="@(p => p.Nom)" Title="Nom" Width="180px" />
-                    <DataGridColumn TItem="Produit" For="@(p => p.Categorie)" Title="Catégorie" Width="140px" />
-                    <DataGridColumn TItem="Produit" For="@(p => p.PrixUnitaire)" Title="Prix unitaire" Width="130px" FormatString="{0:C}" TextAlign="SuperTextAlignment.Right" />
+                    <DataGridColumn TItem="Produit" For="@(p => p.Reference)" Title="Reference" Width="120px" />
+                    <DataGridColumn TItem="Produit" For="@(p => p.Nom)" Title="Name" Width="180px" />
+                    <DataGridColumn TItem="Produit" For="@(p => p.Categorie)" Title="Category" Width="140px" />
+                    <DataGridColumn TItem="Produit" For="@(p => p.PrixUnitaire)" Title="Unit Price" Width="130px" FormatString="{0:C}" TextAlign="SuperTextAlignment.Right" />
                     <DataGridColumn TItem="Produit" For="@(p => p.Stock)" Title="Stock" Width="90px" TextAlign="SuperTextAlignment.Center" />
-                    <DataGridColumn TItem="Produit" For="@(p => p.Actif)" Title="Actif" Width="90px" TextAlign="SuperTextAlignment.Center">
+                    <DataGridColumn TItem="Produit" For="@(p => p.Actif)" Title="Active" Width="90px" TextAlign="SuperTextAlignment.Center">
                         <Template>
                             @if (context.Actif)
                             {
-                                <span class="badge text-bg-success">Oui</span>
+                                <span class="badge text-bg-success">Yes</span>
                             }
                             else
                             {
-                                <span class="badge text-bg-secondary">Non</span>
+                                <span class="badge text-bg-secondary">No</span>
                             }
                         </Template>
                     </DataGridColumn>
@@ -171,26 +171,26 @@
 
     private readonly List<Produit> _produits =
     [
-        new("REF-001", "Clavier mécanique, Clavier mécanique, Clavier mécanique, Clavier mécanique ",     "Périphériques",  89.99m,   42,  true),
-        new("REF-002", "Souris ergonomique",     "Périphériques",  59.90m,   128, true),
-        new("REF-003", "Écran 27\" 4K",          "Moniteurs",      449.00m,  15,  true),
-        new("REF-004", "Câble HDMI 2.1",         "Accessoires",    12.50m,   340, true),
-        new("REF-005", "Hub USB-C",              "Accessoires",    34.99m,   87,  true),
-        new("REF-006", "Casque sans fil",        "Audio",          129.00m,  63,  true),
-        new("REF-007", "Webcam 1080p",           "Vidéo",          49.90m,   0,   false),
-        new("REF-008", "Disque SSD 1 To",        "Stockage",       79.90m,   210, true),
-        new("REF-009", "Clé USB 64 Go",          "Stockage",       9.99m,    520, true),
-        new("REF-010", "Tapis de souris XL",     "Accessoires",    19.90m,   175, true),
-        new("REF-011", "Station d'accueil",      "Accessoires",    189.00m,  22,  true),
-        new("REF-012", "Bras d'écran",           "Mobilier",       69.90m,   48,  false),
-        new("REF-013", "Repose-poignets",        "Accessoires",    14.90m,   95,  true),
-        new("REF-014", "Lampe de bureau LED",    "Mobilier",       39.90m,   67,  true),
-        new("REF-015", "Micro USB",              "Audio",          24.90m,   0,   false),
-        new("REF-016", "Adaptateur DisplayPort", "Accessoires",    15.00m,   290, true),
-        new("REF-017", "Ventilateur laptop",     "Accessoires",    29.90m,   38,  true),
-        new("REF-018", "Batterie externe",       "Énergie",        45.00m,   112, true),
-        new("REF-019", "Chargeur rapide 65W",    "Énergie",        35.00m,   204, true),
-        new("REF-020", "Housse laptop 15\"",      "Protection",     22.90m,   156, true),
+        new("REF-001", "Mechanical keyboard, Mechanical keyboard, Mechanical keyboard, Mechanical keyboard ",     "Peripherals",  89.99m,   42,  true),
+        new("REF-002", "Ergonomic mouse",        "Peripherals",  59.90m,   128, true),
+        new("REF-003", "27\" 4K Monitor",         "Monitors",      449.00m,  15,  true),
+        new("REF-004", "HDMI 2.1 Cable",          "Accessories",    12.50m,   340, true),
+        new("REF-005", "USB-C Hub",               "Accessories",    34.99m,   87,  true),
+        new("REF-006", "Wireless Headset",        "Audio",          129.00m,  63,  true),
+        new("REF-007", "1080p Webcam",            "Video",          49.90m,   0,   false),
+        new("REF-008", "1 TB SSD",                "Storage",       79.90m,   210, true),
+        new("REF-009", "64 GB USB Drive",         "Storage",       9.99m,    520, true),
+        new("REF-010", "XL Mouse Pad",            "Accessories",    19.90m,   175, true),
+        new("REF-011", "Docking Station",         "Accessories",    189.00m,  22,  true),
+        new("REF-012", "Monitor Arm",             "Furniture",       69.90m,   48,  false),
+        new("REF-013", "Wrist Rest",              "Accessories",    14.90m,   95,  true),
+        new("REF-014", "LED Desk Lamp",           "Furniture",       39.90m,   67,  true),
+        new("REF-015", "USB Microphone",          "Audio",          24.90m,   0,   false),
+        new("REF-016", "DisplayPort Adapter",     "Accessories",    15.00m,   290, true),
+        new("REF-017", "Laptop Cooling Fan",      "Accessories",    29.90m,   38,  true),
+        new("REF-018", "Power Bank",              "Energy",        45.00m,   112, true),
+        new("REF-019", "65W Fast Charger",        "Energy",        35.00m,   204, true),
+        new("REF-020", "15\" Laptop Sleeve",       "Protection",     22.90m,   156, true),
     ];
 
     private ValueTask<GridItemsProviderResult<Produit>> LoadProduitsAsync(GridItemsProviderRequest<Produit> request)
@@ -233,18 +233,18 @@
 }
 
 
-<PageTitle>SuperGrid – Démo Verticale</PageTitle>
+<PageTitle>SuperGrid – Vertical Demo</PageTitle>
 
-<h1>SuperGrid – Orientation Verticale</h1>
+<h1>SuperGrid – Vertical Orientation</h1>
 <p class="text-muted">
-    En mode <code>Vertical</code>, chaque enregistrement est affiché sous forme de grille de propriétés
-    avec 3 colonnes : <strong>#</strong> (numéro), <strong>Propriété</strong> (titre) et <strong>Valeur</strong>.
+    In <code>Vertical</code> mode, each record is displayed as a property grid
+    with 3 columns: <strong>#</strong> (number), <strong>Property</strong> (title) and <strong>Value</strong>.
 </p>
 
 <div class="row">
     <div class="col-md-6">
         <h4 class="mt-3">Vertical</h4>
-        <p class="text-muted">Mode grille de propriétés — un bloc par enregistrement.</p>
+        <p class="text-muted">Property grid mode — one block per record.</p>
         <div style="height: 500px;">
             <SuperDataGrid TItem="Produit"
                            ItemsProvider="LoadProduitsAsync"
@@ -260,20 +260,20 @@
                            CurrentRowBackground="#3b95c6"
                            TableCssClass="table-bordered">
                 <ChildContent>
-                    <DataGridColumn For="@(p => p.Reference)" Title="Référence" />
-                    <DataGridColumn For="@(p => p.Nom)" Title="Nom de colonne très long pour voir si ça depasse de beaucoup encore plus" />
-                    <DataGridColumn For="@(p => p.Categorie)" Title="Catégorie" />
-                    <DataGridColumn For="@(p => p.PrixUnitaire)" Title="Prix unitaire" FormatString="{0:C}" />
+                    <DataGridColumn For="@(p => p.Reference)" Title="Reference" />
+                    <DataGridColumn For="@(p => p.Nom)" Title="Very long column name to see if it overflows a lot even more" />
+                    <DataGridColumn For="@(p => p.Categorie)" Title="Category" />
+                    <DataGridColumn For="@(p => p.PrixUnitaire)" Title="Unit Price" FormatString="{0:C}" />
                     <DataGridColumn For="@(p => p.Stock)" Title="Stock" />
-                    <DataGridColumn For="@(p => p.Actif)" Title="Actif">
+                    <DataGridColumn For="@(p => p.Actif)" Title="Active">
                         <Template>
                             @if (context.Actif)
                             {
-                                <span class="badge text-bg-success">Oui</span>
+                                <span class="badge text-bg-success">Yes</span>
                             }
                             else
                             {
-                                <span class="badge text-bg-secondary">Non</span>
+                                <span class="badge text-bg-secondary">No</span>
                             }
                         </Template>
                     </DataGridColumn>
@@ -283,8 +283,8 @@
     </div>
 
     <div class="col-md-6">
-        <h4 class="mt-3">Horizontal (classique)</h4>
-        <p class="text-muted">Même jeu de données, orientation par défaut.</p>
+        <h4 class="mt-3">Horizontal (classic)</h4>
+        <p class="text-muted">Same dataset, default orientation.</p>
         <div style="height: 500px;">
             <SuperDataGrid TItem="Produit"
                            ItemsProvider="LoadProduitsAsync"
@@ -297,20 +297,20 @@
                            DisplayColumnVisibilityToggle="false"
                            TableCssClass="table-striped table-hover table-bordered">
                 <ChildContent>
-                    <DataGridColumn For="@(p => p.Reference)" Title="Référence" Width="120px" />
-                    <DataGridColumn For="@(p => p.Nom)" Title="Nom" Width="180px" />
-                    <DataGridColumn For="@(p => p.Categorie)" Title="Catégorie" Width="140px" />
-                    <DataGridColumn For="@(p => p.PrixUnitaire)" Title="Prix unitaire" Width="130px" FormatString="{0:C}" TextAlign="SuperTextAlignment.Right" />
+                    <DataGridColumn For="@(p => p.Reference)" Title="Reference" Width="120px" />
+                    <DataGridColumn For="@(p => p.Nom)" Title="Name" Width="180px" />
+                    <DataGridColumn For="@(p => p.Categorie)" Title="Category" Width="140px" />
+                    <DataGridColumn For="@(p => p.PrixUnitaire)" Title="Unit Price" Width="130px" FormatString="{0:C}" TextAlign="SuperTextAlignment.Right" />
                     <DataGridColumn For="@(p => p.Stock)" Title="Stock" Width="90px" TextAlign="SuperTextAlignment.Center" />
-                    <DataGridColumn For="@(p => p.Actif)" Title="Actif" Width="90px" TextAlign="SuperTextAlignment.Center">
+                    <DataGridColumn For="@(p => p.Actif)" Title="Active" Width="90px" TextAlign="SuperTextAlignment.Center">
                         <Template>
                             @if (context.Actif)
                             {
-                                <span class="badge text-bg-success">Oui</span>
+                                <span class="badge text-bg-success">Yes</span>
                             }
                             else
                             {
-                                <span class="badge text-bg-secondary">Non</span>
+                                <span class="badge text-bg-secondary">No</span>
                             }
                         </Template>
                     </DataGridColumn>

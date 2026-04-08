@@ -1,9 +1,9 @@
-﻿using DemoWebSize.Components;
+﻿using DemoWebSite.Components;
 
 using SuperBlazorComponents;
 using SuperBlazorComponents.Components.SuperDataGrid;
 
-using static DemoWebSize.Components.Pages.SuperGridDemo;
+using static DemoWebSite.Components.Pages.SuperGridDemo;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,6 +49,9 @@ builder.Services.AddSuperComponents(options =>
 		DisplayDefaultFooterTemplate = true
 	});
 });
+
+System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = new System.Globalization.CultureInfo("en-US");
+System.Globalization.CultureInfo.DefaultThreadCurrentCulture = new System.Globalization.CultureInfo("en-US");
 
 var app = builder.Build();
 

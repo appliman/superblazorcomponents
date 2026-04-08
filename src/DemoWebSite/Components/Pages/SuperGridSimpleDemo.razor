@@ -2,73 +2,73 @@
 @using System.ComponentModel.DataAnnotations
 @using SuperBlazorComponents.Components.SuperDataGrid
 
-<PageTitle>SuperGrid – Démo simple</PageTitle>
+<PageTitle>SuperGrid – Simple Demo</PageTitle>
 
-<h1>SuperGrid – Démo simple</h1>
-<p class="text-muted">Comparaison de deux presets : <code>SimpleGrid</code> (minimal) et <code>GridWithFooter</code> (complet).</p>
+<h1>SuperGrid – Simple Demo</h1>
+<p class="text-muted">Comparison of two presets: <code>SimpleGrid</code> (minimal) and <code>GridWithFooter</code> (full).</p>
 
 <h4 class="mt-3">SimpleGrid</h4>
-<p class="text-muted">Sans sélecteur, sans filtre, sans pied de page.</p>
+<p class="text-muted">No selector, no filter, no footer.</p>
 <div style="height: 400px;">
     <SuperDataGrid TItem="Personne"
                    ItemsProvider="LoadPersonnesAsync"
                    DefaultSettingsName="SimpleGrid">
         <ChildContent>
-            <DataGridColumn For="@(p => p.Nom)"     Title="Nom"        Width="200px" Filterable="true" />
-            <DataGridColumn For="@(p => p.Prenom)"  Title="Prénom"     Width="180px" />
-            <DataGridColumn For="@(p => p.Ville)"   Title="Ville"      Width="180px" />
-            <DataGridColumn For="@(p => p.Fonction)" Title="Fonction"   Width="140px">
+            <DataGridColumn For="@(p => p.Nom)"     Title="Last Name"   Width="200px" Filterable="true" />
+            <DataGridColumn For="@(p => p.Prenom)"  Title="First Name"  Width="180px" />
+            <DataGridColumn For="@(p => p.Ville)"   Title="City"        Width="180px" />
+            <DataGridColumn For="@(p => p.Fonction)" Title="Position"    Width="140px">
                 <Template>
                     <span class="badge text-bg-light border">@GetDisplayName(context.Fonction)</span>
                 </Template>
             </DataGridColumn>
-            <DataGridColumn For="@(p => p.Age)"     Title="Âge"        Width="90px"  TextAlign="SuperTextAlignment.Center" />
-            <DataGridColumn For="@(p => p.Actif)"   Title="Actif"      Width="100px" TextAlign="SuperTextAlignment.Center" Filterable="true">
+            <DataGridColumn For="@(p => p.Age)"     Title="Age"        Width="90px"  TextAlign="SuperTextAlignment.Center" />
+            <DataGridColumn For="@(p => p.Actif)"   Title="Active"     Width="100px" TextAlign="SuperTextAlignment.Center" Filterable="true">
                 <Template>
                     @if (context.Actif)
                     {
-                        <span class="badge text-bg-success">Oui</span>
+                        <span class="badge text-bg-success">Yes</span>
                     }
                     else
                     {
-                        <span class="badge text-bg-secondary">Non</span>
+                        <span class="badge text-bg-secondary">No</span>
                     }
                 </Template>
             </DataGridColumn>
-            <DataGridColumn For="@(p => p.Salaire)" Title="Salaire"    Width="140px" FormatString="{0:C}" TextAlign="SuperTextAlignment.Right" />
+            <DataGridColumn For="@(p => p.Salaire)" Title="Salary"     Width="140px" FormatString="{0:C}" TextAlign="SuperTextAlignment.Right" />
         </ChildContent>
     </SuperDataGrid>
 </div>
 
 <h4 class="mt-4">GridWithFooter</h4>
-<p class="text-muted">Avec sélecteur, filtres, redimensionnement et pied de page.</p>
+<p class="text-muted">With selector, filters, resizing, and footer.</p>
 <div style="height: 400px;">
     <SuperDataGrid TItem="Personne"
                    ItemsProvider="LoadPersonnesAsync"
                    DefaultSettingsName="GridWithFooter">
         <ChildContent>
-            <DataGridColumn For="@(p => p.Nom)"     Title="Nom"        Width="200px" />
-            <DataGridColumn For="@(p => p.Prenom)"  Title="Prénom"     Width="180px" />
-            <DataGridColumn For="@(p => p.Ville)"   Title="Ville"      Width="180px" />
-            <DataGridColumn For="@(p => p.Fonction)" Title="Fonction"   Width="140px">
+            <DataGridColumn For="@(p => p.Nom)"     Title="Last Name"   Width="200px" />
+            <DataGridColumn For="@(p => p.Prenom)"  Title="First Name"  Width="180px" />
+            <DataGridColumn For="@(p => p.Ville)"   Title="City"        Width="180px" />
+            <DataGridColumn For="@(p => p.Fonction)" Title="Position"    Width="140px">
                 <Template>
                     <span class="badge text-bg-light border">@GetDisplayName(context.Fonction)</span>
                 </Template>
             </DataGridColumn>
-            <DataGridColumn For="@(p => p.Age)"     Title="Âge"        Width="90px"  TextAlign="SuperTextAlignment.Center" />
-            <DataGridColumn For="@(p => p.Actif)"   Title="Actif"      Width="100px" TextAlign="SuperTextAlignment.Center">
+            <DataGridColumn For="@(p => p.Age)"     Title="Age"        Width="90px"  TextAlign="SuperTextAlignment.Center" />
+            <DataGridColumn For="@(p => p.Actif)"   Title="Active"     Width="100px" TextAlign="SuperTextAlignment.Center">
                 <Template>
                     @if (context.Actif)
                     {
-                        <span class="badge text-bg-success">Oui</span>
+                        <span class="badge text-bg-success">Yes</span>
                     }
                     else
                     {
-                        <span class="badge text-bg-secondary">Non</span>
+                        <span class="badge text-bg-secondary">No</span>
                     }
                 </Template>
             </DataGridColumn>
-            <DataGridColumn For="@(p => p.Salaire)" Title="Salaire"    Width="140px" FormatString="{0:C}" TextAlign="SuperTextAlignment.Right" />
+            <DataGridColumn For="@(p => p.Salaire)" Title="Salary"     Width="140px" FormatString="{0:C}" TextAlign="SuperTextAlignment.Right" />
         </ChildContent>
     </SuperDataGrid>
 </div>
@@ -149,13 +149,13 @@
 
     private enum FonctionPersonne
     {
-        [Display(Name = "Cadre")]
+        [Display(Name = "Manager")]
         Cadre,
-        [Display(Name = "Ouvrier", Description = "Ceci est un exemple")]
+        [Display(Name = "Worker", Description = "This is an example")]
         Ouvrier,
-        [Display(Name = "Président")]
+        [Display(Name = "President")]
         President,
-        [Display(Name = "Secrétaire")]
+        [Display(Name = "Secretary")]
         Secretaire
     }
 

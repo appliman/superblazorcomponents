@@ -1,5 +1,6 @@
 ﻿@using SuperBlazorComponents.Components.Buttons
 @using SuperBlazorComponents.Components.SuperDataGrid
+@using SuperBlazorComponents.Components.SuperLabel
 @typeparam TItem
 @implements IDisposable
 
@@ -13,13 +14,13 @@
                 aria-expanded="false"
                 title="Colonnes visibles">
             <i class="fa-solid fa-eye"></i>
-            <span class="ms-1">Colonnes</span>
+            <SuperLabel fr="Colonnes" en="Columns" class="ms-1"/>
         </button>
 
         <ul class="dropdown-menu super-datagrid-columns-menu">
             <li class="dropdown-header super-datagrid-columns-title">
                 <i class="fa-solid fa-eye me-2" aria-hidden="true"></i>
-                Colonnes visibles
+                <SuperLabel fr="Colonnes visibles" en="Visible columns"/>
             </li>
             @foreach (var column in _columns)
             {
