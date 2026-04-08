@@ -1,0 +1,60 @@
+﻿@using Microsoft.AspNetCore.Components.Forms
+@implements IDisposable
+
+@code {
+
+	[CascadingParameter]
+	public EditContext CurrentEditContext { get; set; } = default!;
+
+	List<string> errorOrWarningList = new();
+
+	protected override void OnAfterRender(bool firstRender)
+	{
+		if (firstRender)
+		{
+			CurrentEditContext.OnValidationStateChanged += CurrentEditContextValidationRequested;
+		}
+	}
+
+	private void CurrentEditContextValidationRequested(object? sender, ValidationStateChangedEventArgs e)
+	{
+		// On recherche toutes les propriétés du model en erreur
+		var errorList = CurrentEditContext.GetValidationMessages();
+		errorOrWarningList = errorList.ToList();
+		StateHasChanged();
+	}
+
+	public void Dispose()
+	{
+		CurrentEditContext.OnValidationStateChanged -= CurrentEditContextValidationRequested;
+	}
+}
+
+@if (errorOrWarningList.Any())
+{
+	<ul class="list-group mt-2 mb-2 pt-3 pb-3">
+		@if (!errorOrWarningList.Any(i => i.StartsWith("Attention:")))
+		{
+			<li class="list-group-item group-item-primary">Certaines informations empêchent cette opération les raisons suivantes :</li>
+		}
+		else if (errorOrWarningList.Count(i => i.StartsWith("Attention:")) == errorOrWarningList.Count())
+		{
+			<li class="list-group-item group-item-primary">Voici quelques avertissements :</li>
+		}
+		else
+		{
+			<li class="list-group-item group-item-primary">Voici quelques avertissements, et certaines informations empêchent cette opération pour les raisons suivantes :</li>
+		}
+		@foreach (var item in errorOrWarningList)
+		{
+			if (item.StartsWith("Attention:"))
+			{
+				<li class="list-group-item list-group-item-warning">@item</li>
+			}
+			else
+			{
+				<li class="list-group-item list-group-item-danger">@item</li>
+			}
+		}
+	</ul>
+}

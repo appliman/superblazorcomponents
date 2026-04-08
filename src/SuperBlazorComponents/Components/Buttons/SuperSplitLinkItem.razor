@@ -1,0 +1,147 @@
+﻿@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Routing
+@inject NavigationManager NavigationManager
+
+<li>
+    <a href="@Path" class="@CssClass" @onclick="OnClick" @attributes="@CapturedAttributes">
+        @if (!string.IsNullOrWhiteSpace(Icon))
+        {
+            <i class="@IconCssClass" aria-hidden="true"></i>
+            <span class="ms-1"></span>
+        }
+
+        @if (ChildContent is not null)
+        {
+            @ChildContent
+        }
+        else
+        {
+            @Text
+        }
+    </a>
+</li>
+
+@code
+{
+    [CascadingParameter]
+    internal SuperSplitButton? Parent { get; set; }
+
+    [Parameter]
+    public string Text { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? Icon { get; set; }
+
+    [Parameter]
+    public SuperIconStyle IconStyle { get; set; } = SuperIconStyle.Configuration;
+
+    [Inject]
+    private SuperBlazorComponents.Configuration.SuperComponentsConfiguration SuperComponentsConfiguration { get; set; } = default!;
+
+    [Parameter]
+    public string Path { get; set; } = string.Empty;
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    [Parameter]
+    public SuperButtonSize Size { get; set; } = SuperButtonSize.Default;
+
+    [Parameter]
+    public NavLinkMatch Match { get; set; } = NavLinkMatch.Prefix;
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object> CapturedAttributes { get; set; } = new();
+
+    private string IconCssClass
+    {
+        get
+        {
+            if (string.IsNullOrWhiteSpace(Icon))
+            {
+                return string.Empty;
+            }
+
+            // Support pour Material Icons (legacy)
+            if (!Icon.StartsWith("fa-"))
+            {
+                return "material-icons";
+            }
+
+            // Font Awesome avec style automatique
+            var stylePrefix = ResolvedIconStyle switch
+            {
+                SuperIconStyle.Regular => "fa-regular",
+                SuperIconStyle.Brands => "fa-brands",
+                SuperIconStyle.Duotone => "fa-duotone",
+                _ => "fa-solid"
+            };
+            return $"{stylePrefix} {Icon}";
+        }
+    }
+
+    private SuperIconStyle ResolvedIconStyle
+    {
+        get
+        {
+            var resolvedStyle = IconStyle == SuperIconStyle.Configuration
+                ? SuperComponentsConfiguration.DefaultSuperIconeStyle
+                : IconStyle;
+
+            return resolvedStyle == SuperIconStyle.Configuration
+                ? SuperIconStyle.Solid
+                : resolvedStyle;
+        }
+    }
+
+    private string CssClass
+    {
+        get
+        {
+            CapturedAttributes.TryGetValue("class", out var cls);
+            var additional = cls?.ToString();
+
+            var bootstrap = "dropdown-item";
+
+            if (Size == SuperButtonSize.Small)
+            {
+                bootstrap = "dropdown-item dropdown-item-sm";
+            }
+
+            if (Size == SuperButtonSize.Large)
+            {
+                bootstrap = "dropdown-item";
+            }
+
+            if (Disabled)
+            {
+                bootstrap = $"{bootstrap} disabled";
+            }
+
+            if (string.IsNullOrWhiteSpace(additional))
+            {
+                return bootstrap;
+            }
+
+            return $"{bootstrap} {additional}";
+        }
+    }
+
+    private void OnClick()
+    {
+        if (Disabled)
+        {
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(Path))
+        {
+            return;
+        }
+
+        NavigationManager.NavigateTo(Path);
+    }
+}

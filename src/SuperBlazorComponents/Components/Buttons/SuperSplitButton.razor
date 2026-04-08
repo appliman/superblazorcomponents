@@ -1,0 +1,237 @@
+﻿@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Web
+@implements IDisposable
+
+<div class="@ContainerCssClass" @attributes="@CapturedAttributes">
+    <button type="button" class="@MainButtonCssClass" @onclick="@OnMainClick" disabled="@Disabled">
+        @if (!string.IsNullOrWhiteSpace(Icon))
+        {
+            <i class="@IconCssClass" title="@Text" aria-hidden="true"></i>
+        }
+
+        @if (!UseIconOnly)
+        {
+            @if (!string.IsNullOrWhiteSpace(Icon))
+            {
+                <span class="ms-1"></span>
+            }
+
+            @if (ButtonContent is not null)
+            {
+                @ButtonContent
+            }
+            else
+            {
+                @Text
+            }
+        }
+    </button>
+
+    <button type="button" class="@ToggleButtonCssClass" data-bs-toggle="dropdown" aria-expanded="false" disabled="@Disabled">
+        <span class="visually-hidden">Toggle Dropdown</span>
+    </button>
+
+    <ul class="@DropdownMenuCssClass">
+        <CascadingValue Value="this" IsFixed="true">
+            @Menu
+        </CascadingValue>
+    </ul>
+</div>
+
+@code
+{
+    [CascadingParameter]
+    public SuperLayout.SuperLayout? MainLayout { get; set; }
+
+    [Parameter]
+    public string Text { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? Icon { get; set; }
+
+    [Parameter]
+    public SuperIconStyle IconStyle { get; set; } = SuperIconStyle.Configuration;
+
+    [Inject]
+    private SuperBlazorComponents.Configuration.SuperComponentsConfiguration SuperComponentsConfiguration { get; set; } = default!;
+
+    [Parameter]
+    public bool AllowCollapse { get; set; } = true;
+
+    [Parameter]
+    public SuperDropdownMenuAlignment MenuAlignment { get; set; } = SuperDropdownMenuAlignment.Start;
+
+    [Parameter]
+    public RenderFragment? ButtonContent { get; set; }
+
+    [Parameter]
+    public RenderFragment? Menu { get; set; }
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> Click { get; set; }
+
+    [Parameter]
+    public EventCallback<SuperSplitButtonActionEventArgs> ActionSelected { get; set; }
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    [Parameter]
+    public bool Outline { get; set; }
+
+    [Parameter]
+    public SuperButtonSize Size { get; set; } = SuperButtonSize.Default;
+
+    [Parameter]
+    public SuperButtonStyle Style { get; set; } = SuperButtonStyle.Primary;
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object> CapturedAttributes { get; set; } = new();
+
+    private bool IsCollapsedOrHidden => AllowCollapse 
+        && MainLayout?.SidebarState is SuperLayout.SidebarState.Collapsed or SuperLayout.SidebarState.Hidden;
+
+    private bool UseIconOnly => IsCollapsedOrHidden && !string.IsNullOrWhiteSpace(Icon);
+
+    private string IconCssClass
+    {
+        get
+        {
+            var stylePrefix = ResolvedIconStyle switch
+            {
+                SuperIconStyle.Regular => "fa-regular",
+                SuperIconStyle.Brands => "fa-brands",
+                SuperIconStyle.Duotone => "fa-duotone",
+                _ => "fa-solid"
+            };
+            return $"{stylePrefix} {Icon}";
+        }
+    }
+
+    private SuperIconStyle ResolvedIconStyle
+    {
+        get
+        {
+            var resolvedStyle = IconStyle == SuperIconStyle.Configuration
+                ? SuperComponentsConfiguration.DefaultSuperIconeStyle
+                : IconStyle;
+
+            return resolvedStyle == SuperIconStyle.Configuration
+                ? SuperIconStyle.Solid
+                : resolvedStyle;
+        }
+    }
+
+    private string DropdownMenuCssClass
+    {
+        get
+        {
+            var baseClass = "dropdown-menu";
+            return MenuAlignment == SuperDropdownMenuAlignment.End 
+                ? $"{baseClass} dropdown-menu-end" 
+                : baseClass;
+        }
+    }
+
+    private string ContainerCssClass
+    {
+        get
+        {
+            CapturedAttributes.TryGetValue("class", out var cls);
+            var additional = cls?.ToString();
+
+            var bootstrap = "btn-group";
+
+            if (string.IsNullOrWhiteSpace(additional))
+            {
+                return bootstrap;
+            }
+
+            return $"{bootstrap} {additional}";
+        }
+    }
+
+    private string MainButtonCssClass
+    {
+        get
+        {
+            var variant = Style.ToString().ToLowerInvariant();
+            var bootstrap = Outline ? $"btn btn-outline-{variant}" : $"btn btn-{variant}";
+
+            var sizeClass = Size switch
+            {
+                SuperButtonSize.Small => "btn-sm",
+                SuperButtonSize.Large => "btn-lg",
+                _ => string.Empty
+            };
+
+            if (!string.IsNullOrWhiteSpace(sizeClass))
+            {
+                bootstrap = $"{bootstrap} {sizeClass}";
+            }
+
+            return bootstrap;
+        }
+    }
+
+    private string ToggleButtonCssClass => $"{MainButtonCssClass} dropdown-toggle dropdown-toggle-split";
+
+    private async Task OnMainClick(MouseEventArgs e)
+    {
+        if (!Click.HasDelegate)
+        {
+            return;
+        }
+
+        if (Disabled)
+        {
+            return;
+        }
+
+        await Click.InvokeAsync(e);
+    }
+
+    internal async Task NotifyActionSelectedAsync(string actionName)
+    {
+        if (!ActionSelected.HasDelegate)
+        {
+            return;
+        }
+
+        if (Disabled)
+        {
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(actionName))
+        {
+            return;
+        }
+
+        await ActionSelected.InvokeAsync(new SuperSplitButtonActionEventArgs(actionName));
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (MainLayout is not null)
+            {
+                MainLayout.OnSidebarStateChanged += OnSidebarStateChanged;
+            }
+        }
+    }
+
+    private void OnSidebarStateChanged(SuperLayout.SidebarState previousState, SuperLayout.SidebarState newState)
+    {
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        if (MainLayout is not null)
+        {
+            MainLayout.OnSidebarStateChanged -= OnSidebarStateChanged;
+        }
+    }
+}

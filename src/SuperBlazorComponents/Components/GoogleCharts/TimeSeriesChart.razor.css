@@ -1,0 +1,161 @@
+﻿.time-series-chart {
+	position: relative;
+	width: 100%;
+}
+
+.chart-no-data {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 300px;
+	background-color: #f8f9fa;
+	border: 1px dashed #dee2e6;
+	border-radius: 4px;
+}
+
+.chart-no-data p {
+	color: #6c757d;
+	font-size: 14px;
+	margin: 0;
+}
+
+.chart-title {
+	font-size: 16px;
+	font-weight: 600;
+	fill: #212529;
+}
+
+.grid-line-horizontal,
+.grid-line-vertical {
+	stroke: #e9ecef;
+	stroke-width: 1;
+	stroke-dasharray: 2, 2;
+}
+
+.axis-line {
+	stroke: #495057;
+	stroke-width: 2;
+}
+
+.axis-label-x,
+.axis-label-y {
+	font-size: 10px;
+	fill: #6c757d;
+}
+
+.axis-label-x {
+	font-size: 9px;
+}
+
+.axis-title {
+	font-size: 12px;
+	font-weight: 500;
+	fill: #495057;
+}
+
+.data-line {
+	fill: none;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+.data-marker {
+	stroke: white;
+	stroke-width: 2;
+}
+
+.weekend-band {
+	fill: rgba(108, 117, 125, 0.05);
+}
+
+.week-separator {
+	stroke: rgba(108, 117, 125, 0.2);
+	stroke-width: 1;
+	stroke-dasharray: 4, 4;
+}
+
+.month-marker {
+	stroke: rgba(74, 144, 226, 0.4);
+	stroke-width: 2;
+}
+
+.month-label {
+	font-size: 10px;
+	font-weight: 600;
+	fill: #4A90E2;
+}
+
+.month-labels-bottom {
+	position: relative;
+	height: 30px;
+	margin-top: 10px;
+	width: 100%;
+}
+
+.month-label-bottom {
+	position: absolute;
+	font-size: 11px;
+	color: #4A90E2;
+	font-weight: 600;
+	transform: translateX(-50%) rotate(-45deg);
+	transform-origin: center;
+	white-space: nowrap;
+	text-shadow: 0 0 3px white;
+}
+
+.hover-area {
+	fill: transparent;
+	stroke: none;
+	cursor: pointer;
+}
+
+.hover-area:hover {
+	fill: rgba(74, 144, 226, 0.1);
+}
+
+.tooltip-group {
+	pointer-events: none;
+}
+
+.tooltip-bg {
+	fill: rgba(33, 37, 41, 0.95);
+	stroke: #4A90E2;
+	stroke-width: 1;
+}
+
+.tooltip-text {
+	fill: white;
+	font-size: 12px;
+	font-weight: 500;
+}
+
+@media (max-width: 768px) {
+	.chart-title {
+		font-size: 14px;
+	}
+
+	.axis-label-x,
+	.axis-label-y {
+		font-size: 8px;
+	}
+
+	.axis-label-x {
+		font-size: 7px;
+	}
+
+	.axis-title {
+		font-size: 10px;
+	}
+
+	.month-label {
+		font-size: 8px;
+	}
+
+	.month-label-bottom {
+		font-size: 9px;
+	}
+
+	.tooltip-text {
+		font-size: 10px;
+	}
+}

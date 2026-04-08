@@ -1,0 +1,199 @@
+﻿.super-date-range-dialog {
+    min-width: 0;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    /*background-color: #ffffff;*/
+}
+
+.super-date-range-dialog > .row {
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+.super-date-range-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding: 1rem;
+    border-top: 1px solid var(--bs-border-color);
+    /*background-color: #ffffff;*/
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    box-shadow: 0 -0.25rem 0.75rem rgba(0, 0, 0, 0.08);
+}
+
+.super-date-range-footer-summary {
+    color: #495057;
+    font-weight: 500;
+}
+
+.super-date-range-footer-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-left: auto;
+    flex-wrap: wrap;
+}
+
+.super-date-range-cancel-button {
+    min-width: 7rem;
+    border: 1px solid #6c757d;
+    background-color: #ffffff;
+    color: #343a40;
+}
+
+.super-date-range-cancel-button:hover,
+.super-date-range-cancel-button:focus {
+    border-color: #495057;
+    background-color: #f8f9fa;
+    color: #212529;
+}
+
+.super-date-range-apply-button {
+    min-width: 7rem;
+}
+
+.super-date-range-presets {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: 27rem;
+    overflow-y: auto;
+    background-color: #ffffff;
+}
+
+.super-date-range-presets .list-group-item {
+    border-inline: 0;
+    border-radius: 0;
+    padding-block: 0.9rem;
+    background-color: #ffffff;
+    color: #212529;
+}
+
+.super-date-range-presets .list-group-item.active {
+    background-color: #f8f9fa;
+    border-color: var(--bs-border-color);
+    color: #212529;
+}
+
+.super-date-range-calendars {
+    min-width: 0;
+}
+
+.super-date-range-calendar {
+    min-width: 0;
+}
+
+.super-date-range-weeks {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.super-date-range-weekdays,
+.super-date-range-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 0.25rem;
+}
+
+.super-date-range-weekdays.with-week-numbers,
+.super-date-range-grid.with-week-numbers {
+    grid-template-columns: minmax(2.25rem, 0.7fr) repeat(7, minmax(0, 1fr));
+}
+
+.super-date-range-weekdays {
+    text-align: center;
+}
+
+.super-date-range-week-number-header,
+.super-date-range-week-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.25rem;
+    border-radius: var(--bs-border-radius-sm);
+    border: 1px solid #cbd3da;
+    background-color: #f8f9fa;
+    color: #212529;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.super-date-range-week-number {
+    transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, color 0.15s ease-in-out;
+}
+
+.super-date-range-week-number:not(:disabled):hover {
+    background-color: rgba(var(--bs-primary-rgb), 0.12);
+    color: var(--bs-body-color);
+}
+
+.super-date-range-week-number.is-selected {
+    background-color: var(--bs-primary-bg-subtle);
+    border-color: rgba(var(--bs-primary-rgb), 0.35);
+    color: var(--bs-primary-text-emphasis);
+}
+
+.super-date-range-week-number:disabled,
+.super-date-range-week-number.is-disabled {
+    opacity: 0.85;
+    cursor: not-allowed;
+    background-color: lightgray;
+}
+
+.super-date-range-week-number-header {
+    text-transform: none;
+}
+
+.super-date-range-empty {
+    aspect-ratio: 1;
+}
+
+.super-date-range-day {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    aspect-ratio: 1;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    background-color: transparent;
+    color: var(--bs-body-color);
+    transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, color 0.15s ease-in-out;
+}
+
+.super-date-range-day:hover {
+    background-color: var(--bs-tertiary-bg);
+}
+
+    .super-date-range-day:disabled,
+    .super-date-range-day.is-disabled {
+        background-color: lightgrey;
+        color: var(--bs-tertiary-color);
+        cursor: not-allowed;
+        opacity: 0.65;
+    }
+
+.super-date-range-day:disabled:hover,
+.super-date-range-day.is-disabled:hover {
+    background-color: var(--bs-secondary-bg);
+}
+
+.super-date-range-day.is-in-range {
+    border-radius: var(--bs-border-radius-sm);
+    background-color: rgba(var(--bs-primary-rgb), 0.18);
+}
+
+.super-date-range-day.is-boundary {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+    color: var(--bs-white);
+}
+
+.super-date-range-day.is-today {
+    border-color: rgba(var(--bs-primary-rgb), 0.55);
+}

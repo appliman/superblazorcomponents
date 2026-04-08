@@ -1,0 +1,28 @@
+﻿@page "/breadcrumb"
+@using SuperBlazorComponents.Components.BreadCrumbs
+
+<h3>SuperBreadCrumb</h3>
+
+<p class="text-body-secondary">Par défaut, le séparateur est un petit chevron SVG.</p>
+
+<SuperBreadCrumb>
+    <SuperBreadCrumbItem Path="/" Text="Components" />
+    <SuperBreadCrumbItem Path="/badge" Text="Badge" />
+    <SuperBreadCrumbItem Icon="add" Text="Add" IsActive="true" />
+</SuperBreadCrumb>
+
+<SuperBreadCrumb class="mt-3">
+    <SuperBreadCrumbItem Path="/" Text="Home" />
+    <SuperBreadCrumbItem Path="/breadcrumb">
+        <Content>
+            <strong>Custom</strong> content
+        </Content>
+    </SuperBreadCrumbItem>
+    <SuperBreadCrumbItem Text="Current" IsActive="true" />
+</SuperBreadCrumb>
+
+<SuperBreadCrumb class="mt-3" Separator=">">
+    <SuperBreadCrumbItem Path="/" Text="Home" />
+    <SuperBreadCrumbItem Path="/breadcrumb" Text="Breadcrumb" />
+    <SuperBreadCrumbItem Text="Current" IsActive="true" />
+</SuperBreadCrumb>

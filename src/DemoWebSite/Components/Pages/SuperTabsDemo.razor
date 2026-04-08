@@ -1,0 +1,11 @@
+﻿@page "/super-tabs-demo"
+@inject NavigationManager NavigationManager
+
+<PageTitle>SuperTabs</PageTitle>
+
+@code {
+    protected override void OnInitialized()
+    {
+        NavigationManager.NavigateTo("super-tabs-demo/horizontal", replace: true);
+    }
+}

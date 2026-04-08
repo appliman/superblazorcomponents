@@ -1,0 +1,15 @@
+﻿@using SuperBlazorComponents.Components.SuperDataGrid
+<h3>MyFilterComponent</h3>
+
+@code {
+    [Parameter]
+    public string PropertyName { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback<SuperDataGridFilterInfo> ApplyFilter { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+}

@@ -1,0 +1,26 @@
+﻿@inject SuperDialogService DialogService
+@implements IDisposable
+
+@if (_isVisible && _componentType != null)
+{
+    <div class="modal fade show d-block" tabindex="-1" role="dialog" style="background-color: rgba(0,0,0,0.5);"
+         @onclick="OnBackdropClick">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable @GetSizeClass()" role="document" style="@GetDialogStyle()"
+             @onclick:stopPropagation="true">
+            <div class="modal-content @_options?.CssClass">
+                <div class="modal-header">
+                    <h5 class="modal-title">@_title</h5>
+                    @if (_options?.ShowCloseButton ?? true)
+                    {
+                        <button type="button" class="btn-close" aria-label="Fermer" @onclick="CloseDialog"></button>
+                    }
+                </div>
+                <div class="modal-body" style="@GetBodyStyle()">
+                    <DynamicComponent Type="_componentType" Parameters="_parameters" />
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+

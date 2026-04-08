@@ -1,0 +1,46 @@
+﻿@using Microsoft.AspNetCore.Components.Forms
+
+<div class="container-fluid py-2">
+    <div class="row g-3">
+        <div class="col-12">
+            <label class="form-label text-body-secondary">Opérateur</label>
+            <InputSelect class="form-select" @bind-Value="_selectedOperator">
+                @foreach (var option in SuperDataGridNumberFilterOperatorHelper.Options)
+                {
+                    <option value="@option.Key">@option.Value</option>
+                }
+            </InputSelect>
+        </div>
+
+        @if (IsRangeOperator)
+        {
+            <div class="col-6">
+                <label class="form-label text-body-secondary">De</label>
+                <InputNumber TValue="long?" class="form-control" @bind-Value="_value" />
+            </div>
+            <div class="col-6">
+                <label class="form-label text-body-secondary">A</label>
+                <InputNumber TValue="long?" class="form-control" @bind-Value="_valueTo" />
+            </div>
+        }
+        else
+        {
+            <div class="col-6">
+                <label class="form-label text-body-secondary">@Label</label>
+                <InputNumber TValue="long?" class="form-control" @bind-Value="_value" />
+            </div>
+        }
+    </div>
+</div>
+
+<div class="d-flex justify-content-end gap-2 border-top mt-4 pt-3">
+    <button type="button" class="btn btn-secondary" @onclick="RemoveAsync">
+        Retirer
+    </button>
+    <button type="button" class="btn btn-outline-secondary" @onclick="CancelAsync">
+        Annuler
+    </button>
+    <button type="button" class="btn btn-primary" @onclick="ApplyAsync" disabled="@(!CanApply())">
+        Appliquer
+    </button>
+</div>

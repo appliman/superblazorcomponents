@@ -1,0 +1,33 @@
+﻿@using SuperBlazorComponents.Services
+@using Microsoft.AspNetCore.Components
+
+@inject SuperNotificationService NotificationService
+@implements IDisposable
+
+<div class="toast-container position-fixed @PositionCssClass p-3" style="z-index: 1200;">
+    @foreach (var n in NotificationService.Notifications)
+    {
+        <div class="toast show mb-2" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <span class="me-2 @GetIconCssClass(n.Severity)">
+                    <i class="@GetIcon(n.Severity)" aria-hidden="true"></i>
+                </span>
+                <strong class="me-auto">@n.Summary</strong>
+                <button type="button" class="btn-close" aria-label="Close" @onclick="() => CloseAsync(n)"></button>
+            </div>
+            <div class="toast-body" style="cursor: @(n.Click is null ? "default" : "pointer")"
+                 @onclick="() => OnToastClickAsync(n)">
+                @n.Detail
+            </div>
+
+            @if (ShouldShowProgress(n))
+            {
+                <div class="progress" style="height: 2px; border-radius: 0;">
+                    <div class="progress-bar" role="progressbar" style="width: @GetProgressPercent(n);"></div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+

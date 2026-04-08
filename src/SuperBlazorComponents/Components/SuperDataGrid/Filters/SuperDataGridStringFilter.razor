@@ -1,0 +1,107 @@
+﻿@using System.Timers
+@using Microsoft.Extensions.Logging
+@inject IJSRuntime JSRuntime
+@inject ILogger<SuperDataGridStringFilter> Logger
+@implements IDisposable
+
+<div class="stcf-container">
+    <input class="form-control stcf-input"
+           type="text"
+           placeholder="@Placeholder"
+           value="@_value"
+           id="@_inputId"
+           @oninput="OnInputChanged" />
+
+    @if (!string.IsNullOrWhiteSpace(_value))
+    {
+        <button type="button"
+                class="stcf-clear"
+                title="Effacer le filtre"
+                @onclick="ClearAsync">
+            ×
+        </button>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string PropertyName { get; set; } = string.Empty;    
+
+    [Parameter]
+    public EventCallback<SuperDataGridFilterInfo> ApplyFilter { get; set; }
+
+    [Parameter]
+    public string Placeholder { get; set; } = "Filtre...";
+
+    [Parameter]
+    public int DelayMilliseconds { get; set; } = 2000;
+
+    bool _isDisposed;
+    readonly string _inputId = $"filter_{Guid.NewGuid():N}";
+    string _value = string.Empty;
+    System.Timers.Timer _debouceTimer = new();
+    SuperDataGridFilterInfo filterInfo = new();
+
+    protected override void OnInitialized()
+    {
+        _debouceTimer.AutoReset = true;
+        _debouceTimer.Elapsed += RaiseApplyFilter;
+        _debouceTimer.Interval = DelayMilliseconds;
+
+        filterInfo = new SuperDataGridFilterInfo
+        {
+            PropertyValue = _value,
+            PropertyName = PropertyName,
+            Operator = SuperDataGridFilterOperator.Contains,
+            PropertyType = typeof(string)
+        };
+
+    }
+
+    private async Task OnInputChanged(ChangeEventArgs args)
+    {
+        _value = await JSRuntime.InvokeAsync<string>("eval", $"document.getElementById('{_inputId}').value");
+        _debouceTimer.Start();
+    }
+
+    private void RaiseApplyFilter(object? s, ElapsedEventArgs e)
+    {
+        if (ApplyFilter.HasDelegate)
+        {
+            InvokeAsync(async () =>
+            {
+                try
+                {
+                    filterInfo.PropertyValue = _value;
+                    await ApplyFilter.InvokeAsync(filterInfo);
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError(ex, ex.Message);
+                }
+            });
+            _debouceTimer.Stop();
+        }
+    }
+
+    private async Task ClearAsync()
+    {
+        // On clean la textbox en javascript
+        await JSRuntime.InvokeVoidAsync("eval", $"document.getElementById('{_inputId}').value = ''");
+        _value = string.Empty;
+
+        if (ApplyFilter.HasDelegate)
+        {
+            filterInfo.PropertyValue = null;
+            await ApplyFilter.InvokeAsync(filterInfo);
+        }
+        _debouceTimer.Stop();
+    }
+
+    public void Dispose()
+    {
+        _isDisposed = true;
+        _debouceTimer.Elapsed -= RaiseApplyFilter;
+        _debouceTimer.Dispose();
+    }
+}

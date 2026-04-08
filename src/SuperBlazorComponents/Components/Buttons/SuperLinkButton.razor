@@ -1,0 +1,36 @@
+﻿@using Microsoft.AspNetCore.Components
+
+<a class="@CssClass" href="@ResolvedHref" aria-disabled="@AriaDisabled" tabindex="@TabIndex" @attributes="@_additionalAttributes">
+    @if (!string.IsNullOrWhiteSpace(Image))
+    {
+        <img src="@Image" alt="@Text" title="@Text" class="super-button-image" aria-hidden="true" />
+    }
+    else if (!string.IsNullOrWhiteSpace(Icon))
+    {
+        <i class="@IconCssClass" title="@Text" aria-hidden="true"></i>
+    }
+
+    @if (!UseIconOnly)
+    {
+        @if (!string.IsNullOrWhiteSpace(Image) || !string.IsNullOrWhiteSpace(Icon))
+        {
+            <span class="ms-1"></span>
+        }
+
+        @if (ChildContent is not null)
+        {
+            @ChildContent
+        }
+        else
+        {
+            @Text
+        }
+
+        @if (!string.IsNullOrWhiteSpace(BadgeText))
+        {
+            <span class="ms-2">
+                <span class="@BadgeCssClass">@BadgeText</span>
+            </span>
+        }
+    }
+</a>

@@ -1,0 +1,38 @@
+﻿@using Microsoft.AspNetCore.Components
+
+<div class="@CssClass" role="group" aria-label="@AriaLabel" @attributes="@CapturedAttributes">
+    @Buttons
+</div>
+
+@code
+{
+    [Parameter]
+    public string AriaLabel { get; set; } = "Button group";
+
+    [Parameter]
+    public RenderFragment? Buttons { get; set; }
+
+    [Parameter]
+    public bool Vertical { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object> CapturedAttributes { get; set; } = new();
+
+    private string CssClass
+    {
+        get
+        {
+            CapturedAttributes.TryGetValue("class", out var cls);
+            var additional = cls?.ToString();
+
+            var bootstrap = Vertical ? "btn-group-vertical" : "btn-group";
+
+            if (string.IsNullOrWhiteSpace(additional))
+            {
+                return bootstrap;
+            }
+
+            return $"{bootstrap} {additional}";
+        }
+    }
+}

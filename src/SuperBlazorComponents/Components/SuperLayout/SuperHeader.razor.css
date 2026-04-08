@@ -1,0 +1,86 @@
+﻿/* SuperHeader - CSS isolé avec support dark mode Bootstrap */
+.super-header {
+    grid-area: header;
+    z-index: 1030;
+    border-bottom: 1px solid var(--bs-border-color);
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+}
+
+.super-header-container {
+    display: grid;
+    grid-template-columns: var(--super-sidebar-width, 250px) 1fr auto;
+    align-items: center;
+    width: 100%;
+    min-height: var(--super-header-height, 50px);
+    padding: 0rem 0.5rem;
+}
+
+.super-layout-sidebar-collapsed .super-header-container {
+    grid-template-columns: var(--super-sidebar-collapsed-width, 0px) 1fr auto;
+}
+
+.super-layout-sidebar-hidden .super-header-container {
+    grid-template-columns: auto 1fr auto;
+}
+
+.super-header-brand {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+}
+
+.super-layout-sidebar-collapsed .super-header-brand-content {
+    display: none !important;
+}
+
+.super-layout-sidebar-hidden .super-header-brand-content {
+    display: none !important;
+}
+
+.super-header-body {
+    margin-left:-5px;
+    min-width: 0;
+    min-height: 40px;
+}
+
+.super-header-sticky {
+    position: sticky;
+    top: 0;
+}
+
+.super-header .navbar {
+    min-height: 50px;
+    padding: 0;
+    margin: 0;
+    background-color: transparent !important;
+}
+
+.super-header-toggle {
+    font-size: 1.5rem;
+    line-height: 1;
+    color: var(--bs-body-color);
+    background: transparent;
+    cursor: pointer;
+}
+
+.super-header-toggle:hover {
+    opacity: 0.75;
+}
+
+.super-header-toggle:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.super-header-end {
+    color: var(--bs-body-color);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-left: auto;
+}
+
+.super-header-nav {
+    --bs-navbar-padding-y: 0rem !important;
+}

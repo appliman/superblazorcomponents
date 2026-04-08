@@ -1,0 +1,71 @@
+﻿@using SuperBlazorComponents.Components.Buttons
+@using SuperBlazorComponents.Components.SuperDataGrid
+@using Microsoft.AspNetCore.Components.Web
+@typeparam TItem
+@implements IDisposable
+
+@if (_effectiveSuperDataGrid is not null)
+{
+    <SuperButton Icon="fa-arrows-rotate"
+                 Style="SuperButtonStyle.Secondary"
+                 Size="@Size"
+                 title="Refraichir le contenu de la liste"
+                 Click="OnRefreshAsync" />
+}
+
+@code {
+    private SuperDataGrid<TItem>? _effectiveSuperDataGrid;
+
+    [Parameter]
+    public SuperDataGrid<TItem>? SuperDataGrid { get; set; }
+
+    [Parameter]
+    public EventCallback Refreshed { get; set; }
+
+    [Parameter]
+    public SuperButtonSize Size { get; set; } = SuperButtonSize.Default;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        SuperDataGrid<TItem>.GridInstanceReady += OnGridInstanceReady;
+    }
+
+    protected override void OnParametersSet()
+    {
+        _effectiveSuperDataGrid = SuperDataGrid ?? _effectiveSuperDataGrid;
+        base.OnParametersSet();
+    }
+
+    private void OnGridInstanceReady(SuperDataGrid<TItem> grid)
+    {
+        if (_effectiveSuperDataGrid is not null)
+        {
+            return;
+        }
+
+        _effectiveSuperDataGrid = grid;
+        SuperDataGrid = grid;
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private async Task OnRefreshAsync(MouseEventArgs args)
+    {
+        if (_effectiveSuperDataGrid is null)
+        {
+            return;
+        }
+
+        await _effectiveSuperDataGrid.ReloadAsync();
+
+        if (Refreshed.HasDelegate)
+        {
+            await Refreshed.InvokeAsync();
+        }
+    }
+
+    public void Dispose()
+    {
+        SuperDataGrid<TItem>.GridInstanceReady -= OnGridInstanceReady;
+    }
+}

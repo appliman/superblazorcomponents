@@ -1,0 +1,154 @@
+﻿@using SuperBlazorComponents.Components.Buttons
+@typeparam TItem
+@implements IDisposable
+
+@{
+    var hasProgrammaticItems = MenuItemsSource?.Any() == true;
+    var hasCustomItems = MenuItems is not null || hasProgrammaticItems;
+}
+
+@if (_effectiveSuperDataGrid is not null)
+{
+    <SuperSplitButton Text="@selectionText"
+                      Icon="fa-check-square"
+                      Style="SuperButtonStyle.Secondary"
+                      Size="@Size"
+                      ActionSelected="OnActionSelectedAsync">
+        <Menu>
+            <SuperSplitButtonItem ActionName="selectAll" Text="Tout sélectionner" Icon="fa-square-check" IconStyle="SuperIconStyle.Regular" />
+            <SuperSplitButtonItem ActionName="clear" Text="Effacer la sélection" Icon="fa-square" IconStyle="SuperIconStyle.Regular" />
+            @if (hasCustomItems)
+            {
+                <SuperSplitDivider/>
+            }
+            @if (hasProgrammaticItems)
+            {
+                @foreach (var item in MenuItemsSource!.Where(i => !string.IsNullOrWhiteSpace(i.ActionName)))
+                {
+                    <SuperSplitButtonItem ActionName="@item.ActionName"
+                                          Text="@item.Text"
+                                          Icon="@item.Icon"
+                                          IconStyle="@item.IconStyle"
+                                          Disabled="@item.Disabled" />
+                }
+            }
+            @if (MenuItems is not null)
+            {
+                @MenuItems
+            }
+        </Menu>
+    </SuperSplitButton>
+}
+
+@code {
+    private SuperDataGrid<TItem>? _effectiveSuperDataGrid;
+
+    [Parameter]
+    public SuperDataGrid<TItem>? SuperDataGrid { get; set; }
+
+    [Parameter]
+    public RenderFragment? MenuItems { get; set; }
+
+    [Parameter]
+    public IEnumerable<SuperDataGridRowSelectorItem>? MenuItemsSource { get; set; }
+
+    [Parameter]
+    public EventCallback<SelectedActionInfo<TItem>> ActionSelected { get; set; }
+
+    [Parameter]
+    public SuperButtonSize Size { get; set; } = SuperButtonSize.Default;
+
+    string selectionText = "Sélection";
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        SuperDataGrid<TItem>.GridInstanceReady += OnGridInstanceReady;
+    }
+
+    protected override void OnParametersSet()
+    {
+        _effectiveSuperDataGrid = SuperDataGrid ?? _effectiveSuperDataGrid;
+        if (_effectiveSuperDataGrid is not null)
+        {
+            _effectiveSuperDataGrid.SelectedRowsChanged -= OnSelectedRowsChanged;
+            _effectiveSuperDataGrid.SelectedRowsChanged += OnSelectedRowsChanged;
+        }
+        base.OnParametersSet();
+    }
+
+    private void OnGridInstanceReady(SuperDataGrid<TItem> grid)
+    {
+        if (_effectiveSuperDataGrid is not null)
+        {
+            return;
+        }
+
+        _effectiveSuperDataGrid = grid;
+        SuperDataGrid = grid;
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    void OnSelectedRowsChanged(object? sender, EventArgs e)
+    {
+        if (_effectiveSuperDataGrid is null)
+        {
+            return;
+        }
+
+        var selectionInfo = _effectiveSuperDataGrid.GetSelectionInfo();
+
+        if (selectionInfo.AllSelected && selectionInfo.ExcludedCount > 0)
+        {
+            selectionText = $"Sélection (Tout sauf {selectionInfo.ExcludedCount})";
+        }
+        else
+        {
+            selectionText = selectionInfo.SelectedCount > 0 ? $"Sélection ({selectionInfo.SelectedCount})" : "Sélection";
+        }
+
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private async Task OnActionSelectedAsync(SuperBlazorComponents.Components.Buttons.SuperSplitButtonActionEventArgs args)
+    {
+        if (_effectiveSuperDataGrid is null)
+        {
+            return;
+        }
+
+        if (args.ActionName == "selectAll")
+        {
+            await _effectiveSuperDataGrid.SelectAllAsync();
+            return;
+        }
+        else if (args.ActionName == "clear")
+        {
+            await _effectiveSuperDataGrid.ClearSelectionAsync();
+            return;
+        }
+
+        var selectionInfo = _effectiveSuperDataGrid.GetSelectionInfo();
+        var selectionInfoArgs = new SelectedActionInfo<TItem>
+        {
+            ActionName = args.ActionName,
+            DataGridSelectionInfo = selectionInfo
+        };
+
+        if (ActionSelected.HasDelegate)
+        {
+            await ActionSelected.InvokeAsync(selectionInfoArgs);
+        }
+
+        SuperDataGrid?.OnSelectorMenuItemClicked(selectionInfoArgs);
+    }
+
+    public void Dispose()
+    {
+        SuperDataGrid<TItem>.GridInstanceReady -= OnGridInstanceReady;
+        if (SuperDataGrid is not null)
+        {
+            SuperDataGrid.SelectedRowsChanged -= OnSelectedRowsChanged;
+        }
+    }
+}

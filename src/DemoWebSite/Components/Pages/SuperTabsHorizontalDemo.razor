@@ -1,0 +1,309 @@
+﻿@page "/super-tabs-demo/horizontal"
+
+@using SuperBlazorComponents.Components.SuperTabs
+@inject SuperTabsService TabsService
+
+<PageTitle>SuperTabs horizontal</PageTitle>
+
+<h1>SuperTabs - Horizontal</h1>
+
+<div class="mb-3">
+    <button class="btn btn-primary me-2" @onclick="AddTab">Ajouter un onglet</button>
+    <button class="btn btn-outline-secondary me-2" @onclick="SelectNext">Onglet suivant</button>
+    <button class="btn btn-outline-secondary me-2" @onclick="SelectPrevious">Onglet précédent</button>
+    <button class="btn btn-outline-danger me-2" @onclick="CloseCurrent" disabled="@(!_tabs.Any(t => t.Closable) || _selectedIndex < 0)">Fermer l'onglet courant</button>
+    <button class="btn btn-outline-warning" @onclick="ToggleUnsaved">Basculer "modifications non sauvegardées"</button>
+</div>
+
+<div class="mb-3">
+    <div><strong>Instance:</strong> <code>@_instanceId</code></div>
+    <div><strong>SelectedIndex:</strong> <code>@_selectedIndex</code></div>
+    <div><strong>Onglet courant:</strong> <code>@(TabsService.GetCurrentTabTitle(_instanceId) ?? "(aucun)")</code></div>
+</div>
+
+<SuperTabs InstanceId="@_instanceId"
+           Tabs="@_tabs"
+           Position="@SuperTabPosition.Top"
+           Height="@_height"
+           AllowAddTab="true"
+           PersistInUrl="true"
+           PersistenceKey="@_persistenceKey"
+           EnableAnimations="true"
+           EnableKeyboardNavigation="true"
+           SelectedIndex="@_selectedIndex"
+           SelectedIndexChanged="OnSelectedIndexChanged"
+           OnTabChanging="OnTabChanging"
+           OnTabChanged="OnTabChanged"
+           OnTabClosing="OnTabClosing"
+           OnTabClosed="OnTabClosed"
+           OnAddTabClicked="OnAddTabClicked">
+</SuperTabs>
+
+<div class="mt-3">
+    <h2 class="h5">Journal</h2>
+    <div class="border rounded p-2" style="min-height: 120px; max-height: 260px; overflow: auto; background: var(--bs-body-bg)">
+        @if (_events.Count == 0)
+        {
+            <div class="text-muted">Aucun évènement pour l'instant.</div>
+        }
+        else
+        {
+            <ul class="mb-0">
+                @foreach (var e in _events)
+                {
+                    <li>@e</li>
+                }
+            </ul>
+        }
+    </div>
+</div>
+
+@code {
+    private readonly string _instanceId = "super-tabs-demo-horizontal";
+    private readonly string _persistenceKey = "super-tabs-demo-horizontal:selected";
+
+    private readonly List<string> _events = new();
+    private readonly List<SuperTabItem> _tabs = new();
+
+    private int _selectedIndex;
+    private string _height = "360px";
+    private int _nextCounter = 1;
+
+    protected override void OnInitialized()
+    {
+        _tabs.Add(new SuperTabItem
+        {
+            Id = "overview",
+            Title = "Aperçu",
+            Icon = "fa-solid fa-compass",
+            IconColor = "var(--bs-primary)",
+            BadgeText = "Nouveau",
+            BadgeClass = "badge-primary",
+            Content = builder =>
+            {
+                var i = 0;
+                builder.OpenElement(i++, "div");
+                builder.AddMarkupContent(i++, "<h3>Aperçu</h3>");
+                builder.AddMarkupContent(i++, "<p>Exemples: badges, onglets désactivés/masqués, fermeture, lazy-load, persistance (URL + localStorage), navigation clavier.</p>");
+                builder.AddMarkupContent(i++, "<ul><li>Clavier: flèches, Home/End, Ctrl+1..9</li><li>Persistance URL: paramètre <code>?tab=</code></li><li>Persistance localStorage: <code>PersistenceKey</code></li></ul>");
+                builder.CloseElement();
+            }
+        });
+
+        _tabs.Add(new SuperTabItem
+        {
+            Id = "lazy",
+            Title = "Lazy",
+            Icon = "fa-solid fa-bolt",
+            LazyLoad = true,
+            Tooltip = "Contenu rendu au premier affichage",
+            Content = builder =>
+            {
+                var i = 0;
+                builder.OpenElement(i++, "div");
+                builder.AddMarkupContent(i++, "<h3>Lazy loading</h3>");
+                builder.AddContent(i++, $"Ce contenu est rendu lors de la première sélection. Date/heure: {DateTimeOffset.Now:O}");
+                builder.CloseElement();
+            }
+        });
+
+        _tabs.Add(new SuperTabItem
+        {
+            Id = "disabled",
+            Title = "Désactivé",
+            Icon = "fa-solid fa-ban",
+            Disabled = true,
+            Tooltip = "Onglet visible mais non sélectionnable",
+            Content = builder =>
+            {
+                var i = 0;
+                builder.OpenElement(i++, "div");
+                builder.AddMarkupContent(i++, "<h3>Désactivé</h3>");
+                builder.AddMarkupContent(i++, "<p>Vous ne devriez pas pouvoir sélectionner cet onglet.</p>");
+                builder.CloseElement();
+            }
+        });
+
+        _tabs.Add(new SuperTabItem
+        {
+            Id = "closable",
+            Title = "Fermable",
+            Icon = "fa-solid fa-xmark",
+            Closable = true,
+            BadgeText = "1",
+            BadgeClass = "badge-danger",
+            Content = builder =>
+            {
+                var i = 0;
+                builder.OpenElement(i++, "div");
+                builder.AddMarkupContent(i++, "<h3>Fermeture</h3>");
+                builder.AddMarkupContent(i++, "<p>Vous pouvez fermer cet onglet via la croix ou le bouton au-dessus.</p>");
+                builder.CloseElement();
+            }
+        });
+
+        _tabs.Add(new SuperTabItem
+        {
+            Id = "unsaved",
+            Title = "Édition",
+            Icon = "fa-solid fa-pen-to-square",
+            Closable = true,
+            HasUnsavedChanges = true,
+            ConfirmLeaveMessage = "Des modifications ne sont pas sauvegardées. Voulez-vous quitter cet onglet ?",
+            Content = builder =>
+            {
+                var i = 0;
+                builder.OpenElement(i++, "div");
+                builder.AddMarkupContent(i++, "<h3>Modifications non sauvegardées</h3>");
+                builder.AddMarkupContent(i++, "<p>En quittant ou en fermant cet onglet, une confirmation doit être affichée.</p>");
+                builder.AddContent(i++, $"Statut: {(_tabs.First(t => t.Id == "unsaved").HasUnsavedChanges ? "Non sauvegardé" : "OK")}");
+                builder.CloseElement();
+            }
+        });
+
+        _tabs.Add(new SuperTabItem
+        {
+            Id = "hidden",
+            Title = "Masqué",
+            Visible = false,
+            Content = builder =>
+            {
+                var i = 0;
+                builder.OpenElement(i++, "div");
+                builder.AddMarkupContent(i++, "<h3>Masqué</h3>");
+                builder.AddMarkupContent(i++, "<p>Cet onglet n'est pas visible.</p>");
+                builder.CloseElement();
+            }
+        });
+    }
+
+    private Task OnSelectedIndexChanged(int index)
+    {
+        _selectedIndex = index;
+        return Task.CompletedTask;
+    }
+
+    private void AddTab()
+    {
+        var id = $"dyn-{_nextCounter}";
+        var n = _nextCounter;
+        _nextCounter++;
+
+        var tab = new SuperTabItem
+        {
+            Id = id,
+            Title = $"Dynamique {n}",
+            Icon = "fa-solid fa-layer-group",
+            Closable = true,
+            BadgeText = n.ToString(),
+            BadgeClass = "badge-secondary",
+            Content = builder =>
+            {
+                var i = 0;
+                builder.OpenElement(i++, "div");
+                builder.AddMarkupContent(i++, "<h3>Onglet dynamique</h3>");
+                builder.AddContent(i++, $"Id: {id}");
+                builder.AddMarkupContent(i++, "<br />");
+                builder.AddContent(i++, $"Créé: {DateTimeOffset.Now:O}");
+                builder.CloseElement();
+            }
+        };
+
+        TabsService.AddTab(_instanceId, tab, selectAfterAdd: true);
+        AddEvent($"Service.AddTab: {tab.Title}");
+    }
+
+    private void CloseCurrent()
+    {
+        if (_selectedIndex < 0)
+        {
+            return;
+        }
+
+        TabsService.RemoveTab(_instanceId, _selectedIndex);
+        AddEvent($"Service.RemoveTab: index={_selectedIndex}");
+    }
+
+    private void SelectNext()
+    {
+        if (_tabs.Count == 0)
+        {
+            return;
+        }
+
+        var next = Math.Min(_tabs.Count - 1, _selectedIndex + 1);
+        TabsService.SelectTab(_instanceId, next);
+        AddEvent($"Service.SelectTab: index={next}");
+    }
+
+    private void SelectPrevious()
+    {
+        if (_tabs.Count == 0)
+        {
+            return;
+        }
+
+        var prev = Math.Max(0, _selectedIndex - 1);
+        TabsService.SelectTab(_instanceId, prev);
+        AddEvent($"Service.SelectTab: index={prev}");
+    }
+
+    private void ToggleUnsaved()
+    {
+        var tab = _tabs.FirstOrDefault(t => t.Id == "unsaved");
+        if (tab is null)
+        {
+            return;
+        }
+
+        tab.HasUnsavedChanges = !tab.HasUnsavedChanges;
+        AddEvent($"Toggle HasUnsavedChanges: {tab.HasUnsavedChanges}");
+        StateHasChanged();
+    }
+
+    private Task OnTabChanging(SuperTabChangeEventArgs args)
+    {
+        AddEvent($"OnTabChanging: {args.PreviousIndex} -> {args.NewIndex}");
+        return Task.CompletedTask;
+    }
+
+    private Task OnTabChanged(SuperTabChangeEventArgs args)
+    {
+        AddEvent($"OnTabChanged: {args.PreviousIndex} -> {args.NewIndex} (\"{args.NewTab?.Title}\")");
+        return Task.CompletedTask;
+    }
+
+    private Task OnTabClosing(SuperTabCloseEventArgs args)
+    {
+        AddEvent($"OnTabClosing: index={args.Index} (\"{args.Tab?.Title}\")");
+
+        if (args.Tab?.Id == "overview")
+        {
+            args.Cancel = true;
+            AddEvent("Fermeture refusée: l'onglet \"Aperçu\" est protégé");
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private Task OnTabClosed(SuperTabCloseEventArgs args)
+    {
+        AddEvent($"OnTabClosed: index={args.Index} (\"{args.Tab?.Title}\")");
+        return Task.CompletedTask;
+    }
+
+    private void OnAddTabClicked()
+    {
+        AddEvent("OnAddTabClicked");
+        AddTab();
+    }
+
+    private void AddEvent(string message)
+    {
+        _events.Insert(0, $"[{DateTimeOffset.Now:HH:mm:ss}] {message}");
+        if (_events.Count > 50)
+        {
+            _events.RemoveRange(50, _events.Count - 50);
+        }
+    }
+}

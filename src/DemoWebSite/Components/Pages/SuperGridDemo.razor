@@ -1,0 +1,518 @@
+﻿@page "/supergrid-demo"
+@using SuperBlazorComponents
+@using SuperBlazorComponents.Components.Buttons
+@using SuperBlazorComponents.Components.SuperDataGrid
+@using SuperBlazorComponents.Components.SuperDataGrid.Filters
+@using SuperBlazorComponents.Components.SuperDataGrid.Tools
+
+<PageTitle>SuperGrid Demo - 5000 Items</PageTitle>
+
+<h1>SuperGrid Virtualization Demo</h1>
+<p>This demo displays 5000 randomly generated items with simulated database calls using <code>ItemsProvider</code>.</p>
+
+<div class="mb-3">
+    <span class="badge bg-primary">Total Items: @_totalItemCount</span>
+    <span class="badge bg-info">Filtered: @_filteredCount</span>
+    <span class="badge bg-success">Virtualization: Enabled</span>
+    <span class="badge bg-warning text-dark">Simulated DB Delay: @_simulatedDelayMs ms</span>
+</div>
+
+@if (_selectedRow is not null)
+{
+    <div class="alert alert-info mb-3">
+        <strong>Selected Row:</strong> @_selectedRow.FirstName @_selectedRow.LastName (ID: @_selectedRow.Id)
+    </div>
+}
+
+@if (!string.IsNullOrWhiteSpace(_lastActionMessage))
+{
+    <div class="alert alert-warning mb-3">
+        <strong>Last Action:</strong> @_lastActionMessage
+    </div>
+}
+
+@if (_lastCellClicked is not null)
+{
+    <div class="alert alert-secondary mb-3">
+        <strong>Last Cell Clicked:</strong> Property: <code>@_lastCellClicked.PropertyName</code>,
+        Value: <code>@_lastCellClicked.Value</code>,
+        Row ID: @_lastCellClicked.Item.Id
+    </div>
+}
+
+<div class="mb-3">
+    <label class="form-label">Simulated Database Delay (ms):</label>
+    <input type="range" class="form-range" min="0" max="500" step="50" @bind="_simulatedDelayMs" @bind:event="oninput" />
+    <span>@_simulatedDelayMs ms</span>
+</div>
+
+<div style="height: 600px; width: 1200px;">
+    <SuperDataGrid @ref="_grid"
+                   TItem="DemoItem"
+                   ItemsProvider="@LoadItemsFromDatabaseAsync"
+                   Height="100%"
+                   RowHeight="50"
+                   OverscanCount="5"
+                   SelectionMode="SuperDataGridSelectionMode.Multiple"
+                   FreezeHeader="true"
+                   FreezeFooter="true"
+                   AllowColumnReorder="true"
+                   AllowColumnResize="true"
+                   AllowSorting="true"
+                   FreezeLeftColumns="1"
+                   GridId="supergrid-demo"
+                   CurrentRowBackground="#3b95c6"
+                   RowClicked="@OnRowClicked"
+                   CellClicked="@OnCellClicked"
+                   SelectorMenuItemSelected="ActionDemo"
+                   >
+
+        <SelectorMenuItemsContent>
+            <SuperSplitButtonItem ActionName="ping" Text="item demo" />
+        </SelectorMenuItemsContent>
+
+        <HeaderTemplate>
+            <span>Header</span>
+        </HeaderTemplate>
+
+        <ChildContent>
+        
+            <DataGridColumn TItem="DemoItem" Property="Id" Title="ID" Width="100px">
+                <Template>
+                    <strong>@context.Id</strong>
+                </Template>
+                <FooterTemplate>
+                    <strong>Total</strong>
+                </FooterTemplate>
+            </DataGridColumn>
+            <DataGridColumn TItem="DemoItem" Property="FirstName" Title="First Name" Width="150px">
+                <FilterTemplate>
+                    <SuperDataGridStringFilter PropertyName="FirstName"/>
+                </FilterTemplate>
+                <HeaderTemplate>
+                    <b>My First<br />Name</b>
+                </HeaderTemplate>
+            </DataGridColumn>
+            <DataGridColumn TItem="DemoItem" Property="LastName" Title="Last Name" Width="150px">
+            </DataGridColumn>
+            <DataGridColumn TItem="DemoItem" Property="Email" Title="Email" Width="250px" />
+            <DataGridColumn TItem="DemoItem" Property="Age" Title="Age" Width="80px" TextAlign="SuperTextAlignment.Center">
+                <FilterTemplate>
+                    <input type="number" placeholder="Min" @bind="_filterMinAge" @bind:event="oninput" @bind:after="OnFilterChanged" style="width: 100%;" />
+                </FilterTemplate>
+                <FooterTemplate>
+                    <span>Avg: @(_filteredCount > 0 ? (_totalAge / _filteredCount).ToString("F0") : "-")</span>
+                </FooterTemplate>
+            </DataGridColumn>
+            <DataGridColumn TItem="DemoItem" Property="Salary" Title="Salary" Width="120px" FormatString="{0:C}" TextAlign="SuperTextAlignment.Right" AlwaysVisible="true">
+                <FooterTemplate>
+                    <strong>@_totalSalary.ToString("C")</strong>
+                </FooterTemplate>
+            </DataGridColumn>
+            <DataGridColumn TItem="DemoItem" Property="Department" Title="Department" Width="150px">
+                <FilterTemplate>
+                    <select @bind="_filterDepartment" @bind:after="OnFilterChanged">
+                        <option value="">All</option>
+                        @foreach (var dept in _departments)
+                        {
+                            <option value="@dept">@dept</option>
+                        }
+                    </select>
+                </FilterTemplate>
+            </DataGridColumn>
+            <DataGridColumn TItem="DemoItem" Property="JoinDate" Title="Join Date" Width="120px" FormatString="{0:d}" />
+            <DataGridColumn TItem="DemoItem" Property="IsActive" Title="Active" Width="100px" TextAlign="SuperTextAlignment.Center">
+                <FilterTemplate>
+                    <select @bind="_filterIsActive" @bind:after="OnFilterChanged">
+                        <option value="">All</option>
+                        <option value="true">Active</option>
+                        <option value="false">Inactive</option>
+                    </select>
+                </FilterTemplate>
+                <Template>
+                    @if (context.IsActive)
+                    {
+                        <span class="badge bg-success">Yes</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">No</span>
+                    }
+                </Template>
+                <FooterTemplate>
+                    <span>@_activeCount active</span>
+                </FooterTemplate>
+            </DataGridColumn>
+            <DataGridColumn TItem="DemoItem" Property="Score" Title="Score" Width="100px" FormatString="{0:F2}" TextAlign="SuperTextAlignment.Right">
+                <FooterTemplate>
+                    <span>Avg: @(_filteredCount > 0 ? (_totalScore / _filteredCount).ToString("F2") : "-")</span>
+                </FooterTemplate>
+            </DataGridColumn>
+            <DataGridColumn For="@(p => p.Coordinates)" Title="Coordonnées" Width="100px" FormatString="{0:F2}" TextAlign="SuperTextAlignment.Right">
+                <Template>
+                    @context.Coordinates
+                </Template>
+            </DataGridColumn>
+
+        </ChildContent>
+
+        <FooterTemplate>
+            <span>Footer</span>
+        </FooterTemplate>
+    </SuperDataGrid>
+</div>
+
+
+@code {
+    private SuperDataGrid<DemoItem>? _grid;
+    private List<DemoItem> _allItems = [];
+    private int _totalItemCount;
+    private int _filteredCount;
+    private int _simulatedDelayMs = 100;
+    private readonly Random _random = new(42);
+
+    // Selection state
+    private DemoItem? _selectedRow;
+    private CellClickedEventArgs<DemoItem>? _lastCellClicked;
+    private string? _lastActionMessage;
+
+    // Filter fields
+    private int? _filterMinAge;
+    private string _filterDepartment = "";
+    private string _filterIsActive = "";
+
+    // Footer aggregates
+    private decimal _totalSalary;
+    private int _totalAge;
+    private double _totalScore;
+    private int _activeCount;
+
+    private readonly string[] _firstNames =
+    [
+        "Alice", "Bob", "Charlie", "Diana", "Edward", "Fiona", "George", "Hannah",
+        "Isaac", "Julia", "Kevin", "Laura", "Michael", "Nancy", "Oliver", "Patricia",
+        "Quinn", "Rachel", "Samuel", "Teresa", "Ursula", "Victor", "Wendy", "Xavier",
+        "Yvonne", "Zachary", "Amélie", "Bernard", "Céline", "Damien"
+    ];
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            StateHasChanged();
+            _grid?.SelectorMenuItemClicked += (arg) =>
+            {
+                Console.WriteLine(arg.ActionName);
+            };
+        }
+    }
+
+    private readonly string[] _lastNames =
+    [
+        "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis",
+        "Rodriguez", "Martinez", "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson",
+        "Thomas", "Taylor", "Moore", "Jackson", "Martin", "Lee", "Walker", "Hall",
+        "Allen", "Young", "King", "Wright", "Scott", "Green", "Baker"
+    ];
+
+    private readonly string[] _departments =
+    [
+        "Engineering", "Sales", "Marketing", "Human Resources", "Finance",
+        "Customer Support", "Operations", "Research & Development", "Legal", "Administration"
+    ];
+
+    protected override void OnInitialized()
+    {
+        GenerateRandomItems(5000);
+        _totalItemCount = _allItems.Count;
+        _filteredCount = _totalItemCount;
+    }
+
+    private void OnRowClicked(DemoItem item)
+    {
+        _selectedRow = item;
+    }
+
+    private void OnCellClicked(CellClickedEventArgs<DemoItem> args)
+    {
+        _lastCellClicked = args;
+    }
+
+    private async Task OnFilterChanged()
+    {
+        if (_grid is not null)
+        {
+            await _grid.ReloadAsync();
+        }
+    }
+
+    /// <summary>
+    /// Simulates loading items from a database with pagination and sorting support.
+    /// </summary>
+    private async ValueTask<GridItemsProviderResult<DemoItem>> LoadItemsFromDatabaseAsync(
+        GridItemsProviderRequest<DemoItem> request)
+    {
+        // Simulate database latency
+        if (_simulatedDelayMs > 0)
+        {
+            await Task.Delay(_simulatedDelayMs, request.CancellationToken);
+        }
+
+        // Start with all items (simulating a database query)
+        IEnumerable<DemoItem> query = _allItems;
+
+        // Apply grid filters
+        query = ApplyGridFilters(query, request.Filters);
+
+        if (_filterMinAge.HasValue)
+        {
+            query = query.Where(x => x.Age >= _filterMinAge.Value);
+        }
+
+        if (!string.IsNullOrWhiteSpace(_filterDepartment))
+        {
+            query = query.Where(x => x.Department == _filterDepartment);
+        }
+
+        if (!string.IsNullOrWhiteSpace(_filterIsActive))
+        {
+            var isActive = _filterIsActive == "true";
+            query = query.Where(x => x.IsActive == isActive);
+        }
+
+        // Apply sorting if specified
+        if (!string.IsNullOrEmpty(request.SortColumn))
+        {
+            query = request.SortDirection switch
+            {
+                SortDirection.Ascending => request.SortColumn switch
+                {
+                    nameof(DemoItem.Id) => query.OrderBy(x => x.Id),
+                    nameof(DemoItem.FirstName) => query.OrderBy(x => x.FirstName),
+                    nameof(DemoItem.LastName) => query.OrderBy(x => x.LastName),
+                    nameof(DemoItem.Email) => query.OrderBy(x => x.Email),
+                    nameof(DemoItem.Age) => query.OrderBy(x => x.Age),
+                    nameof(DemoItem.Salary) => query.OrderBy(x => x.Salary),
+                    nameof(DemoItem.Department) => query.OrderBy(x => x.Department),
+                    nameof(DemoItem.JoinDate) => query.OrderBy(x => x.JoinDate),
+                    nameof(DemoItem.IsActive) => query.OrderBy(x => x.IsActive),
+                    nameof(DemoItem.Score) => query.OrderBy(x => x.Score),
+                    _ => query
+                },
+                SortDirection.Descending => request.SortColumn switch
+                {
+                    nameof(DemoItem.Id) => query.OrderByDescending(x => x.Id),
+                    nameof(DemoItem.FirstName) => query.OrderByDescending(x => x.FirstName),
+                    nameof(DemoItem.LastName) => query.OrderByDescending(x => x.LastName),
+                    nameof(DemoItem.Email) => query.OrderByDescending(x => x.Email),
+                    nameof(DemoItem.Age) => query.OrderByDescending(x => x.Age),
+                    nameof(DemoItem.Salary) => query.OrderByDescending(x => x.Salary),
+                    nameof(DemoItem.Department) => query.OrderByDescending(x => x.Department),
+                    nameof(DemoItem.JoinDate) => query.OrderByDescending(x => x.JoinDate),
+                    nameof(DemoItem.IsActive) => query.OrderByDescending(x => x.IsActive),
+                    nameof(DemoItem.Score) => query.OrderByDescending(x => x.Score),
+                    _ => query
+                },
+                _ => query
+            };
+        }
+
+        // Get total count after filtering and calculate aggregates
+        var filteredList = query.ToList();
+        _filteredCount = filteredList.Count;
+
+        // Calculate footer aggregates
+        _totalSalary = filteredList.Sum(x => x.Salary);
+        _totalAge = filteredList.Sum(x => x.Age);
+        _totalScore = filteredList.Sum(x => x.Score);
+        _activeCount = filteredList.Count(x => x.IsActive);
+
+        // Apply pagination (simulating OFFSET/FETCH in SQL)
+        var items = filteredList
+            .Skip(request.StartIndex)
+            .Take(request.Count.GetValueOrDefault(1))
+            .ToList();
+
+        for (var i = 0; i < items.Count; i++)
+        {
+            items[i].RowNumber = request.StartIndex + i + 1;
+        }
+
+        // Log for debugging
+        Console.WriteLine($"[DB] Loaded {items.Count} items starting at index {request.StartIndex} (Filtered: {_filteredCount}/{_totalItemCount})");
+
+        return GridItemsProviderResult<DemoItem>.From(items, _filteredCount);
+    }
+
+    private static IEnumerable<DemoItem> ApplyGridFilters(
+        IEnumerable<DemoItem> query,
+        IEnumerable<SuperDataGridFilterInfo> filters)
+    {
+        foreach (var filter in filters)
+        {
+            if (string.IsNullOrWhiteSpace(filter.PropertyName))
+            {
+                continue;
+            }
+
+            switch (filter.PropertyName)
+            {
+                case nameof(DemoItem.FirstName) when !string.IsNullOrWhiteSpace(filter.PropertyValue):
+                    query = ApplyStringFilter(query, x => x.FirstName, filter);
+                    break;
+                case nameof(DemoItem.LastName) when !string.IsNullOrWhiteSpace(filter.PropertyValue):
+                    query = ApplyStringFilter(query, x => x.LastName, filter);
+                    break;
+                case nameof(DemoItem.Email) when !string.IsNullOrWhiteSpace(filter.PropertyValue):
+                    query = ApplyStringFilter(query, x => x.Email, filter);
+                    break;
+                case nameof(DemoItem.Department) when !string.IsNullOrWhiteSpace(filter.PropertyValue):
+                    query = ApplyStringFilter(query, x => x.Department, filter);
+                    break;
+                case nameof(DemoItem.Age) when int.TryParse(filter.PropertyValue, out var age):
+                    query = ApplyComparableFilter(query, x => x.Age, age, filter.Operator);
+                    break;
+                case nameof(DemoItem.Salary) when decimal.TryParse(filter.PropertyValue, out var salary):
+                    query = ApplyComparableFilter(query, x => x.Salary, salary, filter.Operator);
+                    break;
+                case nameof(DemoItem.Score) when double.TryParse(filter.PropertyValue, out var score):
+                    query = ApplyComparableFilter(query, x => x.Score, score, filter.Operator);
+                    break;
+                case nameof(DemoItem.IsActive) when bool.TryParse(filter.PropertyValue, out var isActive):
+                    query = ApplyComparableFilter(query, x => x.IsActive, isActive, filter.Operator);
+                    break;
+                case nameof(DemoItem.JoinDate):
+                    query = ApplyDateRangeFilter(query, x => x.JoinDate, filter);
+                    break;
+            }
+        }
+
+        return query;
+    }
+
+    private static IEnumerable<DemoItem> ApplyStringFilter(
+        IEnumerable<DemoItem> query,
+        Func<DemoItem, string> selector,
+        SuperDataGridFilterInfo filter)
+    {
+        var value = filter.PropertyValue ?? string.Empty;
+        return filter.Operator switch
+        {
+            SuperDataGridFilterOperator.Equals => query.Where(x => string.Equals(selector(x), value, StringComparison.OrdinalIgnoreCase)),
+            SuperDataGridFilterOperator.NotEquals => query.Where(x => !string.Equals(selector(x), value, StringComparison.OrdinalIgnoreCase)),
+            SuperDataGridFilterOperator.StartsWith => query.Where(x => selector(x).StartsWith(value, StringComparison.OrdinalIgnoreCase)),
+            SuperDataGridFilterOperator.EndsWith => query.Where(x => selector(x).EndsWith(value, StringComparison.OrdinalIgnoreCase)),
+            _ => query.Where(x => selector(x).Contains(value, StringComparison.OrdinalIgnoreCase))
+        };
+    }
+
+    private static IEnumerable<DemoItem> ApplyComparableFilter<TValue>(
+        IEnumerable<DemoItem> query,
+        Func<DemoItem, TValue> selector,
+        TValue filterValue,
+        SuperDataGridFilterOperator filterOperator)
+        where TValue : IComparable<TValue>
+    {
+        return filterOperator switch
+        {
+            SuperDataGridFilterOperator.Equals => query.Where(x => selector(x).CompareTo(filterValue) == 0),
+            SuperDataGridFilterOperator.NotEquals => query.Where(x => selector(x).CompareTo(filterValue) != 0),
+            SuperDataGridFilterOperator.GreaterThan => query.Where(x => selector(x).CompareTo(filterValue) > 0),
+            SuperDataGridFilterOperator.GreaterThanOrEqual => query.Where(x => selector(x).CompareTo(filterValue) >= 0),
+            SuperDataGridFilterOperator.LessThan => query.Where(x => selector(x).CompareTo(filterValue) < 0),
+            SuperDataGridFilterOperator.LessThanOrEqual => query.Where(x => selector(x).CompareTo(filterValue) <= 0),
+            _ => query.Where(x => selector(x).CompareTo(filterValue) == 0)
+        };
+    }
+
+    private static IEnumerable<DemoItem> ApplyDateRangeFilter(
+        IEnumerable<DemoItem> query,
+        Func<DemoItem, DateTime> selector,
+        SuperDataGridFilterInfo filter)
+    {
+        if (filter.StartDate is not null)
+        {
+            query = query.Where(x => selector(x) >= filter.StartDate.Value);
+        }
+
+        if (filter.EndDate is not null)
+        {
+            query = query.Where(x => selector(x) <= filter.EndDate.Value);
+        }
+
+        return query;
+    }
+
+    private void GenerateRandomItems(int count)
+    {
+        _allItems.Clear();
+
+        for (int i = 1; i <= count; i++)
+        {
+            var firstName = _firstNames[_random.Next(_firstNames.Length)];
+            var lastName = _lastNames[_random.Next(_lastNames.Length)];
+
+            _allItems.Add(new DemoItem
+            {
+                Id = i,
+                FirstName = firstName,
+                LastName = lastName,
+                Email = $"{firstName.ToLower()}.{lastName.ToLower()}@example.com",
+                Age = _random.Next(22, 65),
+                Salary = _random.Next(30000, 150000),
+                Department = _departments[_random.Next(_departments.Length)],
+                JoinDate = DateTime.Now.AddDays(-_random.Next(1, 3650)),
+                IsActive = _random.Next(100) > 20,
+                Score = _random.NextDouble() * 100
+            });
+        }
+    }
+
+    private Task ActionDemo(SelectedActionInfo<DemoItem> selectedAction)
+    {
+        ArgumentNullException.ThrowIfNull(selectedAction);
+        ArgumentNullException.ThrowIfNull(selectedAction.DataGridSelectionInfo);
+
+        var selectedCount = selectedAction.DataGridSelectionInfo.SelectedCountTotal;
+
+        _lastActionMessage = selectedAction.ActionName switch
+        {
+            "ping" => $"Action 'ping' exécutée sur {selectedCount} ligne(s) sélectionnée(s).",
+            "selectAll" => $"Action 'selectAll' exécutée ({selectedCount} ligne(s) sélectionnée(s)).",
+            "clear" => "Action 'clear' exécutée (sélection effacée).",
+            _ => $"Action '{selectedAction.ActionName}' exécutée ({selectedCount} ligne(s) sélectionnée(s))."
+        };
+
+        return Task.CompletedTask;
+    }
+
+    public class DemoItem : IDataItem
+    {
+        public int Id { get; set; }
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public int Age { get; set; }
+        public decimal Salary { get; set; }
+        public string Department { get; set; } = string.Empty;
+        public DateTime JoinDate { get; set; }
+        public bool IsActive { get; set; }
+        public double Score { get; set; }
+
+        public object KeyValue => Id;
+        public bool IsSelected { get; set; }
+        public int RowNumber { get; set; }
+        public Coordinates Coordinates { get; set; } = new();
+    }
+
+    public class Coordinates
+    {
+        public double X { get; set; }
+        public double Y { get; set; }
+        public override string ToString()
+        {
+            return $"{X},{Y}";
+        }
+    }
+}
+

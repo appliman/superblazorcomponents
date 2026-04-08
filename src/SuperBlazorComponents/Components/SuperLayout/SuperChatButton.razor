@@ -1,0 +1,13 @@
+﻿@namespace SuperBlazorComponents.Components.SuperLayout
+
+<button class="btn btn-link super-chat-toggle p-0 border-0 @ActiveClass @CssClass"
+        type="button"
+        @onclick="OnToggleClick"
+        aria-label="@Tooltip"
+        title="@Tooltip">
+    <i class="@IconCssClass"></i>
+    @if (!string.IsNullOrEmpty(Text))
+    {
+        <span class="super-chat-text">@Text</span>
+    }
+</button>

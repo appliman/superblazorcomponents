@@ -1,0 +1,75 @@
+﻿@page "/dialog-demo"
+
+@using SuperBlazorComponents.Components.Buttons
+@using SuperBlazorComponents.Components.Dialogs
+@using SuperBlazorComponents.Services
+
+@inject SuperDialogService DialogService
+
+<PageTitle>DialogService Demo</PageTitle>
+
+<h1>DialogService (DynamicDialog)</h1>
+
+<div class="card mt-3">
+    <div class="card-header">
+        Ouvrir une modale dynamique
+    </div>
+    <div class="card-body">
+        <div class="d-flex flex-wrap gap-2">
+            <SuperButton Text="Ouvrir (default)" Style="SuperButtonStyle.Primary" Click="@OpenDefaultAsync" />
+            <SuperButton Text="Ouvrir (large + height)" Style="SuperButtonStyle.Secondary" Click="@OpenLargeAsync" />
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(_result))
+        {
+            <div class="alert alert-success mt-3 mb-0">Résultat: @_result</div>
+        }
+        else if (_resultWasSet)
+        {
+            <div class="alert alert-warning mt-3 mb-0">Résultat: null</div>
+        }
+    </div>
+</div>
+
+@code
+{
+    private string? _result;
+    private bool _resultWasSet;
+
+    private async Task OpenDefaultAsync()
+    {
+        _resultWasSet = false;
+        _result = null;
+
+        var result = await DialogService.OpenAsync<DialogServiceDemoDialog>(
+            "Démo modale",
+            new Dictionary<string, object>
+            {
+                [nameof(DialogServiceDemoDialog.Message)] = "Hello"
+            });
+
+        _resultWasSet = true;
+        _result = result as string;
+    }
+
+    private async Task OpenLargeAsync()
+    {
+        _resultWasSet = false;
+        _result = null;
+
+        var result = await DialogService.OpenAsync<DialogServiceDemoDialog>(
+            "Démo modale (large)",
+            new Dictionary<string, object>
+            {
+                [nameof(DialogServiceDemoDialog.Message)] = "Modale large"
+            },
+            new DialogOptions
+            {
+                Size = DialogSize.Large,
+                Height = "300px"
+            });
+
+        _resultWasSet = true;
+        _result = result as string;
+    }
+}

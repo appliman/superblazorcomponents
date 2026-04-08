@@ -1,0 +1,86 @@
+﻿@page "/google-pie-chart-demo"
+@using SuperBlazorComponents.Components.GoogleCharts
+
+<PageTitle>Google Pie Chart</PageTitle>
+
+<h1>Google Pie Chart</h1>
+
+<p class="text-muted">
+    Exemples de graphiques à secteurs avec <code>GooglePieChart</code>.
+</p>
+
+<div class="card mt-3">
+    <div class="card-header">
+        Standard
+    </div>
+    <div class="card-body">
+        <GooglePieChart Columns="_pieColumns" Data="_pieData" Options="_standardOptions" />
+    </div>
+</div>
+
+<div class="card mt-3">
+    <div class="card-header">
+        Donut
+    </div>
+    <div class="card-body">
+        <GooglePieChart Columns="_pieColumns" Data="_pieData" Options="_donutOptions" />
+    </div>
+</div>
+
+<div class="card mt-3">
+    <div class="card-header">
+        3D
+    </div>
+    <div class="card-body">
+        <GooglePieChart Columns="_pieColumns" Data="_budgetData" Options="_threeDimensionalOptions" />
+    </div>
+</div>
+
+@code {
+    private readonly List<GoogleChartColumn> _pieColumns =
+    [
+        new GoogleChartColumn { Label = "Activité", Type = "string" },
+        new GoogleChartColumn { Label = "Heures", Type = "number" }
+    ];
+
+    private readonly List<GoogleChartDataRow> _pieData =
+    [
+        new GoogleChartDataRow { Label = "Travail", Values = [11m] },
+        new GoogleChartDataRow { Label = "Repas", Values = [2m] },
+        new GoogleChartDataRow { Label = "Déplacements", Values = [2m] },
+        new GoogleChartDataRow { Label = "Loisirs", Values = [3m] },
+        new GoogleChartDataRow { Label = "Sommeil", Values = [6m] }
+    ];
+
+    private readonly List<GoogleChartDataRow> _budgetData =
+    [
+        new GoogleChartDataRow { Label = "Produit", Values = [45m] },
+        new GoogleChartDataRow { Label = "Marketing", Values = [18m] },
+        new GoogleChartDataRow { Label = "Support", Values = [12m] },
+        new GoogleChartDataRow { Label = "Ops", Values = [15m] },
+        new GoogleChartDataRow { Label = "Finance", Values = [10m] }
+    ];
+
+    private readonly GooglePieChartOptions _standardOptions = new()
+    {
+        Title = "Répartition d'une journée",
+        Height = "320",
+        PieSliceText = "percentage"
+    };
+
+    private readonly GooglePieChartOptions _donutOptions = new()
+    {
+        Title = "Répartition des tâches",
+        Height = "320",
+        PieHole = 0.45,
+        PieSliceText = "label"
+    };
+
+    private readonly GooglePieChartOptions _threeDimensionalOptions = new()
+    {
+        Title = "Budget par département",
+        Height = "320",
+        Is3D = true,
+        PieSliceText = "value"
+    };
+}

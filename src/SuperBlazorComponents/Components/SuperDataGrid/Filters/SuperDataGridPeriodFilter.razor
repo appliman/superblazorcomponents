@@ -1,0 +1,89 @@
+﻿@using System.Globalization
+@using SuperBlazorComponents.Components
+@using SuperBlazorComponents.Components.SuperDateRange
+@using SuperBlazorComponents.Services
+
+@inject SuperDialogService DialogService
+
+<div class="sdgpf-container">
+    <button type="button"
+            class="btn btn-sm btn-outline-secondary sdgpf-button"
+            @onclick="OpenDialogAsync">
+        <span class="sdgpf-button-content">
+            <i class="fa-solid fa-filter sdgpf-icon" title="Filtrer par période" aria-hidden="true"></i>
+            <span class="text-truncate">@GetDisplayText()</span>
+        </span>
+    </button>
+</div>
+
+@code {
+    private static readonly CultureInfo FrCulture = CultureInfo.GetCultureInfo("fr-FR");
+
+    private SuperDateRangeSelection _selectedRange = new(null, null, SuperDateRangePreset.AllTime);
+
+    [Parameter]
+    public string PropertyName { get; set; } = string.Empty;
+
+    [Parameter]
+    public Type PropertyType { get; set; } = typeof(DateTime?);
+
+    [Parameter]
+    public EventCallback<SuperDataGridFilterInfo> ApplyFilter { get; set; }
+
+    [Parameter]
+    public bool DisplayWeekNumbers { get; set; } = true;
+
+    [Parameter]
+    public bool DisableFutureDates { get; set; } = true;
+
+    private async Task OpenDialogAsync()
+    {
+        var result = await DialogService.OpenDateRangeDialogAsync(
+            "Sélectionner une période",
+            _selectedRange,
+            DisplayWeekNumbers,
+            DisableFutureDates);
+
+        if (result is null)
+        {
+            return;
+        }
+
+        _selectedRange = result;
+        await ApplySelectedRangeAsync(result);
+    }
+
+    private async Task ApplySelectedRangeAsync(SuperDateRangeSelection range)
+    {
+        if (!ApplyFilter.HasDelegate || string.IsNullOrWhiteSpace(PropertyName))
+        {
+            return;
+        }
+
+        var periodName = GetPeriodName(range);
+        var filterInfo = new SuperDataGridFilterInfo
+        {
+            PropertyName = PropertyName,
+            PropertyValue = range.StartDate is null && range.EndDate is null ? null : periodName,
+            StartDate = range.StartDate,
+            EndDate = range.EndDate,
+            PeriodName = periodName,
+            PeriodPreset = range.Preset,
+            PropertyType = PropertyType,
+            Operator = SuperDataGridFilterOperator.Equals
+        };
+
+        await ApplyFilter.InvokeAsync(filterInfo);
+    }
+
+    private static string GetPeriodName(SuperDateRangeSelection range)
+    {
+        return SuperDateRangePresetCalculator.GetSummary(range, FrCulture);
+    }
+
+    private string GetDisplayText()
+    {
+        var text = GetPeriodName(_selectedRange);
+        return string.IsNullOrWhiteSpace(text) ? "Période..." : text;
+    }
+}

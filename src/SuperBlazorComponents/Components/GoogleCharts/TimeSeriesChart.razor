@@ -1,0 +1,211 @@
+﻿@namespace SuperBlazorComponents.Components.GoogleCharts
+@inherits ComponentBase
+
+<div class="time-series-chart">
+	@if (!Data.Any())
+	{
+		<div class="chart-no-data">
+			<p>Aucune donnée à afficher</p>
+		</div>
+	}
+	else
+	{
+		<svg width="100%" height="@(_chartHeight)" viewBox="0 0 @(_chartWidth) @(_chartHeight)" preserveAspectRatio="none">
+			<defs>
+				<clipPath id="chart-area-@GetHashCode()">
+					<rect x="@Options.Padding.Left"
+						  y="@Options.Padding.Top"
+						  width="@GetChartAreaWidth()"
+						  height="@GetChartAreaHeight()" />
+				</clipPath>
+			</defs>
+
+			<g>
+				<text x="@(_chartWidth / 2)"
+					  y="20"
+					  class="chart-title"
+					  text-anchor="middle">@Options.Title</text>
+			</g>
+
+			@if (Options.ShowWeekendBands)
+			{
+				<g clip-path="url(#chart-area-@GetHashCode())">
+					@foreach (var (start, end) in GetWeekendBands())
+					{
+						var x1 = GetX(start);
+						var x2 = GetX(end.AddDays(1));
+						<rect x="@x1"
+							  y="@Options.Padding.Top"
+							  width="@(x2 - x1)"
+							  height="@GetChartAreaHeight()"
+							  class="weekend-band" />
+					}
+				</g>
+			}
+
+			@if (Options.ShowWeekSeparators)
+			{
+				<g clip-path="url(#chart-area-@GetHashCode())">
+					@foreach (var date in GetWeekSeparators())
+					{
+						var x = GetX(date);
+						<line x1="@x"
+							  y1="@Options.Padding.Top"
+							  x2="@x"
+							  y2="@(Options.Padding.Top + GetChartAreaHeight())"
+							  class="week-separator" />
+					}
+				</g>
+			}
+
+			@if (Options.ShowMonthMarkers)
+			{
+				<g clip-path="url(#chart-area-@GetHashCode())">
+					@foreach (var (date, label) in GetMonthMarkers())
+					{
+						var x = GetX(date);
+						<line x1="@x"
+							  y1="@Options.Padding.Top"
+							  x2="@x"
+							  y2="@(Options.Padding.Top + GetChartAreaHeight())"
+							  class="month-marker" />
+						<g>
+							<text x="@x"
+								  y="@(Options.Padding.Top - 10)"
+								  class="month-label"
+								  text-anchor="start"
+								  transform="rotate(-45, @x, @(Options.Padding.Top - 10))">@label</text>
+						</g>
+					}
+				</g>
+			}
+
+			@if (Options.ShowHorizontalGrid)
+			{
+				@foreach (var (value, label) in GetYAxisTicks())
+				{
+					var y = GetY(value);
+					<line x1="@Options.Padding.Left"
+						  y1="@y"
+						  x2="@(Options.Padding.Left + GetChartAreaWidth())"
+						  y2="@y"
+						  class="grid-line-horizontal" />
+				}
+			}
+
+			@if (Options.ShowVerticalGrid)
+			{
+				@foreach (var (date, label) in GetXAxisTicks())
+				{
+					var x = GetX(date);
+					<line x1="@x"
+						  y1="@Options.Padding.Top"
+						  x2="@x"
+						  y2="@(Options.Padding.Top + GetChartAreaHeight())"
+						  class="grid-line-vertical" />
+				}
+			}
+
+			<line x1="@Options.Padding.Left"
+				  y1="@Options.Padding.Top"
+				  x2="@Options.Padding.Left"
+				  y2="@(Options.Padding.Top + GetChartAreaHeight())"
+				  class="axis-line" />
+
+			<line x1="@Options.Padding.Left"
+				  y1="@(Options.Padding.Top + GetChartAreaHeight())"
+				  x2="@(Options.Padding.Left + GetChartAreaWidth())"
+				  y2="@(Options.Padding.Top + GetChartAreaHeight())"
+				  class="axis-line" />
+
+			@foreach (var (value, label) in GetYAxisTicks())
+			{
+				var y = GetY(value);
+				<g>
+					<text x="@(Options.Padding.Left - 10)"
+						  y="@(y + 4)"
+						  class="axis-label-y"
+						  text-anchor="end">@label</text>
+				</g>
+			}
+
+			<g>
+				<text x="15"
+					  y="@((Options.Padding.Top + GetChartAreaHeight() / 2))"
+					  class="axis-title"
+					  text-anchor="middle"
+					  transform="rotate(-90, 15, @((Options.Padding.Top + GetChartAreaHeight() / 2)))">@Options.YAxisTitle</text>
+			</g>
+
+			@foreach (var (date, label) in GetXAxisTicks())
+			{
+				var x = GetX(date);
+				var axisY = Options.Padding.Top + GetChartAreaHeight();
+				var labelY = axisY + 20;
+				<g>
+					<text x="@x"
+						  y="@labelY"
+						  class="axis-label-x"
+						  text-anchor="start"
+						  transform="rotate(-45, @x, @labelY)">@label</text>
+				</g>
+			}
+
+			<g clip-path="url(#chart-area-@GetHashCode())">
+				<path d="@GenerateLinePath()"
+					  class="data-line"
+					style="stroke: @Options.LineColor; stroke-width: @(Options.LineWidth)px" />
+
+				@foreach (var point in Data.OrderBy(d => d.Date))
+				{
+					var x = GetX(point.Date);
+					var y = GetY(point.Value);
+					var capturePoint = point;
+					<circle cx="@x"
+							cy="@y"
+							r="8"
+							class="hover-area"
+							@onmouseover="@((MouseEventArgs e) => ShowTooltip(capturePoint, x, y))"
+							@onmouseout="@(() => HideTooltip())" />
+				}
+
+				@if (Options.ShowMarkers)
+				{
+					@foreach (var point in Data)
+					{
+						var x = GetX(point.Date);
+						var y = GetY(point.Value);
+						<circle cx="@x"
+								cy="@y"
+								r="4"
+								class="data-marker"
+								style="fill: @Options.LineColor; pointer-events: none;" />
+					}
+				}
+			</g>
+
+			@if (_showTooltip)
+			{
+				<g class="tooltip-group" transform="translate(@(_tooltipX), @(_tooltipY))">
+					<rect x="-60" y="-25" width="120" height="20" rx="4" class="tooltip-bg" />
+					<g>
+						<text x="0" y="-10" class="tooltip-text" text-anchor="middle">@_tooltipContent</text>
+					</g>
+				</g>
+			}
+		</svg>
+
+		<div class="month-labels-bottom">
+			@foreach (var (date, label) in GetMonthMarkers())
+			{
+				var totalDays = (_maxDate - _minDate).TotalDays;
+				var daysSinceStart = (date - _minDate).TotalDays;
+				var leftPercent = totalDays > 0 ? (daysSinceStart / totalDays * 100) : 0;
+
+				<span class="month-label-bottom" style="left: calc(@(Options.Padding.Left)px + @(leftPercent)% * (100% - @(Options.Padding.Left + Options.Padding.Right)px) / 100%)">
+					@date.ToString("MMMM yyyy", _culture)
+				</span>
+			}
+		</div>
+	}
+</div>

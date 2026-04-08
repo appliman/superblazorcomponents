@@ -1,0 +1,42 @@
+﻿@page "/splitter-demo/vertical"
+@using SuperBlazorComponents.Components.SuperSplitter
+
+<PageTitle>SuperSplitter Vertical</PageTitle>
+
+<h1>SuperSplitter - Vertical</h1>
+
+<div class="mb-3 d-flex flex-wrap gap-2 align-items-center">
+    <span>Taille 1er panneau: <strong>@FirstPaneSize.ToString("0")%</strong></span>
+</div>
+
+<div style="height: 65vh; min-height: 320px; border: 1px solid var(--bs-border-color); border-radius: 0.375rem; overflow: hidden;">
+    <SuperSplitter Orientation="@SuperSplitterOrientation.Vertical"
+                  FirstPaneSize="@FirstPaneSize"
+                  FirstPaneSizeChanged="@OnFirstPaneSizeChanged"
+                  MinFirstPaneSize="10"
+                  MaxFirstPaneSize="90"
+                  PersistenceKey="AdminBlazorApp:SuperSplitterDemo:Vertical">
+        <SplitPane>
+            <div class="h-100 p-3" style="background-color: var(--bs-tertiary-bg);">
+                <h5 class="mb-2">Panneau 1</h5>
+                <p class="mb-0">Déplace la barre pour redimensionner.</p>
+            </div>
+        </SplitPane>
+        <SplitPane>
+            <div class="h-100 p-3">
+                <h5 class="mb-2">Panneau 2</h5>
+                <p class="mb-0">Orientation: <strong>Vertical</strong></p>
+            </div>
+        </SplitPane>
+    </SuperSplitter>
+</div>
+
+@code {
+    private double FirstPaneSize { get; set; } = 35;
+
+    private Task OnFirstPaneSizeChanged(double value)
+    {
+        FirstPaneSize = value;
+        return Task.CompletedTask;
+    }
+}

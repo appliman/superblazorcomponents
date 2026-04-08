@@ -1,0 +1,152 @@
+﻿@using SuperBlazorComponents.Components.Buttons
+@using SuperBlazorComponents.Components.SuperDataGrid
+@typeparam TItem
+@implements IDisposable
+
+@if (_effectiveSuperDataGrid is not null)
+{
+    <div class="dropdown super-datagrid-columns-tool">
+        <button class="btn btn-secondary btn-sm dropdown-toggle"
+                type="button"
+                data-bs-toggle="dropdown"
+                data-bs-auto-close="outside"
+                aria-expanded="false"
+                title="Colonnes visibles">
+            <i class="fa-solid fa-eye"></i>
+            <span class="ms-1">Colonnes</span>
+        </button>
+
+        <ul class="dropdown-menu super-datagrid-columns-menu">
+            <li class="dropdown-header super-datagrid-columns-title">
+                <i class="fa-solid fa-eye me-2" aria-hidden="true"></i>
+                Colonnes visibles
+            </li>
+            @foreach (var column in _columns)
+            {
+                <li>
+                    <label class="dropdown-item super-datagrid-column-item">
+                        <input type="checkbox"
+                               class="form-check-input"
+                               checked="@column.IsVisible"
+                               disabled="@column.IsAlwaysVisible"
+                               @onchange="@(args => OnColumnVisibilityChangedAsync(column, args))" />
+                        <span>@column.DisplayName</span>
+                    </label>
+                </li>
+            }
+        </ul>
+    </div>
+}
+
+@code {
+    private SuperDataGrid<TItem>? _effectiveSuperDataGrid;
+    private List<SuperDataGridColumnVisibilityInfo> _columns = [];
+
+    [Parameter]
+    public SuperDataGrid<TItem>? SuperDataGrid { get; set; }
+
+    [Parameter]
+    public EventCallback<IReadOnlyList<SuperDataGridColumnVisibilityInfo>> ColumnVisibilityChanged { get; set; }
+
+    [Parameter]
+    public SuperButtonSize Size { get; set; } = SuperButtonSize.Default;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        SuperDataGrid<TItem>.GridInstanceReady += OnGridInstanceReady;
+    }
+
+    protected override void OnParametersSet()
+    {
+        var requestedGrid = SuperDataGrid ?? _effectiveSuperDataGrid;
+        SetEffectiveSuperDataGrid(requestedGrid);
+        RefreshColumns();
+        base.OnParametersSet();
+    }
+
+    private void OnGridInstanceReady(SuperDataGrid<TItem> grid)
+    {
+        if (_effectiveSuperDataGrid is not null)
+        {
+            return;
+        }
+
+        SetEffectiveSuperDataGrid(grid);
+        SuperDataGrid = grid;
+        RefreshColumns();
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private async Task OnColumnVisibilityChangedAsync(SuperDataGridColumnVisibilityInfo column, ChangeEventArgs args)
+    {
+        if (_effectiveSuperDataGrid is null)
+        {
+            return;
+        }
+
+        if (column.IsAlwaysVisible)
+        {
+            return;
+        }
+
+        if (args.Value is not bool isVisible)
+        {
+            return;
+        }
+
+        await _effectiveSuperDataGrid.SetColumnVisibilityAsync(column.ColumnIndex, isVisible);
+        RefreshColumns();
+
+        if (ColumnVisibilityChanged.HasDelegate)
+        {
+            await ColumnVisibilityChanged.InvokeAsync(_columns);
+        }
+    }
+
+    private void RefreshColumns()
+    {
+        if (_effectiveSuperDataGrid is null)
+        {
+            _columns = [];
+            return;
+        }
+
+        _columns = _effectiveSuperDataGrid.GetColumnVisibilityInfo().ToList();
+    }
+
+    private void SetEffectiveSuperDataGrid(SuperDataGrid<TItem>? grid)
+    {
+        if (ReferenceEquals(_effectiveSuperDataGrid, grid))
+        {
+            return;
+        }
+
+        if (_effectiveSuperDataGrid is not null)
+        {
+            _effectiveSuperDataGrid.ColumnStateChanged -= OnColumnStateChanged;
+        }
+
+        _effectiveSuperDataGrid = grid;
+
+        if (_effectiveSuperDataGrid is not null)
+        {
+            _effectiveSuperDataGrid.ColumnStateChanged += OnColumnStateChanged;
+        }
+    }
+
+    private void OnColumnStateChanged(object? sender, EventArgs args)
+    {
+        RefreshColumns();
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        SuperDataGrid<TItem>.GridInstanceReady -= OnGridInstanceReady;
+        if (_effectiveSuperDataGrid is not null)
+        {
+            _effectiveSuperDataGrid.ColumnStateChanged -= OnColumnStateChanged;
+        }
+    }
+}

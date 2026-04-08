@@ -1,0 +1,60 @@
+﻿@page "/splitter-demo/both"
+@using SuperBlazorComponents.Components.SuperSplitter
+
+<PageTitle>SuperSplitter - Les 2</PageTitle>
+
+<h1>SuperSplitter - Les 2</h1>
+
+<SuperSplitter Orientation="@SuperSplitterOrientation.Vertical"
+                FirstPaneSize="@VerticalFirstPaneSize"
+                FirstPaneSizeChanged="@OnVerticalFirstPaneSizeChanged"
+                MinFirstPaneSize="10"
+                MaxFirstPaneSize="90"
+                PersistenceKey="AdminBlazorApp:SuperSplitterDemo:Both:Vertical">
+    <SplitPane>
+        <SuperSplitter Orientation="@SuperSplitterOrientation.Horizontal"
+                       FirstPaneSize="@HorizontalFirstPaneSize"
+                       FirstPaneSizeChanged="@OnHorizontalFirstPaneSizeChanged"
+                       MinFirstPaneSize="10"
+                       MaxFirstPaneSize="90"
+                       PersistenceKey="AdminBlazorApp:SuperSplitterDemo:Both:Horizontal">
+            <SplitPane>
+                <div class="h-100 p-3" style="background-color: var(--bs-tertiary-bg);">
+                    <h5 class="mb-2">Panneau 1</h5>
+                    <p class="mb-0">Taille: <strong>@HorizontalFirstPaneSize.ToString("0")%</strong></p>
+                </div>
+            </SplitPane>
+            <SplitPane>
+                <div class="h-100 p-3">
+                    <h5 class="mb-2">Panneau 2</h5>
+                    <p class="mb-0">Orientation: <strong>Horizontal</strong></p>
+                </div>
+            </SplitPane>
+        </SuperSplitter>
+    </SplitPane>
+    <SplitPane>
+        <div class="h-100 p-3">
+            <h5 class="mb-2">Panneau 3</h5>
+            <p class="mb-0">Orientation: <strong>Vertical</strong></p>
+        </div>
+    </SplitPane>
+</SuperSplitter>
+
+
+@code {
+    private double VerticalFirstPaneSize { get; set; } = 35;
+
+    private double HorizontalFirstPaneSize { get; set; } = 35;
+
+    private Task OnVerticalFirstPaneSizeChanged(double value)
+    {
+        VerticalFirstPaneSize = value;
+        return Task.CompletedTask;
+    }
+
+    private Task OnHorizontalFirstPaneSizeChanged(double value)
+    {
+        HorizontalFirstPaneSize = value;
+        return Task.CompletedTask;
+    }
+}

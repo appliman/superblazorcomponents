@@ -1,0 +1,14 @@
+﻿/* SuperBody - CSS isolé avec support dark mode Bootstrap */
+.super-body {
+    grid-area: body;
+    min-width: 0;
+    overflow-y: auto;
+    color: var(--bs-body-color);
+    margin: 0;
+    padding: 0;
+}
+
+.super-body-content {
+    height: 100%;
+    padding: 0;
+}

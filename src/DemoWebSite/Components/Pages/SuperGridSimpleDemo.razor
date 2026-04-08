@@ -1,0 +1,167 @@
+﻿@page "/supergrid-simple-demo"
+@using System.ComponentModel.DataAnnotations
+@using SuperBlazorComponents.Components.SuperDataGrid
+
+<PageTitle>SuperGrid – Démo simple</PageTitle>
+
+<h1>SuperGrid – Démo simple</h1>
+<p class="text-muted">Comparaison de deux presets : <code>SimpleGrid</code> (minimal) et <code>GridWithFooter</code> (complet).</p>
+
+<h4 class="mt-3">SimpleGrid</h4>
+<p class="text-muted">Sans sélecteur, sans filtre, sans pied de page.</p>
+<div style="height: 400px;">
+    <SuperDataGrid TItem="Personne"
+                   ItemsProvider="LoadPersonnesAsync"
+                   DefaultSettingsName="SimpleGrid">
+        <ChildContent>
+            <DataGridColumn For="@(p => p.Nom)"     Title="Nom"        Width="200px" Filterable="true" />
+            <DataGridColumn For="@(p => p.Prenom)"  Title="Prénom"     Width="180px" />
+            <DataGridColumn For="@(p => p.Ville)"   Title="Ville"      Width="180px" />
+            <DataGridColumn For="@(p => p.Fonction)" Title="Fonction"   Width="140px">
+                <Template>
+                    <span class="badge text-bg-light border">@GetDisplayName(context.Fonction)</span>
+                </Template>
+            </DataGridColumn>
+            <DataGridColumn For="@(p => p.Age)"     Title="Âge"        Width="90px"  TextAlign="SuperTextAlignment.Center" />
+            <DataGridColumn For="@(p => p.Actif)"   Title="Actif"      Width="100px" TextAlign="SuperTextAlignment.Center" Filterable="true">
+                <Template>
+                    @if (context.Actif)
+                    {
+                        <span class="badge text-bg-success">Oui</span>
+                    }
+                    else
+                    {
+                        <span class="badge text-bg-secondary">Non</span>
+                    }
+                </Template>
+            </DataGridColumn>
+            <DataGridColumn For="@(p => p.Salaire)" Title="Salaire"    Width="140px" FormatString="{0:C}" TextAlign="SuperTextAlignment.Right" />
+        </ChildContent>
+    </SuperDataGrid>
+</div>
+
+<h4 class="mt-4">GridWithFooter</h4>
+<p class="text-muted">Avec sélecteur, filtres, redimensionnement et pied de page.</p>
+<div style="height: 400px;">
+    <SuperDataGrid TItem="Personne"
+                   ItemsProvider="LoadPersonnesAsync"
+                   DefaultSettingsName="GridWithFooter">
+        <ChildContent>
+            <DataGridColumn For="@(p => p.Nom)"     Title="Nom"        Width="200px" />
+            <DataGridColumn For="@(p => p.Prenom)"  Title="Prénom"     Width="180px" />
+            <DataGridColumn For="@(p => p.Ville)"   Title="Ville"      Width="180px" />
+            <DataGridColumn For="@(p => p.Fonction)" Title="Fonction"   Width="140px">
+                <Template>
+                    <span class="badge text-bg-light border">@GetDisplayName(context.Fonction)</span>
+                </Template>
+            </DataGridColumn>
+            <DataGridColumn For="@(p => p.Age)"     Title="Âge"        Width="90px"  TextAlign="SuperTextAlignment.Center" />
+            <DataGridColumn For="@(p => p.Actif)"   Title="Actif"      Width="100px" TextAlign="SuperTextAlignment.Center">
+                <Template>
+                    @if (context.Actif)
+                    {
+                        <span class="badge text-bg-success">Oui</span>
+                    }
+                    else
+                    {
+                        <span class="badge text-bg-secondary">Non</span>
+                    }
+                </Template>
+            </DataGridColumn>
+            <DataGridColumn For="@(p => p.Salaire)" Title="Salaire"    Width="140px" FormatString="{0:C}" TextAlign="SuperTextAlignment.Right" />
+        </ChildContent>
+    </SuperDataGrid>
+</div>
+
+@code {
+    private static readonly List<Personne> _personnes =
+    [
+        new("Dupont",    "Alice",   "Paris",       FonctionPersonne.Cadre,      32, true,  42_000m),
+        new("Martin",    "Bruno",   "Lyon",        FonctionPersonne.Ouvrier,    45, true,  55_500m),
+        new("Leroy",     "Claire",  "Marseille",   FonctionPersonne.Secretaire, 28, false, 31_200m),
+        new("Bernard",   "David",   "Toulouse",    FonctionPersonne.Cadre,      38, true,  48_300m),
+        new("Petit",     "Emma",    "Bordeaux",    FonctionPersonne.President,  52, false, 61_000m),
+        new("Robert",    "Fabrice", "Nantes",      FonctionPersonne.Ouvrier,    41, true,  50_700m),
+        new("Richard",   "Gaëlle",  "Strasbourg",  FonctionPersonne.Secretaire, 29, true,  37_400m),
+        new("Simon",     "Hugo",    "Montpellier", FonctionPersonne.Cadre,      35, false, 43_100m),
+        new("Michel",    "Isabelle", "Rennes",     FonctionPersonne.President,  47, true,  58_600m),
+        new("Laurent",   "Julien",  "Nice",        FonctionPersonne.Ouvrier,    31, true,  40_900m),
+    ];
+
+    private ValueTask<GridItemsProviderResult<Personne>> LoadPersonnesAsync(GridItemsProviderRequest<Personne> request)
+    {
+        var query = _personnes.AsEnumerable();
+
+        foreach (var filter in request.Filters)
+        {
+            if (filter.PropertyName == nameof(Personne.Fonction) && filter.SelectedValues.Count > 0)
+            {
+                var selectedFunctions = filter.SelectedValues
+                    .Select(value => Enum.TryParse<FonctionPersonne>(value, out var fonction) ? fonction : (FonctionPersonne?)null)
+                    .Where(value => value.HasValue)
+                    .Select(value => value!.Value)
+                    .ToHashSet();
+
+                query = query.Where(personne => selectedFunctions.Contains(personne.Fonction));
+            }
+
+            if (filter.PropertyName == nameof(Personne.Actif)
+                && bool.TryParse(filter.PropertyValue, out var actif))
+            {
+                query = query.Where(personne => personne.Actif == actif);
+            }
+        }
+
+        query = (request.SortColumn, request.SortDirection) switch
+        {
+            (nameof(Personne.Nom),     SortDirection.Ascending)  => query.OrderBy(p => p.Nom),
+            (nameof(Personne.Nom),     SortDirection.Descending) => query.OrderByDescending(p => p.Nom),
+            (nameof(Personne.Prenom),  SortDirection.Ascending)  => query.OrderBy(p => p.Prenom),
+            (nameof(Personne.Prenom),  SortDirection.Descending) => query.OrderByDescending(p => p.Prenom),
+            (nameof(Personne.Ville),   SortDirection.Ascending)  => query.OrderBy(p => p.Ville),
+            (nameof(Personne.Ville),   SortDirection.Descending) => query.OrderByDescending(p => p.Ville),
+            (nameof(Personne.Fonction), SortDirection.Ascending)  => query.OrderBy(p => p.Fonction),
+            (nameof(Personne.Fonction), SortDirection.Descending) => query.OrderByDescending(p => p.Fonction),
+            (nameof(Personne.Age),     SortDirection.Ascending)  => query.OrderBy(p => p.Age),
+            (nameof(Personne.Age),     SortDirection.Descending) => query.OrderByDescending(p => p.Age),
+            (nameof(Personne.Salaire), SortDirection.Ascending)  => query.OrderBy(p => p.Salaire),
+            (nameof(Personne.Salaire), SortDirection.Descending) => query.OrderByDescending(p => p.Salaire),
+            _                                                     => query
+        };
+
+        var totalCount = query.Count();
+        var page = query
+            .Skip(request.StartIndex)
+            .Take(request.Count ?? totalCount)
+            .ToList();
+
+        return ValueTask.FromResult(new GridItemsProviderResult<Personne>(page, totalCount));
+    }
+
+    private sealed record Personne(
+        string Nom,
+        string Prenom,
+        string Ville,
+        FonctionPersonne Fonction,
+        int Age,
+        bool Actif,
+        decimal Salaire);
+
+    private enum FonctionPersonne
+    {
+        [Display(Name = "Cadre")]
+        Cadre,
+        [Display(Name = "Ouvrier", Description = "Ceci est un exemple")]
+        Ouvrier,
+        [Display(Name = "Président")]
+        President,
+        [Display(Name = "Secrétaire")]
+        Secretaire
+    }
+
+    private static string GetDisplayName(FonctionPersonne fonction)
+    {
+        var member = typeof(FonctionPersonne).GetMember(fonction.ToString()).FirstOrDefault();
+        return member?.GetCustomAttributes(typeof(DisplayAttribute), false).OfType<DisplayAttribute>().FirstOrDefault()?.GetName() ?? fonction.ToString();
+    }
+}

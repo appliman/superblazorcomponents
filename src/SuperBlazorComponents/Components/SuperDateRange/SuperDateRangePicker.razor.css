@@ -1,0 +1,160 @@
+﻿.super-date-range-picker {
+    min-width: var(--sdrp-min-width, 18rem);
+}
+
+.super-date-range-picker.is-open {
+    z-index: 4000;
+}
+
+.super-date-range-picker > .btn {
+    min-width: var(--sdrp-min-width, 18rem);
+}
+
+.super-date-range-panel {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 0;
+    z-index: 4001;
+    width: min(100vw - 2rem, 58rem);
+    overflow: hidden;
+    border-radius: var(--bs-border-radius-lg);
+}
+
+.super-date-range-presets {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: 26rem;
+    overflow-y: auto;
+}
+
+.super-date-range-presets .list-group-item {
+    border-inline: 0;
+    border-radius: 0;
+    padding-block: 0.9rem;
+}
+
+.super-date-range-calendars {
+    min-width: 0;
+}
+
+.super-date-range-calendar {
+    min-width: 0;
+}
+
+.super-date-range-weeks {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.super-date-range-weekdays,
+.super-date-range-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 0.25rem;
+}
+
+.super-date-range-weekdays.with-week-numbers,
+.super-date-range-grid.with-week-numbers {
+    grid-template-columns: minmax(2.25rem, 0.7fr) repeat(7, minmax(0, 1fr));
+}
+
+.super-date-range-weekdays {
+    text-align: center;
+}
+
+.super-date-range-week-number-header,
+.super-date-range-week-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.25rem;
+    border-radius: var(--bs-border-radius-sm);
+    background-color: #e9ecef;
+    color: #495057;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.super-date-range-week-number {
+    border: 1px solid transparent;
+    transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, color 0.15s ease-in-out;
+}
+
+.super-date-range-week-number:not(:disabled):hover {
+    background-color: rgba(var(--bs-primary-rgb), 0.12);
+    color: var(--bs-body-color);
+}
+
+.super-date-range-week-number.is-selected {
+    background-color: var(--bs-primary-bg-subtle);
+    border-color: rgba(var(--bs-primary-rgb), 0.35);
+    color: var(--bs-primary-text-emphasis);
+}
+
+.super-date-range-week-number:disabled,
+.super-date-range-week-number.is-disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.super-date-range-week-number-header {
+    text-transform: none;
+}
+
+.super-date-range-empty {
+    aspect-ratio: 1;
+}
+
+.super-date-range-day {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    aspect-ratio: 1;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    background-color: transparent;
+    color: var(--bs-body-color);
+    transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, color 0.15s ease-in-out;
+}
+
+.super-date-range-day:hover {
+    background-color: var(--bs-tertiary-bg);
+}
+
+.super-date-range-day:disabled,
+.super-date-range-day.is-disabled {
+    background-color: var(--bs-secondary-bg);
+    color: var(--bs-secondary-color);
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
+.super-date-range-day:disabled:hover,
+.super-date-range-day.is-disabled:hover {
+    background-color: var(--bs-secondary-bg);
+}
+
+.super-date-range-day.is-in-range {
+    border-radius: var(--bs-border-radius-sm);
+    background-color: rgba(var(--bs-primary-rgb), 0.18);
+}
+
+.super-date-range-day.is-boundary {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+    color: var(--bs-white);
+}
+
+.super-date-range-day.is-today {
+    border-color: rgba(var(--bs-primary-rgb), 0.55);
+}
+
+@media (max-width: 991.98px) {
+    .super-date-range-panel {
+        position: static;
+        width: 100%;
+        margin-top: 0.75rem;
+    }
+}

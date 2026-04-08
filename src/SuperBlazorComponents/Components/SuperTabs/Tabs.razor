@@ -1,0 +1,9 @@
+﻿@ChildContent
+
+@code {
+    [CascadingParameter]
+    internal SuperTabs? Owner { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

@@ -1,0 +1,282 @@
+﻿@page "/todo-supergrid-demo"
+@using SuperBlazorComponents.Components.Buttons
+@using SuperBlazorComponents.Components.SuperDataGrid
+
+<PageTitle>Todo List – SuperDataGrid Edition</PageTitle>
+
+<h1>Todo List</h1>
+<p class="text-muted">
+    Démonstration de <code>SuperDataGrid</code> en mode édition <strong>par ligne</strong>.
+    Double-cliquez sur une ligne pour l'éditer, ou utilisez les boutons d'action.
+    Les données restent en mémoire pour la démo.
+</p>
+
+<div class="card mb-3">
+    <div class="card-header">Nouvelle tâche</div>
+    <div class="card-body">
+        <div class="row g-2 align-items-end">
+            <div class="col-md-6">
+                <label class="form-label">Titre</label>
+                <input type="text"
+                       class="form-control"
+                       placeholder="Nom de la tâche…"
+                       @bind="_newTitle"
+                       @bind:event="oninput"
+                       @onkeydown="OnNewTitleKeyDownAsync" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Priorité</label>
+                <select class="form-select" @bind="_newPriority">
+                    <option value="Basse">Basse</option>
+                    <option value="Normale">Normale</option>
+                    <option value="Haute">Haute</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <SuperButton Text="Ajouter"
+                             Icon="fa-plus"
+                             Style="SuperButtonStyle.Primary"
+                             Click="AddTaskAsync"
+                             Disabled="@string.IsNullOrWhiteSpace(_newTitle)" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<div style="height: 500px;">
+    <SuperDataGrid @ref="_grid"
+                   TItem="TodoItem"
+                   ItemsProvider="LoadDatas"
+                   EditOnDoubleClick="true"
+                   Height="100%"
+                   RowHeight="50"
+                   DisplaySelectionColumn="false"
+                   AllowSorting="true"
+                   AllowColumnResize="true"
+                   AllowColumnReorder="false"
+                   AllowFiltering="false"
+                   GridId="todo-supergrid-demo"
+                   TableCssClass="table-bordered table-hover"
+                   DisplayRefreshButton="false"
+                   ActionsWidth="70">
+
+        <ActionsTemplate Context="item">
+            @if (_grid is not null && _grid.IsRowInEditMode(item))
+            {
+                <SuperButton Icon="fa-check"
+                             Text=""
+                             Style="SuperButtonStyle.Success"
+                             Size="SuperButtonSize.Small"
+                             AllowCollapse="false"
+                             title="Valider"
+                             Click="@(async _ => await _grid!.EndEditAsync(item))" />
+                <SuperButton Icon="fa-xmark"
+                             Text=""
+                             Style="SuperButtonStyle.Secondary"
+                             Size="SuperButtonSize.Small"
+                             AllowCollapse="false"
+                             title="Annuler"
+                             Click="@(async _ => await _grid!.CancelEditAsync(item))" />
+            }
+            else
+            {
+                <SuperButton Icon="fa-pencil"
+                             Text=""
+                             Style="SuperButtonStyle.Primary"
+                             Size="SuperButtonSize.Small"
+                             AllowCollapse="false"
+                             title="Modifier"
+                             Click="@(async _ => await _grid!.BeginEditAsync(item))" />
+                <SuperButton Icon="fa-trash"
+                             Text=""
+                             Style="SuperButtonStyle.Danger"
+                             Size="SuperButtonSize.Small"
+                             AllowCollapse="false"
+                             title="Supprimer"
+                             Click="@(async _ => await DeleteTaskAsync(item))" />
+            }
+        </ActionsTemplate>
+
+        <ChildContent>
+
+            <DataGridColumn TItem="TodoItem" Property="Title" Title="Tâche" Width="550px">
+                <EditTemplate>
+                    <input type="text"
+                           class="form-control form-control-sm"
+                           value="@context.Title"
+                           @onchange="@(e => context.Title = e.Value?.ToString() ?? string.Empty)" />
+                </EditTemplate>
+            </DataGridColumn>
+
+            <DataGridColumn TItem="TodoItem" Property="Priority" Title="Priorité" Width="160px" TextAlign="SuperTextAlignment.Center">
+                <EditTemplate>
+                    <select class="form-select form-select-sm"
+                            value="@context.Priority"
+                            @onchange="@(e => context.Priority = e.Value?.ToString() ?? "Normale")">
+                        <option value="Basse">Basse</option>
+                        <option value="Normale">Normale</option>
+                        <option value="Haute">Haute</option>
+                    </select>
+                </EditTemplate>
+                <Template>
+                    @switch (context.Priority)
+                    {
+                        case "Haute":
+                            <span class="badge text-bg-danger">Haute</span>
+                            break;
+                        case "Basse":
+                            <span class="badge text-bg-success">Basse</span>
+                            break;
+                        default:
+                            <span class="badge text-bg-warning text-dark">Normale</span>
+                            break;
+                    }
+                </Template>
+            </DataGridColumn>
+
+            <DataGridColumn TItem="TodoItem" Property="IsCompleted" Title="Terminée" Width="110px" TextAlign="SuperTextAlignment.Center">
+                <EditTemplate>
+                    <input type="checkbox"
+                           class="form-check-input"
+                           checked="@context.IsCompleted"
+                           @onchange="@(async e => { context.IsCompleted = (bool)(e.Value ?? false); await (_grid?.ReloadAsync() ?? Task.CompletedTask); })" />
+                </EditTemplate>
+                <Template>
+                    @if (context.IsCompleted)
+                    {
+                        <span class="badge text-bg-success">Terminée</span>
+                    }
+                    else
+                    {
+                        <span class="badge text-bg-secondary">En cours</span>
+                    }
+                </Template>
+            </DataGridColumn>
+
+            <DataGridColumn TItem="TodoItem" Property="CreatedAt" Title="Créée le" Width="160px" FormatString="{0:dd/MM/yyyy HH:mm}" />
+
+        </ChildContent>
+
+        <FooterTemplate>
+            <span>
+                @_items.Count tâche(s) — @_items.Count(i => i.IsCompleted) terminée(s) — @_items.Count(i => !i.IsCompleted) en cours
+            </span>
+        </FooterTemplate>
+
+    </SuperDataGrid>
+</div>
+
+@code {
+    private SuperDataGrid<TodoItem>? _grid;
+    private List<TodoItem> _items = [];
+    private string _newTitle = string.Empty;
+    private string _newPriority = "Normale";
+    private int _nextId = 1;
+
+    protected override void OnInitialized()
+    {
+        _items =
+        [
+            new TodoItem { Id = _nextId++, Title = "Préparer la réunion de lundi", Priority = "Haute", IsCompleted = false, CreatedAt = DateTime.Now.AddDays(-2) },
+            new TodoItem { Id = _nextId++, Title = "Mettre à jour la documentation", Priority = "Normale", IsCompleted = false, CreatedAt = DateTime.Now.AddDays(-1) },
+            new TodoItem { Id = _nextId++, Title = "Corriger le bug #1234", Priority = "Haute", IsCompleted = true, CreatedAt = DateTime.Now.AddDays(-3) },
+            new TodoItem { Id = _nextId++, Title = "Déployer la version 2.1", Priority = "Normale", IsCompleted = false, CreatedAt = DateTime.Now.AddHours(-5) },
+            new TodoItem { Id = _nextId++, Title = "Archiver les anciennes tâches", Priority = "Basse", IsCompleted = false, CreatedAt = DateTime.Now.AddHours(-1) },
+    ];
+    }
+
+    private ValueTask<GridItemsProviderResult<TodoItem>> LoadDatas(GridItemsProviderRequest<TodoItem> request)
+    {
+        var query = _items.AsEnumerable();
+
+        // Filtres texte
+        foreach (var filter in request.Filters)
+        {
+            if (string.IsNullOrWhiteSpace(filter.PropertyValue))
+            {
+                continue;
+            }
+
+            query = filter.PropertyName switch
+            {
+                nameof(TodoItem.Title) => query.Where(t => t.Title.Contains(filter.PropertyValue, StringComparison.OrdinalIgnoreCase)),
+                nameof(TodoItem.Priority) => query.Where(t => t.Priority.Contains(filter.PropertyValue, StringComparison.OrdinalIgnoreCase)),
+                _ => query
+            };
+        }
+
+        // Tri
+        query = (request.SortColumn, request.SortDirection) switch
+        {
+            (nameof(TodoItem.Title), SortDirection.Ascending)         => query.OrderBy(t => t.Title),
+            (nameof(TodoItem.Title), SortDirection.Descending)        => query.OrderByDescending(t => t.Title),
+            (nameof(TodoItem.Priority), SortDirection.Ascending)      => query.OrderBy(t => t.Priority),
+            (nameof(TodoItem.Priority), SortDirection.Descending)     => query.OrderByDescending(t => t.Priority),
+            (nameof(TodoItem.IsCompleted), SortDirection.Ascending)   => query.OrderBy(t => t.IsCompleted),
+            (nameof(TodoItem.IsCompleted), SortDirection.Descending)  => query.OrderByDescending(t => t.IsCompleted),
+            (nameof(TodoItem.CreatedAt), SortDirection.Ascending)     => query.OrderBy(t => t.CreatedAt),
+            (nameof(TodoItem.CreatedAt), SortDirection.Descending)    => query.OrderByDescending(t => t.CreatedAt),
+            _                                                          => query
+        };
+
+        var totalCount = query.Count();
+        var page = query
+            .Skip(request.StartIndex)
+            .Take(request.Count ?? totalCount)
+            .ToList();
+
+        return ValueTask.FromResult(new GridItemsProviderResult<TodoItem>(page, totalCount));
+    }
+
+    private async Task AddTaskAsync(Microsoft.AspNetCore.Components.Web.MouseEventArgs _)
+    {
+        if (string.IsNullOrWhiteSpace(_newTitle))
+        {
+            return;
+        }
+
+        _items.Add(new TodoItem
+        {
+            Id = _nextId++,
+            Title = _newTitle.Trim(),
+            Priority = _newPriority,
+            IsCompleted = false,
+            CreatedAt = DateTime.Now
+        });
+
+        _newTitle = string.Empty;
+        _newPriority = "Normale";
+
+        if (_grid is not null)
+        {
+            await _grid.ReloadAsync();
+        }
+    }
+
+    private async Task DeleteTaskAsync(TodoItem item)
+    {
+        _items.Remove(item);
+
+        if (_grid is not null)
+        {
+            await _grid.ReloadAsync();
+        }
+    }
+
+    private async Task OnNewTitleKeyDownAsync(Microsoft.AspNetCore.Components.Web.KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await AddTaskAsync(new Microsoft.AspNetCore.Components.Web.MouseEventArgs());
+        }
+    }
+
+    private sealed class TodoItem
+    {
+        public int Id { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public string Priority { get; set; } = "Normale";
+        public bool IsCompleted { get; set; }
+        public DateTime CreatedAt { get; set; }
+    }
+}

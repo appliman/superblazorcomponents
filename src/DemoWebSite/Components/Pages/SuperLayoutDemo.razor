@@ -1,0 +1,27 @@
+﻿@page "/superlayout"
+
+@using SuperBlazorComponents.Components.SuperLayout
+
+@code {
+
+}
+
+<SuperLayout>
+    <SuperHeader>
+        <Toolbar>
+            <SuperChatButton />
+        </Toolbar>
+    </SuperHeader>
+    <SuperSidebar>
+
+    </SuperSidebar>
+    <SuperBody>
+        <p>This is the Body</p>
+    </SuperBody>
+    <SuperChat Title="Chat IA">
+        <p>Bienvenue dans l'assistant IA. Posez vos questions ici.</p>
+    </SuperChat>
+    <SuperFooter>
+        <h3>This is the Footer</h3>
+    </SuperFooter>
+</SuperLayout>

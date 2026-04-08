@@ -1,0 +1,84 @@
+﻿@using Microsoft.AspNetCore.Components
+
+<li class="@CssClass" aria-current="@AriaCurrent" @attributes="@CapturedAttributes">
+    @if (!string.IsNullOrWhiteSpace(Path) && !IsActive)
+    {
+        <a href="@Path">
+            @ItemContent
+        </a>
+    }
+    else
+    {
+        @ItemContent
+    }
+</li>
+
+@code
+{
+    [Parameter]
+    public string? Path { get; set; }
+
+    [Parameter]
+    public string? Text { get; set; }
+
+    [Parameter]
+    public string? Icon { get; set; }
+
+    [Parameter]
+    public bool IsActive { get; set; }
+
+    [Parameter]
+    public RenderFragment? Content { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object> CapturedAttributes { get; set; } = new();
+
+    private string? AriaCurrent => IsActive ? "page" : null;
+
+    private RenderFragment ItemContent => builder =>
+    {
+        if (!string.IsNullOrWhiteSpace(Icon))
+        {
+            builder.OpenElement(0, "i");
+            builder.AddAttribute(1, "class", Icon);
+            builder.AddAttribute(2, "aria-hidden", "true");
+            builder.CloseElement();
+
+            if (!string.IsNullOrWhiteSpace(Text) || Content is not null)
+            {
+                builder.OpenElement(3, "span");
+                builder.AddAttribute(4, "class", "ms-1");
+                builder.CloseElement();
+            }
+        }
+
+        if (!string.IsNullOrWhiteSpace(Text))
+        {
+            builder.AddContent(5, Text);
+            return;
+        }
+
+        if (Content is not null)
+        {
+            builder.AddContent(6, Content);
+        }
+    };
+
+    private string CssClass
+    {
+        get
+        {
+            CapturedAttributes.TryGetValue("class", out var cls);
+            var additional = cls?.ToString();
+
+            var bootstrap = IsActive ? "breadcrumb-item active" : "breadcrumb-item";
+
+            if (string.IsNullOrWhiteSpace(additional))
+            {
+                return bootstrap;
+            }
+
+            return $"{bootstrap} {additional}";
+        }
+    }
+}

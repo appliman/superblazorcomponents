@@ -1,0 +1,35 @@
+﻿.sdgpf-container {
+    margin-bottom: 1px;
+    width: 100%;
+}
+
+.sdgpf-button {
+    width: 100%;
+    min-width: 0;
+    padding: 0.125rem 0.375rem;
+    font-size: 0.875rem;
+    line-height: 1.2;
+    overflow: hidden;
+}
+
+.sdgpf-button-content {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.sdgpf-icon {
+    flex: 0 0 auto;
+    color: var(--bs-secondary-color, #6c757d);
+}
+
+.sdgpf-button:focus,
+.sdgpf-button:focus-visible,
+.sdgpf-button:active {
+    box-shadow: none !important;
+    outline: 0;
+}

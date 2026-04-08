@@ -1,0 +1,15 @@
+﻿.super-button-super-small {
+    padding: 0.15rem 0.35rem;
+    font-size: 0.75rem;
+    line-height: 1.2;
+}
+
+.super-button-image {
+    width: 1em !important;
+    height: 1em !important;
+    max-width: 1em;
+    max-height: 1em;
+    object-fit: contain;
+    display: inline-block;
+    vertical-align: -0.125em;
+}

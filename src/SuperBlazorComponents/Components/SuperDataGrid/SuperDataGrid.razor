@@ -1,0 +1,403 @@
+﻿@using SuperBlazorComponents.Components.SuperDataGrid.Filters
+@using SuperBlazorComponents.Components.SuperDataGrid.Tools
+@typeparam TItem
+@attribute [CascadingTypeParameter(nameof(TItem))]
+@implements IAsyncDisposable
+
+<CascadingValue Value="this" IsFixed="true">
+    @{
+        var visibleColumns = GetVisibleColumns();
+    }
+    <div class="sdg-container @ContainerCssClass"
+         style="@GetContainerStyle()"
+         @ref="_containerRef">
+        @if (DisplaySelectionColumn
+            || HeaderTemplate is not null
+            || DisplayRefreshButton
+            || AllowColumnResize && !string.IsNullOrWhiteSpace(GridId)
+            || DisplayColumnVisibilityToggle)
+        {
+            <div class="sdg-header-section">
+                <div class="d-flex flex-row align-items-center">
+                    @if (DisplaySelectionColumn)
+                    {
+                        <div class="me-1">
+                            <SuperDataGridRowSelector TItem="TItem" SuperDataGrid="this" Size="Components.Buttons.SuperButtonSize.Small" MenuItems="SelectorMenuItemsContent" MenuItemsSource="SelectorMenuItemsSource" ActionSelected="SelectorMenuItemSelected" />
+                        </div>
+                    }
+                    <div class="flex-grow-1 d-flex flex-row align-items-center">
+                        @if (HeaderTemplate is not null)
+                        {
+                            @HeaderTemplate
+                        }
+                    </div>
+                    @if (DisplayRefreshButton)
+                    {
+                        <div class="me-1">
+                            <SuperDatagridRefreshButton TItem="TItem" SuperDataGrid="this" Size="Components.Buttons.SuperButtonSize.Small" />
+                        </div>
+                    }
+                    @if (AllowColumnResize && !string.IsNullOrWhiteSpace(GridId))
+                    {
+                        <div class="me-1">
+                            <SuperDatagridResetButton TItem="TItem" SuperDataGrid="this" Size="Components.Buttons.SuperButtonSize.Small" />
+                        </div>
+                    }
+                    @if (DisplayColumnVisibilityToggle)
+                    {
+                        <div class="me-1">
+                            <SuperDatagridColumnVisibilityButton TItem="TItem" SuperDataGrid="this" Size="Components.Buttons.SuperButtonSize.Small" />
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+        @if (GridOrientation == SuperDataGridOrientation.Vertical)
+        {
+            <div class="sdg-table-wrapper @(FreezeHeader ? "sdg-freeze-header" : "")"
+                 style="@GetTableWrapperStyle()">
+                <table class="table sdg-vertical-table @TableCssClass" @ref="_tableRef">
+                    <colgroup>
+                        @if (DisplayRowNumberColumn)
+                        {
+                            @if (ActionsTemplate is not null)
+                            {
+                                <col style="width: 65px; min-width: 65px;" />
+                            }
+                            else
+                            {
+                                <col style="width: var(--sdg-row-number-width, 50px); min-width: var(--sdg-row-number-width, 50px);" />
+                            }
+                        }
+                        <col class="sdg-vertical-key-column" />
+                        <col class="sdg-vertical-value-column" />
+                    </colgroup>
+                    @if (FreezeHeader)
+                    {
+                        <thead class="sdg-sticky-header">
+                            <tr class="sdg-column-headers">
+                                @if (DisplayRowNumberColumn)
+                                {
+                                    <th class="sdg-row-number-header sdg-frozen-left" style="@GetRowNumberHeaderStyle()">#</th>
+                                }
+                                <th class="sdg-column-header" style="font-size: 0.8rem;">Propriété</th>
+                                <th class="sdg-column-header" style="font-size: 0.8rem;">Valeur</th>
+                            </tr>
+                        </thead>
+                    }
+                    <tbody>
+                        <Virtualize @ref="_virtualizeRef"
+                                    ItemsProvider="LoadItemsAsync"
+                                    ItemSize="@GetVerticalItemSize()"
+                                    OverscanCount="@OverscanCount"
+                                    SpacerElement="tr">
+                            <ItemContent Context="item">
+                                @{
+                                    var verticalRowClass = GetRowClass(item);
+                                    var verticalVisibleCols = GetVisibleColumns();
+                                    var isFirst = true;
+                                }
+                                @for (var colIdx = 0; colIdx < verticalVisibleCols.Count; colIdx++)
+                                {
+                                    var column = verticalVisibleCols[colIdx];
+                                    var isLastRow = colIdx == verticalVisibleCols.Count - 1;
+                                    <tr class="sdg-vertical-row sdg-vertical-item @(isLastRow ? "sdg-vertical-item-last" : "") @verticalRowClass"
+                                        @onclick="@(() => OnRowClick(item))"
+                                        @ondblclick="@(() => OnRowDoubleClick(item))">
+                                        @if (isFirst && DisplayRowNumberColumn)
+                                        {
+                                            <td class="sdg-vertical-row-number @(ActionsTemplate is not null ? "sdg-vertical-has-actions" : "")"
+                                                rowspan="@verticalVisibleCols.Count">
+                                                <div class="sdg-vertical-num">@GetRowNumber(item)</div>
+                                                @if (ActionsTemplate is not null)
+                                                {
+                                                    <div class="sdg-vertical-actions">
+                                                        @ActionsTemplate(item)
+                                                    </div>
+                                                }
+                                            </td>
+                                            isFirst = false;
+                                        }
+                                        <td class="sdg-vertical-key">
+                                            <span class="sdg-vertical-key-text" title="@column.Title">@column.Title</span>
+                                        </td>
+                                        <td class="sdg-vertical-value"
+                                            @onclick="@(() => OnCellClick(item, column))"
+                                            @onclick:stopPropagation="@CellClicked.HasDelegate">
+                                            @if ((EditionMode == SuperDataGridEditionMode.Edit || IsRowInEditMode(item)) && column.EditTemplate is not null)
+                                            {
+                                                @column.EditTemplate(item)
+                                            }
+                                            else if (column.Template is not null)
+                                            {
+                                                @column.Template(item)
+                                            }
+                                            else
+                                            {
+                                                @GetCellValue(column, item)
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </ItemContent>
+                            <Placeholder Context="placeholderContext">
+                                <tr class="sdg-placeholder-row">
+                                    @if (DisplayRowNumberColumn)
+                                    {
+                                        <td><div class="sdg-placeholder-cell"></div></td>
+                                    }
+                                    <td><div class="sdg-placeholder-cell"></div></td>
+                                    <td><div class="sdg-placeholder-cell"></div></td>
+                                </tr>
+                            </Placeholder>
+                        </Virtualize>
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+        <div class="sdg-table-wrapper @(FreezeHeader ? "sdg-freeze-header" : "")"
+             style="@GetTableWrapperStyle()">
+            <table class="table @TableCssClass" @ref="_tableRef">
+                <thead class="@(FreezeHeader ? "sdg-sticky-header" : "")">
+                    <tr class="sdg-column-headers">
+                        @if (DisplayRowNumberColumn)
+                        {
+                            <th class="sdg-row-number-header sdg-frozen-left" style="@GetRowNumberHeaderStyle()">#</th>
+                        }
+                        @if (DisplaySelectionColumn)
+                        {
+                            <th class="sdg-selection-header sdg-frozen-left" style="@GetSelectionColumnStyle()">
+                                @if (SelectionMode == SuperDataGridSelectionMode.Multiple)
+                                {
+                                    <input type="checkbox"
+                                           class="form-check-input"
+                                           checked="@IsAllSelected()"
+                                           @onchange="ToggleSelectAllAsync"
+                                           @onclick:stopPropagation />
+                                }
+                            </th>
+                        }
+                        @if (ActionsTemplate is not null)
+                        {
+                            <th class="sdg-actions-header sdg-frozen-left" style="@GetActionsColumnStyle()"></th>
+                        }
+                        @foreach (var column in visibleColumns)
+                        {
+                            <th class="@GetColumnHeaderClass(column)"
+                                style="@GetColumnHeaderStyle(column)"
+                                @ondragover="@(e => OnColumnDragOver(e, column))"
+                                @ondragover:preventDefault
+                                @ondrop="@(e => OnColumnDrop(e, column))">
+                                <div class="sdg-header-content"
+                                     draggable="@(AllowColumnReorder.ToString().ToLower())"
+                                     @ondragstart="@(e => OnColumnDragStart(e, column))"
+                                     @ondragend="OnColumnDragEnd"
+                                     @onclick="@(() => OnHeaderClick(column))">
+                                    @if (AllowColumnReorder && column.Reorderable)
+                                    {
+                                        <span class="sdg-drag-handle" @onclick:stopPropagation>
+                                            <svg width="10" height="16" viewBox="0 0 10 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <circle cx="2.5" cy="2.5" r="1.5" fill="currentColor" />
+                                                <circle cx="7.5" cy="2.5" r="1.5" fill="currentColor" />
+                                                <circle cx="2.5" cy="8" r="1.5" fill="currentColor" />
+                                                <circle cx="7.5" cy="8" r="1.5" fill="currentColor" />
+                                                <circle cx="2.5" cy="13.5" r="1.5" fill="currentColor" />
+                                                <circle cx="7.5" cy="13.5" r="1.5" fill="currentColor" />
+                                            </svg>
+                                        </span>
+                                    }
+                                    @if (column.HeaderTemplate is not null)
+                                    {
+                                        @column.HeaderTemplate
+                                    }
+                                    else
+                                    {
+                                        <span class="sdg-header-text" title="@column.Title">@column.Title</span>
+                                    }
+                                    @if (column.Sortable && AllowSorting)
+                                    {
+                                        <span class="sdg-sort-indicator @GetSortIndicatorClass(column)"></span>
+                                    }
+                                </div>
+                                @if (AllowFiltering && _columns.Any(i => i.FilterTemplate is not null || i.Filterable))
+                                {
+                                    <div class="sdg-filter-content" @onclick:stopPropagation>
+                                        @if (column.FilterTemplate is not null)
+                                        {
+                                            @column.FilterTemplate
+                                        }
+                                        else if (column.Filterable)
+                                        {
+                                            <SuperDataGridFilterColumn Column="column" FilterProperty="@column.FilterProperty" />
+                                        }
+                                    </div>
+                                }
+                                @if (AllowColumnResize)
+                                {
+                                    <div class="sdg-resize-handle"
+                                         @onmousedown="@(e => OnResizeStart(e, column))"
+                                         @onmousedown:stopPropagation></div>
+                                }
+                            </th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    <Virtualize @ref="_virtualizeRef"
+                                ItemsProvider="LoadItemsAsync"
+                                ItemSize="@RowHeight"
+                                OverscanCount="@OverscanCount"
+                                SpacerElement="tr">
+                        <ItemContent Context="item">
+                            <tr class="@GetRowClass(item)"
+                                @onclick="@(() => OnRowClick(item))"
+                                @ondblclick="@(() => OnRowDoubleClick(item))">
+                                @if (DisplayRowNumberColumn)
+                                {
+                                    <td class="sdg-row-number-cell sdg-frozen-left" style="@GetRowNumberCellStyle()">@GetRowNumber(item)</td>
+                                }
+                                @if (DisplaySelectionColumn)
+                                {
+                                    <td class="sdg-selection-cell sdg-frozen-left" style="@GetSelectionColumnStyle()"
+                                        @onclick:stopPropagation>
+                                        <input type="checkbox"
+                                               class="form-check-input"
+                                               checked="@IsRowSelected(item)"
+                                               @onchange="@(e => OnSelectionCheckboxChangeAsync(item, e))"
+                                               @onclick:stopPropagation />
+                                    </td>
+                                }
+                                @if (ActionsTemplate is not null)
+                                {
+                                    <td class="sdg-actions-cell sdg-frozen-left" style="@GetActionsColumnStyle()"
+                                        @onclick:stopPropagation>
+                                        <div class="sdg-actions-content">
+                                            @ActionsTemplate(item)
+                                        </div>
+                                    </td>
+                                }
+                                @foreach (var column in visibleColumns)
+                                {
+                                    <td class="@GetCellClass(column, item)"
+                                        style="@GetCombinedCellStyle(column)"
+                                        @onclick="@(() => OnCellClick(item, column))"
+                                        @onclick:stopPropagation="@CellClicked.HasDelegate">
+                                        @if ((EditionMode == SuperDataGridEditionMode.Edit || IsRowInEditMode(item)) && column.EditTemplate is not null)
+                                        {
+                                            @column.EditTemplate(item)
+                                        }
+                                        else if (column.Template is not null)
+                                        {
+                                            @column.Template(item)
+                                        }
+                                        else
+                                        {
+                                            @GetCellValue(column, item)
+                                        }
+                                    </td>
+                                }
+                            </tr>
+                        </ItemContent>
+                        <Placeholder Context="placeholderContext">
+                            <tr class="sdg-placeholder-row">
+                                @if (DisplayRowNumberColumn)
+                                {
+                                    <td class="sdg-row-number-cell sdg-frozen-left">
+                                        <div class="sdg-placeholder-cell"></div>
+                                    </td>
+                                }
+                                @if (DisplaySelectionColumn)
+                                {
+                                    <td class="sdg-selection-cell sdg-frozen-left" style="@GetSelectionColumnStyle()">
+                                        <div class="sdg-placeholder-cell"></div>
+                                    </td>
+                                }
+                                @if (ActionsTemplate is not null)
+                                {
+                                    <td class="sdg-actions-cell sdg-frozen-left" style="@GetActionsColumnStyle()">
+                                        <div class="sdg-placeholder-cell"></div>
+                                    </td>
+                                }
+                                @foreach (var column in visibleColumns)
+                                {
+                                    <td style="@GetColumnStyle(column)">
+                                        <div class="sdg-placeholder-cell"></div>
+                                    </td>
+                                }
+                            </tr>
+                        </Placeholder>
+                    </Virtualize>
+                </tbody>
+                @if (_columns.Any(i => i.FooterTemplate is not null))
+                {
+                    <tfoot class="@(FreezeFooter ? "sdg-sticky-footer" : "")">
+                        <tr class="sdg-column-footers">
+                            @if (DisplayRowNumberColumn)
+                            {
+                                <td class="sdg-row-number-cell sdg-frozen-left"></td>
+                            }
+                            @if (DisplaySelectionColumn)
+                            {
+                                <td class="sdg-selection-cell sdg-frozen-left" style="@GetSelectionColumnStyle()"></td>
+                            }
+                            @if (ActionsTemplate is not null)
+                            {
+                                <td class="sdg-actions-cell sdg-frozen-left" style="@GetActionsColumnStyle()"></td>
+                            }
+                            @foreach (var column in visibleColumns)
+                            {
+                                <td style="@GetColumnFooterStyle(column)">
+                                    @if (column.FooterTemplate is not null)
+                                    {
+                                        @column.FooterTemplate
+                                    }
+                                </td>
+                            }
+                        </tr>
+                    </tfoot>
+                }
+            </table>
+        </div>
+        }
+
+        @if (FooterTemplate is not null)
+        {
+            <div class="sdg-footer-section">
+                @FooterTemplate
+            </div>
+        }
+        else if (DisplayDefaultFooterTemplate)
+        {
+            <div class="sdg-footer-section">
+                @FooterText
+            </div>
+        }
+
+        @if (_isLoading
+                    && LoadingTemplate is not null)
+        {
+            <div class="sdg-loading-overlay">
+                <div class="sdg-loading-spinner">
+                    @if (LoadingTemplate is not null)
+                    {
+                        @LoadingTemplate
+                    }
+                    else
+                    {
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Chargement...</span>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+
+    @* Hidden container for column definitions *@
+    <div style="display:none">
+        @ChildContent
+    </div>
+</CascadingValue>

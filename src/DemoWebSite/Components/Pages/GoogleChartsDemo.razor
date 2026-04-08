@@ -1,0 +1,152 @@
+﻿@page "/google-charts-demo"
+@using SuperBlazorComponents.Components.GoogleCharts
+
+<PageTitle>Google Combo Chart</PageTitle>
+
+<h1>Google Combo Chart</h1>
+
+<p class="text-muted">
+    Exemples de graphiques <code>GoogleComboChart</code> avec des séries en ligne, colonnes et mixées.
+</p>
+
+<div class="card mt-3">
+    <div class="card-header">
+        Line
+    </div>
+    <div class="card-body">
+        <GoogleComboChart Columns="_lineColumns" Data="_lineData" Options="_lineOptions" />
+    </div>
+</div>
+
+<div class="card mt-3">
+    <div class="card-header">
+        Column
+    </div>
+    <div class="card-body">
+        <GoogleComboChart Columns="_columnColumns" Data="_columnData" Options="_columnOptions" />
+    </div>
+</div>
+
+<div class="card mt-3">
+    <div class="card-header">
+        Mixe
+    </div>
+    <div class="card-body">
+        <GoogleComboChart Columns="_mixedColumns" Data="_mixedData" Options="_mixedOptions" />
+    </div>
+</div>
+
+@code {
+    private readonly List<GoogleChartColumn> _lineColumns =
+    [
+        new GoogleChartColumn { Label = "Mois", Type = "date" },
+        new GoogleChartColumn { Label = "Ventes", Type = "number" },
+        new GoogleChartColumn { Label = "Objectif", Type = "number" }
+    ];
+
+    private readonly List<GoogleChartDataRow> _lineData =
+    [
+        new GoogleChartDataRow { Label = new DateTime(2024, 1, 1), Values = [120m, 110m] },
+        new GoogleChartDataRow { Label = new DateTime(2024, 2, 1), Values = [135m, 130m] },
+        new GoogleChartDataRow { Label = new DateTime(2024, 3, 1), Values = [142m, 140m] },
+        new GoogleChartDataRow { Label = new DateTime(2024, 4, 1), Values = [128m, 135m] },
+        new GoogleChartDataRow { Label = new DateTime(2024, 5, 1), Values = [150m, 145m] },
+        new GoogleChartDataRow { Label = new DateTime(2024, 6, 1), Values = [162m, 155m] }
+    ];
+
+    private readonly GoogleChartOptions _lineOptions = new()
+    {
+        Title = "Ventes vs objectif",
+        DefaultSeriesType = GoogleChartSeriesType.Line,
+        HAxisTitle = "Mois",
+        VAxisTitle = "Montant (k€)",
+        Height = "320",
+        ShowCrosshair = true,
+        ChartAreaBackgroundColor = "#f5f5f5",
+        HAxisGridlinesColor = "#d0d0d0",
+        VAxisGridlinesColor = "#d0d0d0",
+        Series = new Dictionary<int, GoogleChartSeries>
+        {
+            [0] = new GoogleChartSeries { Color = "#1e88e5", LineWidth = 3, PointSize = 5 },
+            [1] = new GoogleChartSeries { Color = "#d81b60", LineWidth = 2, PointSize = 4 }
+        }
+    };
+
+    private readonly List<GoogleChartColumn> _columnColumns =
+    [
+        new GoogleChartColumn { Label = "Mois", Type = "date" },
+        new GoogleChartColumn { Label = "Tickets entrants", Type = "number" },
+        new GoogleChartColumn { Label = "Tickets clos", Type = "number" }
+    ];
+
+    private readonly List<GoogleChartDataRow> _columnData =
+    [
+        new GoogleChartDataRow { Label = new DateTime(2024, 1, 1), Values = [420m, 380m] },
+        new GoogleChartDataRow { Label = new DateTime(2024, 2, 1), Values = [460m, 410m] },
+        new GoogleChartDataRow { Label = new DateTime(2024, 3, 1), Values = [510m, 480m] },
+        new GoogleChartDataRow { Label = new DateTime(2024, 4, 1), Values = [470m, 450m] },
+        new GoogleChartDataRow { Label = new DateTime(2024, 5, 1), Values = [530m, 500m] },
+        new GoogleChartDataRow { Label = new DateTime(2024, 6, 1), Values = [560m, 520m] }
+    ];
+
+    private readonly GoogleChartOptions _columnOptions = new()
+    {
+        Title = "Support - tickets mensuels",
+        DefaultSeriesType = GoogleChartSeriesType.Columns,
+        HAxisTitle = "Mois",
+        VAxisTitle = "Tickets",
+        Height = "320",
+        BarGroupWidth = "70%",
+        ChartAreaBackgroundColor = "#f5f5f5",
+        HAxisGridlinesColor = "#d0d0d0",
+        VAxisGridlinesColor = "#d0d0d0",
+        Series = new Dictionary<int, GoogleChartSeries>
+        {
+            [0] = new GoogleChartSeries { Type = GoogleChartSeriesType.Columns, Color = "#3949ab" },
+            [1] = new GoogleChartSeries { Type = GoogleChartSeriesType.Columns, Color = "#43a047" }
+        }
+    };
+
+    private readonly List<GoogleChartColumn> _mixedColumns =
+    [
+        new GoogleChartColumn { Label = "Mois", Type = "date" },
+        new GoogleChartColumn { Label = "Revenus", Type = "number" },
+        new GoogleChartColumn { Label = "Taux de conversion", Type = "number" }
+    ];
+
+    private readonly List<GoogleChartDataRow> _mixedData =
+    [
+        new GoogleChartDataRow { Label = new DateTime(2024, 1, 1), Values = [980m, 0.054m] },
+        new GoogleChartDataRow { Label = new DateTime(2024, 2, 1), Values = [1040m, 0.061m] },
+        new GoogleChartDataRow { Label = new DateTime(2024, 3, 1), Values = [1110m, 0.067m] },
+        new GoogleChartDataRow { Label = new DateTime(2024, 4, 1), Values = [1060m, 0.058m] },
+        new GoogleChartDataRow { Label = new DateTime(2024, 5, 1), Values = [1180m, 0.071m] },
+        new GoogleChartDataRow { Label = new DateTime(2024, 6, 1), Values = [1250m, 0.076m] }
+    ];
+
+    private readonly GoogleChartOptions _mixedOptions = new()
+    {
+        Title = "Revenus et conversion",
+        DefaultSeriesType = GoogleChartSeriesType.Columns,
+        HAxisTitle = "Mois",
+        VAxisTitle = "Revenus (k€)",
+        VAxis2Title = "Conversion",
+        VAxis2Format = "percent",
+        Height = "320",
+        ChartAreaBackgroundColor = "#f5f5f5",
+        HAxisGridlinesColor = "#d0d0d0",
+        VAxisGridlinesColor = "#d0d0d0",
+        Series = new Dictionary<int, GoogleChartSeries>
+        {
+            [0] = new GoogleChartSeries { Type = GoogleChartSeriesType.Columns, Color = "#00897b" },
+            [1] = new GoogleChartSeries
+            {
+                Type = GoogleChartSeriesType.Line,
+                Color = "#f4511e",
+                LineWidth = 3,
+                PointSize = 5,
+                TargetAxisIndex = 1
+            }
+        }
+    };
+}

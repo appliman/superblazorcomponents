@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="src/DemoWebSite/DemoWebSize.csproj" />
+  <Project Path="src/SuperBlazorComponents/SuperBlazorComponents.csproj" />
+</Solution>

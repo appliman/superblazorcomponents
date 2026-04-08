@@ -1,0 +1,19 @@
+﻿/*
+  Theme: software
+  Opt-in via: document.documentElement[data-sc-theme="software"]
+
+  This file overrides Bootstrap CSS variables that are already used by:
+  - `SuperSidebar.razor.css`
+  - `SuperMenuItem.razor.css`
+*/
+
+[data-sc-theme="software"] {
+    --bs-body-bg: #2f3c44;
+    --bs-body-color: #ffffff;
+
+    --bs-border-color: rgba(255, 255, 255, 0.08);
+    --bs-tertiary-bg: rgba(0, 0, 0, 0.12);
+
+    --bs-primary: #1f84ff;
+    --bs-primary-rgb: 31, 132, 255;
+}

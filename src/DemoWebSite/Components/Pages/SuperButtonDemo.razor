@@ -1,0 +1,305 @@
+﻿@page "/superbutton-demo"
+@using SuperBlazorComponents.Components.Buttons
+@using Microsoft.AspNetCore.Components.Web
+
+<PageTitle>SuperButton Demo</PageTitle>
+
+<h1>SuperButton Demo</h1>
+
+<p class="text-muted">
+    Cette page permet de tester les variantes Bootstrap via <code>Style</code> et le mode busy via <code>BusyText</code>.
+</p>
+
+<div class="card mt-3">
+    <div class="card-header">
+        Styles
+    </div>
+
+    <SuperButton Text="Demo" Style="SuperButtonStyle.Info" Size="SuperButtonSize.SuperSmall" class="me-2"/>
+
+    <div class="card mt-3">
+        <div class="card-header">
+            Confirmation
+        </div>
+        <div class="card-body">
+            <p class="text-muted mb-2">
+                Le click est exécuté uniquement si l'utilisateur confirme.
+            </p>
+
+            <div class="d-flex flex-wrap align-items-center gap-2">
+                <SuperConfirmationButton Text="Supprimer" Icon="fa-solid fa-trash" Style="SuperButtonStyle.Danger"
+                                         ConfirmationContent="Voulez-vous vraiment supprimer ?"
+                                         Click="@SimulateFiveSecondsAsync" />
+
+                <SuperConfirmationButton Text="Lancer" Icon="fa-solid fa-play" Style="SuperButtonStyle.Primary"
+                                         ConfirmationTitle="Confirmation"
+                                         ConfirmationContent="Confirmer l'action ?"
+                                         Click="@SimulateFiveSecondsAsync" />
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <div class="d-flex flex-wrap gap-2">
+            <SuperButton Text="Primary" Style="SuperButtonStyle.Primary" />
+            <SuperButton Text="Secondary" Style="SuperButtonStyle.Secondary" />
+            <SuperButton Text="Success" Style="SuperButtonStyle.Success" />
+            <SuperButton Text="Danger" Style="SuperButtonStyle.Danger" />
+            <SuperButton Text="Warning" Style="SuperButtonStyle.Warning" />
+            <SuperButton Text="Info" Style="SuperButtonStyle.Info" />
+            <SuperButton Text="Light" Style="SuperButtonStyle.Light" />
+            <SuperButton Text="Dark" Style="SuperButtonStyle.Dark" />
+            <SuperButton Text="Link" Style="SuperButtonStyle.Link" />
+
+        </div>
+    </div>
+</div>
+
+<div class="card mt-3">
+    <div class="card-header">
+        SplitButton
+    </div>
+    <div class="card-body">
+        <p class="text-muted mb-2">
+            Exemple de container <code>SuperSplitButton</code>.
+        </p>
+
+        <SuperSplitButton Text="Primary" Style="SuperButtonStyle.Primary" Icon="fa-solid fa-bolt" ActionSelected="OnSplitActionSelected">
+            <Menu>
+                <SuperSplitButtonItem ActionName="action" Text="Action" />
+                <SuperSplitButtonItem ActionName="another-action" Text="Another action" />
+                <SuperSplitButtonItem ActionName="something-else" Text="Something else here" />
+                <SuperSplitDivider />
+                <SuperSplitButtonItem ActionName="separated" Text="Separated link" />
+            </Menu>
+        </SuperSplitButton>
+
+        @if (!string.IsNullOrWhiteSpace(_lastSplitActionName))
+        {
+            <div class="alert alert-info mt-3 mb-0">
+                Action sélectionnée : <strong>@_lastSplitActionName</strong>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="card mt-3">
+    <div class="card-header">
+        SuperLinkButton
+    </div>
+    <div class="card-body">
+        <p class="text-muted mb-2">
+            Variante lien de <code>SuperButton</code> avec propriété <code>Href</code>.
+        </p>
+
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            <SuperLinkButton Text="Accueil" Href="/" Icon="fa-house" Style="SuperButtonStyle.Primary" />
+            <SuperLinkButton Text="Messages" Href="/messages" Icon="fa-envelope" Style="SuperButtonStyle.Secondary" Outline="true" />
+            <SuperLinkButton Text="Paramètres" Href="/settings" Icon="fa-gear" Style="SuperButtonStyle.Info" Size="SuperButtonSize.Small" />
+            <SuperLinkButton Text="Aide" Href="/help" Icon="fa-circle-question" Style="SuperButtonStyle.Success" BadgeText="Nouveau" />
+            <SuperLinkButton Text="OpenAI" Href="https://openai.com" Icon="fa-globe" Style="SuperButtonStyle.Dark" OpenInNewTab="true" />
+            <SuperLinkButton Text="" Href="https://openai.com" Icon="fa-arrow-up-right-from-square" Style="SuperButtonStyle.Link" OpenInNewTab="true" title="OpenAI" aria-label="OpenAI" />
+            <SuperLinkButton Text="Lien désactivé" Href="/disabled" Icon="fa-ban" Style="SuperButtonStyle.Danger" Disabled="true" />
+        </div>
+    </div>
+</div>
+
+<div class="card mt-3">
+    <div class="card-header">
+        Popover
+    </div>
+    <div class="card-body">
+        <p class="text-muted mb-2">
+            Pour afficher un popover Bootstrap, renseigne <code>PopoverTitle</code> et <code>PopoverContent</code>.
+        </p>
+
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            <SuperButton Text="Popover (default)" Style="SuperButtonStyle.Secondary"
+                         PopoverTitle="Popover title" PopoverContent="And here's some amazing content. It's very engaging. Right?" />
+
+            <SuperButton Text="Popover right" Style="SuperButtonStyle.Secondary"
+                         PopoverTitle="Popover title" PopoverContent="Content" PopoverPlacement="right" />
+        </div>
+    </div>
+</div>
+
+<div class="card mt-3">
+    <div class="card-header">
+        Confirmation
+    </div>
+    <div class="card-body">
+        <p class="text-muted mb-2">
+            Le click est exécuté uniquement si l'utilisateur confirme.
+        </p>
+
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            <SuperConfirmationButton Text="Supprimer" Icon="fa-solid fa-trash" Style="SuperButtonStyle.Danger"
+                                     ConfirmationContent="Voulez-vous vraiment supprimer ?"
+                                     Click="@SimulateFiveSecondsAsync" />
+
+            <SuperConfirmationButton Text="Lancer" Icon="fa-solid fa-play" Style="SuperButtonStyle.Primary"
+                                     ConfirmationTitle="Confirmation"
+                                     ConfirmationContent="Confirmer l'action ?"
+                                     Click="@SimulateFiveSecondsAsync" />
+        </div>
+    </div>
+</div>
+<div class="card mt-3">
+    <div class="card-header">
+        Badges
+    </div>
+    <div class="card-body">
+        <div class="d-flex flex-wrap gap-2">
+            <SuperButton Text="Notifications" Style="SuperButtonStyle.Primary" BadgeText="4" BadgeCssClass="badge text-bg-secondary" />
+            <SuperButton Text="Messages" Style="SuperButtonStyle.Success" BadgeText="12" BadgeCssClass="badge text-bg-warning" />
+        </div>
+    </div>
+</div>
+
+<div class="card mt-3">
+    <div class="card-header">
+        ButtonGroup
+    </div>
+    <div class="card-body">
+        <div class="d-flex flex-column gap-3">
+            <div>
+                <SuperButtonGroup AriaLabel="Basic example">
+                    <Buttons>
+                        <SuperButton Text="Left" Style="SuperButtonStyle.Primary" />
+                        <SuperButton Text="Middle" Style="SuperButtonStyle.Primary" />
+                        <SuperButton Text="Right" Style="SuperButtonStyle.Primary" />
+                    </Buttons>
+                </SuperButtonGroup>
+            </div>
+
+            <div>
+                <SuperButtonGroup AriaLabel="Outline example">
+                    <Buttons>
+                        <SuperButton Text="Left" Style="SuperButtonStyle.Secondary" Outline="true" />
+                        <SuperButton Text="Middle" Style="SuperButtonStyle.Secondary" Outline="true" />
+                        <SuperButton Text="Right" Style="SuperButtonStyle.Secondary" Outline="true" />
+                    </Buttons>
+                </SuperButtonGroup>
+            </div>
+
+            <div>
+                <SuperButtonGroup AriaLabel="Vertical example" Vertical="true">
+                    <Buttons>
+                        <SuperButton Text="Top" Style="SuperButtonStyle.Success" />
+                        <SuperButton Text="Middle" Style="SuperButtonStyle.Success" />
+                        <SuperButton Text="Bottom" Style="SuperButtonStyle.Success" />
+                    </Buttons>
+                </SuperButtonGroup>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-3">
+    <div class="card-header">
+        Toggle
+    </div>
+    <div class="card-body">
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            <SuperToggleButton Text="Toggle" Style="SuperButtonStyle.Primary" />
+            <SuperToggleButton Text="Active" Style="SuperButtonStyle.Primary" Active="true" />
+            <SuperToggleButton Text="Disabled" Style="SuperButtonStyle.Primary" Disabled="true" />
+
+            <SuperToggleButton Text="Outline" Style="SuperButtonStyle.Secondary" Outline="true" />
+            <SuperToggleButton Text="Outline active" Style="SuperButtonStyle.Secondary" Outline="true" Active="true" />
+
+            <SuperToggleButton Text="Busy 5s" Style="SuperButtonStyle.Success" Icon="fa-solid fa-rotate" BusyText="Traitement..." Click="@SimulateFiveSecondsAsync" />
+        </div>
+    </div>
+</div>
+
+<div class="card mt-3">
+    <div class="card-header">
+        Disabled
+    </div>
+    <div class="card-body">
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            <SuperButton Text="Primary disabled" Style="SuperButtonStyle.Primary" Disabled="true" />
+            <SuperButton Text="Secondary disabled" Style="SuperButtonStyle.Secondary" Disabled="true" />
+            <SuperButton Text="Outline primary disabled" Style="SuperButtonStyle.Primary" Outline="true" Disabled="true" />
+            <SuperButton Text="Outline secondary disabled" Style="SuperButtonStyle.Secondary" Outline="true" Disabled="true" />
+        </div>
+    </div>
+</div>
+
+<div class="card mt-3">
+    <div class="card-header">
+        Sizes
+    </div>
+    <div class="card-body">
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            <SuperButton Text="Large" Style="SuperButtonStyle.Primary" Size="SuperButtonSize.Large" />
+            <SuperButton Text="Large Outline" Style="SuperButtonStyle.Secondary" Outline="true" Size="SuperButtonSize.Large" />
+            <SuperButton Text="Default" Style="SuperButtonStyle.Success" />
+            <SuperButton Text="Small" Style="SuperButtonStyle.Danger" Size="SuperButtonSize.Small" />
+            <SuperButton Text="Small Outline" Style="SuperButtonStyle.Warning" Outline="true" Size="SuperButtonSize.Small" />
+            <SuperButton Text="SuperSmall" Style="SuperButtonStyle.Success" Size="SuperButtonSize.SuperSmall" />
+        </div>
+    </div>
+</div>
+
+<div class="card mt-3">
+    <div class="card-header">
+        Styles (Outline)
+    </div>
+    <div class="card-body">
+        <div class="d-flex flex-wrap gap-2">
+            <SuperButton Text="Primary" Style="SuperButtonStyle.Primary" Outline="true" />
+            <SuperButton Text="Secondary" Style="SuperButtonStyle.Secondary" Outline="true" />
+            <SuperButton Text="Success" Style="SuperButtonStyle.Success" Outline="true" />
+            <SuperButton Text="Danger" Style="SuperButtonStyle.Danger" Outline="true" />
+            <SuperButton Text="Warning" Style="SuperButtonStyle.Warning" Outline="true" />
+            <SuperButton Text="Info" Style="SuperButtonStyle.Info" Outline="true" />
+            <SuperButton Text="Light" Style="SuperButtonStyle.Light" Outline="true" />
+            <SuperButton Text="Dark" Style="SuperButtonStyle.Dark" Outline="true" />
+        </div>
+    </div>
+</div>
+
+<div class="card mt-3">
+    <div class="card-header">
+        Click + loader (5 secondes)
+    </div>
+    <div class="card-body">
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            <SuperButton Text="Simuler 5s" Icon="fa-solid fa-play" Style="SuperButtonStyle.Primary" BusyText="Traitement..." Click="@SimulateFiveSecondsAsync" />
+
+            <SuperButton Text="Simuler 5s (Danger)" Icon="fa-solid fa-trash" Style="SuperButtonStyle.Danger" BusyText="Suppression..." Click="@SimulateFiveSecondsAsync" />
+
+            <SuperButton Style="SuperButtonStyle.Success" BusyText="Sauvegarde..." Icon="fa-solid fa-floppy-disk" Click="@SimulateFiveSecondsAsync">
+                Sauvegarder (ChildContent)
+            </SuperButton>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(_lastClickMessage))
+        {
+            <div class="alert alert-info mt-3 mb-0">
+                @_lastClickMessage
+            </div>
+        }
+    </div>
+</div>
+
+@code
+{
+    private string? _lastClickMessage;
+    private string? _lastSplitActionName;
+
+    private Task OnSplitActionSelected(SuperSplitButtonActionEventArgs e)
+    {
+        _lastSplitActionName = e.ActionName;
+        return Task.CompletedTask;
+    }
+
+    private async Task SimulateFiveSecondsAsync(MouseEventArgs _)
+    {
+        _lastClickMessage = $"Click reçu à {DateTime.Now:HH:mm:ss}. Attente 5 secondes...";
+        await Task.Delay(TimeSpan.FromSeconds(5));
+        _lastClickMessage = $"Terminé à {DateTime.Now:HH:mm:ss}.";
+    }
+}

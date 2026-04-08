@@ -1,0 +1,225 @@
+﻿@typeparam TItem
+@attribute [CascadingTypeParameter(nameof(TItem))]
+@implements IDisposable
+@using System.Linq.Expressions
+
+@code {
+    [CascadingParameter]
+    protected SuperDataGrid<TItem>? Grid { get; set; }
+
+    /// <summary>
+    /// The property name to bind to for this column.
+    /// </summary>
+    [Parameter]
+    public string Property { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Lambda expression pointing to the property to bind (e.g. <c>p =&gt; p.Name</c>).
+    /// When set, the property name is inferred automatically; <see cref="Property"/> is ignored.
+    /// </summary>
+    [Parameter]
+    public Expression<Func<TItem, object?>>? For { get; set; }
+
+    /// <summary>
+    /// The display title of the column.
+    /// </summary>
+    [Parameter]
+    public string? Title { get; set; }
+
+    /// <summary>
+    /// The width of the column (e.g., "150px", "10%").
+    /// </summary>
+    [Parameter]
+    public string? Width { get; set; }
+
+    /// <summary>
+    /// The minimum width of the column.
+    /// </summary>
+    [Parameter]
+    public string? MinWidth { get; set; }
+
+    /// <summary>
+    /// The maximum width of the column.
+    /// </summary>
+    [Parameter]
+    public string? MaxWidth { get; set; }
+
+    /// <summary>
+    /// Whether this column is visible.
+    /// </summary>
+    [Parameter]
+    public bool Visible { get; set; } = true;
+
+    /// <summary>
+    /// Whether this column must always remain visible.
+    /// </summary>
+    [Parameter]
+    public bool AlwaysVisible { get; set; } = false;
+
+    /// <summary>
+    /// Whether this column is sortable.
+    /// </summary>
+    [Parameter]
+    public bool Sortable { get; set; } = true;
+
+    [Parameter]
+    public bool Filterable { get; set; } = true;
+
+    /// <summary>
+    /// Property name used by the default filter component. When not set, <see cref="Property"/> is used.
+    /// </summary>
+    [Parameter]
+    public string? FilterProperty { get; set; }
+
+    /// <summary>
+    /// Whether this column is resizable.
+    /// </summary>
+    [Parameter]
+    public bool Resizable { get; set; } = true;
+
+    /// <summary>
+    /// Whether this column can be reordered.
+    /// </summary>
+    [Parameter]
+    public bool Reorderable { get; set; } = true;
+
+    /// <summary>
+    /// CSS class applied to header cells.
+    /// </summary>
+    [Parameter]
+    public string? HeaderCssClass { get; set; }
+
+    /// <summary>
+    /// CSS class applied to data cells.
+    /// </summary>
+    [Parameter]
+    public string? CssClass { get; set; }
+
+    /// <summary>
+    /// Function to determine CSS class for each cell based on the item.
+    /// </summary>
+    [Parameter]
+    public Func<TItem, string?>? CellClass { get; set; }
+
+    /// <summary>
+    /// Format string for displaying the value (e.g., "{0:C}", "{0:d}").
+    /// </summary>
+    [Parameter]
+    public string? FormatString { get; set; }
+
+    /// <summary>
+    /// Text alignment for the column content.
+    /// </summary>
+    [Parameter]
+    public SuperTextAlignment TextAlign { get; set; } = SuperTextAlignment.Left;
+
+    /// <summary>
+    /// Custom template for rendering cell content.
+    /// </summary>
+    [Parameter]
+    public RenderFragment<TItem>? Template { get; set; }
+
+    /// <summary>
+    /// Custom template for rendering cell content in edit mode.
+    /// </summary>
+    [Parameter]
+    public RenderFragment<TItem>? EditTemplate { get; set; }
+
+    /// <summary>
+    /// Custom template for rendering the header.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? HeaderTemplate { get; set; }
+
+    /// <summary>
+    /// Custom template for rendering the footer.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? FooterTemplate { get; set; }
+
+    /// <summary>
+    /// Custom template for rendering the filter.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? FilterTemplate { get; set; }
+
+    // Internal state for runtime modifications
+    internal string? _currentWidth;
+    internal bool _currentVisible;
+    internal string? _defaultWidth;
+    internal bool _defaultVisible;
+
+    /// <summary>
+    /// Gets the current width (considers runtime modifications)
+    /// </summary>
+    internal string? CurrentWidth => _currentWidth ?? Width;
+
+    /// <summary>
+    /// Gets the current visibility (considers runtime modifications)
+    /// </summary>
+    internal bool CurrentVisible => _currentVisible;
+
+    protected override void OnInitialized()
+    {
+        _defaultWidth = Width;
+        _defaultVisible = AlwaysVisible || Visible;
+        _currentWidth = Width;
+        _currentVisible = _defaultVisible;
+
+        Grid?.AddColumn(this);
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (For is not null)
+        {
+            Property = GetPropertyName(For);
+        }
+
+        if (string.IsNullOrEmpty(Title) && !string.IsNullOrEmpty(Property))
+        {
+            Title = Property;
+        }
+
+        if (AlwaysVisible)
+        {
+            _defaultVisible = true;
+            _currentVisible = true;
+        }
+    }
+
+    internal void ResetToDefaults()
+    {
+        _currentWidth = _defaultWidth;
+        _currentVisible = AlwaysVisible || _defaultVisible;
+    }
+
+    internal void SetWidth(string? width)
+    {
+        _currentWidth = width;
+    }
+
+    internal void SetVisible(bool visible)
+    {
+        _currentVisible = AlwaysVisible || visible;
+    }
+
+    private static string GetPropertyName(Expression<Func<TItem, object?>> expression)
+    {
+        var body = expression.Body;
+        if (body is UnaryExpression unary && unary.NodeType == ExpressionType.Convert)
+        {
+            body = unary.Operand;
+        }
+        if (body is MemberExpression member)
+        {
+            return member.Member.Name;
+        }
+        throw new ArgumentException("L'expression doit être un accès simple à une propriété (ex: p => p.Nom).", nameof(expression));
+    }
+
+    public void Dispose()
+    {
+        Grid?.RemoveColumn(this);
+    }
+}

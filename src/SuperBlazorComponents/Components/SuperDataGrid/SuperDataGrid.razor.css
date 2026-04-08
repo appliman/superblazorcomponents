@@ -1,0 +1,781 @@
+﻿/* VirtualDataGrid - CSS Isolated Styles based on Bootstrap 5.3 */
+
+/* Container */
+.sdg-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    border: 1px solid var(--bs-border-color, #dee2e6);
+    border-radius: var(--bs-border-radius, 0.375rem);
+    overflow: hidden;
+}
+
+/* Header Section (above table) */
+.sdg-header-section {
+    padding: 0.2rem 0rem;
+    border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+    /*flex-shrink: 0;*/
+}
+
+/* Footer Section (below table) */
+.sdg-footer-section {
+    padding: 0.5rem 0.5rem;
+    border-top: 1px solid var(--bs-border-color, #dee2e6);
+    flex-shrink: 0;
+    font-size: 0.8rem;
+}
+
+/* Table Wrapper */
+.sdg-table-wrapper {
+    overflow-y: scroll;
+    overflow-x: auto;
+    flex: 1 1 auto;
+    position: relative;
+    min-height: 0;
+    /* Create a stacking context so sticky header/footer z-index works predictably */
+    z-index: 0;
+}
+
+    .sdg-table-wrapper.sdg-freeze-header {
+        overflow-y: scroll;
+        overflow-x: auto;
+    }
+
+/* Table Styling */
+.sdg-container table {
+    width: 100%;
+    min-height: 100%;
+    margin-bottom: 0;
+    /* Keep Bootstrap table styles (e.g., table-striped) working as expected */
+    border-collapse: separate;
+    border-spacing: 0;
+    border-spacing: 0;
+    table-layout: fixed;
+}
+
+/* Tbody */
+.sdg-container tbody {
+    position: relative;
+    z-index: 0;
+}
+
+    .sdg-container tbody::after {
+        content: '';
+        display: table-row;
+        height: 100%;
+    }
+
+/* Header Styling */
+.sdg-container thead {
+    position: relative;
+}
+
+.sdg-container .sdg-sticky-header {
+    position: sticky;
+    top: -1px;
+    z-index: 20 !important;
+    background-color: #e9ecef !important;
+}
+
+.sdg-container .sdg-sticky-header tr {
+    background-color: #e9ecef !important;
+}
+
+.sdg-container .sdg-sticky-header th {
+    position: sticky !important;
+    top: 0;
+    z-index: 20 !important;
+    background-color: #e9ecef !important;
+    color: #212529 !important;
+    font-size: 0.8rem;
+    box-shadow: inset 0 -1px 0 0 var(--bs-border-color, #dee2e6);
+}
+
+.sdg-container .sdg-sticky-header,
+.sdg-container .sdg-sticky-header tr,
+.sdg-container .sdg-sticky-header th,
+.sdg-container .sdg-sticky-header .sdg-filter-content {
+    overflow: visible;
+}
+
+.sdg-container .sdg-sticky-header th:has(.super-date-range-picker.is-open) {
+    z-index: 3000 !important;
+}
+
+.sdg-container .sdg-sticky-header th:has(.super-date-range-picker.is-open) .sdg-filter-content {
+    position: relative;
+    z-index: 3001;
+}
+
+/* Column Headers */
+.sdg-column-headers {
+    height: 1px;
+    background-color: #e9ecef !important;
+}
+
+.sdg-row-number-header,
+.sdg-row-number-cell {
+    width: var(--sdg-row-number-width, 50px);
+    min-width: var(--sdg-row-number-width, 50px);
+    max-width: var(--sdg-row-number-width, 50px);
+    text-align: left;
+    vertical-align: middle;
+    position: sticky;
+    inset-inline-start: 0;
+    z-index: 40 !important;
+}
+
+.sdg-row-number-header {
+    font-size: 0.8rem !important;
+    color: var(--bs-secondary-color, #adb5bd) !important;
+    font-weight: 400;
+}
+
+.sdg-container tbody td.sdg-row-number-cell {
+    font-size: 0.8rem !important;
+    color: var(--bs-secondary-color, #adb5bd) !important;
+    font-weight: 400 !important;
+    line-height: 1 !important;
+    border-bottom: 1px solid var(--bs-border-color, #dee2e6) !important;
+    background-color: var(--bs-table-bg-state, var(--bs-table-bg-type, var(--bs-table-bg, var(--bs-body-bg, #fff))));
+    background-clip: padding-box;
+}
+
+.sdg-container tbody td.sdg-frozen-left,
+.sdg-container tbody td.sdg-frozen-right {
+    background-color: var(--bs-table-bg, var(--bs-body-bg, #fff));
+    box-shadow: inset 0 0 0 9999px var(--bs-table-bg-state, var(--bs-table-bg-type, var(--bs-table-accent-bg, transparent)));
+    background-clip: padding-box;
+}
+
+.sdg-selection-header,
+.sdg-selection-cell {
+    width: var(--sdg-selection-width, 40px);
+    min-width: var(--sdg-selection-width, 40px);
+    max-width: var(--sdg-selection-width, 40px);
+    text-align: center;
+    vertical-align: middle;
+    position: sticky;
+    z-index: 40 !important;
+}
+
+.sdg-selection-cell {
+    padding: 0 !important;
+}
+
+/* Actions Column */
+.sdg-actions-header,
+.sdg-actions-cell {
+    width: var(--sdg-actions-width, 50px);
+    min-width: var(--sdg-actions-width, 50px);
+    max-width: var(--sdg-actions-width, 50px);
+    text-align: center;
+    vertical-align: middle;
+    position: sticky;
+    z-index: 40 !important;
+    padding: 0 2px !important;
+}
+
+.sdg-actions-content {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.2rem;
+    white-space: nowrap;
+}
+
+.sdg-sticky-header th.sdg-actions-header {
+    z-index: 41 !important;
+    background-color: #e9ecef !important;
+}
+
+.sdg-selection-cell .form-check-input,
+.sdg-selection-header .form-check-input {
+    margin: 0;
+    cursor: pointer;
+    vertical-align: middle;
+}
+
+.sdg-selection-header .form-check-input {
+    width: 1.2em;
+    height: 1.2em;
+}
+
+.sdg-sticky-header th.sdg-selection-header {
+    z-index: 41 !important;
+    background-color: #e9ecef !important;
+}
+
+.sdg-column-headers th.sdg-selection-header {
+    text-align: center;
+    padding: 0;
+}
+
+    .sdg-column-headers th {
+        padding: 0.1rem 0.3rem;
+        font-weight: 600;
+        font-size: 0.8rem;
+        text-align: left;
+        vertical-align: middle;
+        background-color: #e9ecef !important;
+        color: #212529 !important;
+        user-select: none;
+        height: 30px;
+        box-sizing: border-box;
+        overflow: hidden;
+    }
+
+        .sdg-column-headers th:has(.sdg-filter-content) {
+            padding-bottom: 2.5rem;
+            height: auto;
+        }
+
+        .sdg-column-headers th:has(.sdgpf-container),
+        .sdg-column-headers th:has(.sdgpf-container) .sdg-filter-content {
+            overflow: visible;
+        }
+
+/* Header Content */
+.sdg-header-content {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    flex: 1;
+    background-color: inherit;
+}
+
+/* Drag Handle */
+.sdg-drag-handle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.1rem;
+    padding: 0.1rem;
+    cursor: grab;
+    color: var(--bs-secondary, #6c757d);
+    opacity: 0.7;
+    transition: opacity 0.15s ease-in-out, color 0.15s ease-in-out;
+    flex-shrink: 0;
+    border-radius: 3px;
+}
+
+    .sdg-drag-handle:hover {
+        opacity: 1;
+        cursor: grab;
+        color: var(--bs-body-color, #212529);
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    .sdg-drag-handle:active {
+        cursor: grabbing;
+        background-color: rgba(0, 0, 0, 0.1);
+    }
+
+    .sdg-drag-handle svg {
+        display: block;
+        vertical-align: middle;
+    }
+
+.sdg-sortable .sdg-header-content {
+    cursor: pointer;
+}
+
+    .sdg-sortable .sdg-header-content:hover {
+        color: var(--bs-primary, #0d6efd);
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+
+.sdg-header-text {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Filter Content */
+.sdg-filter-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 0 2px 0 2px;
+    background-color: inherit;
+}
+
+    .sdg-filter-content input,
+    .sdg-filter-content select {
+        width: 100%;
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+        font-weight: normal;
+        border: 1px solid var(--bs-border-color, #dee2e6);
+        border-radius: var(--bs-border-radius-sm, 0.25rem);
+    }
+
+        .sdg-filter-content input:focus,
+        .sdg-filter-content select:focus {
+            border-color: var(--bs-primary, #0d6efd);
+            outline: 0;
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+        }
+
+        .sdg-filter-content input::placeholder {
+            color: var(--bs-secondary-color, #6c757d);
+            opacity: 0.7;
+        }
+
+/* Sort Indicators */
+.sdg-sort-indicator {
+    width: 0;
+    height: 0;
+    border: 5px solid transparent;
+    opacity: 0.3;
+    transition: opacity 0.15s ease-in-out;
+}
+
+    .sdg-sort-indicator.sdg-sort-asc {
+        border-bottom-color: var(--bs-body-color, #212529);
+        border-top: 0;
+        opacity: 1;
+    }
+
+    .sdg-sort-indicator.sdg-sort-desc {
+        border-top-color: var(--bs-body-color, #212529);
+        border-bottom: 0;
+        opacity: 1;
+    }
+
+/* Resize Handle */
+.sdg-resize-handle {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 8px;
+    height: 100%;
+    cursor: col-resize;
+    background: transparent;
+    z-index: 1;
+}
+
+    .sdg-resize-handle:hover,
+    .sdg-resize-handle:active {
+        background-color: var(--bs-primary, #0d6efd);
+        opacity: 0.3;
+    }
+
+/* Column Drag Styling */
+.sdg-dragging {
+    opacity: 0.5;
+    background-color: var(--bs-primary-bg-subtle, #cfe2ff) !important;
+}
+
+.sdg-drag-over {
+    border-left: 3px solid var(--bs-primary, #0d6efd) !important;
+}
+
+/* Base styles for all th and td */
+.sdg-container th,
+.sdg-container td {
+    box-sizing: border-box;
+    overflow: hidden;
+    position: relative;
+}
+
+.sdg-container table.table th,
+.sdg-container table.table td {
+    box-sizing: border-box !important;
+}
+
+/* Body Rows */
+.sdg-row {
+    transition: background-color 0.15s ease-in-out;
+    height: var(--sdg-row-height, 40px);
+}
+
+/* Placeholder rows must match the same height as items for Virtualize spacers to be accurate */
+.sdg-placeholder-row {
+    height: var(--sdg-row-height, 40px);
+}
+
+    .sdg-row:hover {
+        background-color: var(--bs-table-hover-bg, rgba(0, 0, 0, 0.075));
+    }
+
+/* Cells */
+.sdg-cell {
+    padding: 0.1rem 0.2rem;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-sizing: border-box;
+    position: relative;
+    font-size: 0.8rem;
+}
+
+/* IMPORTANT: Forcer l'isolation du contenu des cellules */
+.sdg-cell > * {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: inherit;
+}
+
+/* Selected Row - uniquement la bordure, pas de fond */
+.sdg-row-selected,
+.sdg-row-selected:hover {
+    /* Pas de fond, juste la bordure via les cellules */
+}
+
+/* Ligne courante: indépendante de la sélection */
+.sdg-row-current > td {
+    background-color: var(--sdg-current-row-bg, #3b95c6) !important;
+    color: #fff !important;
+}
+
+.sdg-row-current:hover > td {
+    background-color: var(--sdg-current-row-bg, #3b95c6) !important;
+    color: #fff !important;
+}
+
+.sdg-container tbody tr.sdg-row-current > td,
+.sdg-container tbody tr.sdg-row-current > td * {
+    color: #fff !important;
+}
+
+.sdg-container ::deep tr.sdg-row-current > td a,
+.sdg-container ::deep tr.sdg-row-current > td a:visited {
+    color: #fff !important;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.sdg-row-current > td .text-muted,
+.sdg-row-current:hover > td .text-muted,
+.sdg-row-current > td a,
+.sdg-row-current:hover > td a,
+.sdg-row-current > td .sdg-cell,
+.sdg-row-current:hover > td .sdg-cell {
+    color: #fff !important;
+}
+
+/* Selected Cell - bordures top et bottom uniquement */
+.sdg-cell-selected {
+    border-top: 0 !important;
+    border-bottom: 0 !important;
+}
+
+/* Row in individual edit mode */
+.sdg-row-editing > td {
+    background-color: var(--bs-warning-bg-subtle, #fff3cd) !important;
+    border-top: 1px solid var(--bs-warning-border-subtle, #ffe69c) !important;
+    border-bottom: 1px solid var(--bs-warning-border-subtle, #ffe69c) !important;
+}
+
+.sdg-row-editing:hover > td {
+    background-color: var(--bs-warning-bg-subtle, #fff3cd) !important;
+}
+
+/*    .sdg-cell-selected:first-child {
+        border-left: var(--sdg-selected-border, 2px solid var(--bs-primary, #0d6efd));
+    }
+
+    .sdg-cell-selected:last-child {
+        border-right: var(--sdg-selected-border, 2px solid var(--bs-primary, #0d6efd));
+    }
+*/
+/* Frozen Columns - Simple et direct comme Radzen */
+.sdg-frozen-left,
+.sdg-frozen-right {
+    position: sticky !important;
+    z-index: 1 !important;
+}
+
+.sdg-frozen-left-last {
+    /* Draw separator without affecting cell background/striping */
+    outline: 1px solid var(--bs-border-color, #dee2e6);
+    outline-offset: -1px;
+}
+
+/* Avoid clipped pseudo-element separators */
+.sdg-frozen-left-last::after {
+    content: none;
+}
+
+/* Headers frozen - z-index plus élevé */
+.sdg-sticky-header th.sdg-frozen-left,
+.sdg-sticky-header th.sdg-frozen-right {
+    z-index: 21 !important;
+    background-color: #e9ecef !important;
+    color: #212529 !important;
+    font-size: 0.8rem;
+}
+
+/* Footers frozen (when footer is sticky) - z-index plus élevé */
+.sdg-sticky-footer td.sdg-frozen-left,
+.sdg-sticky-footer td.sdg-frozen-right,
+.sdg-sticky-footer th.sdg-frozen-left,
+.sdg-sticky-footer th.sdg-frozen-right {
+    z-index: 31 !important;
+    background-color: #e9ecef !important;
+}
+
+/* Ombres pour marquer visuellement les frozen columns */
+/* Visual separator for ALL left-frozen cells */
+.sdg-frozen-left::after {
+    content: none;
+}
+
+.sdg-frozen-right::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -1px;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to left, rgba(0, 0, 0, 0.08), transparent);
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Footer Styling */
+.sdg-sticky-footer {
+    position: sticky;
+    bottom: -1px;
+    z-index: 20;
+}
+
+/* Provide an opaque stacking layer for the sticky footer row */
+.sdg-sticky-footer {
+    background-color: #e9ecef;
+}
+
+/* Sticky footer row/cells must sit above other table content */
+.sdg-container tfoot.sdg-sticky-footer {
+    z-index: 30;
+}
+
+.sdg-container tfoot.sdg-sticky-footer tr,
+.sdg-container tfoot.sdg-sticky-footer td,
+.sdg-container tfoot.sdg-sticky-footer th {
+    position: relative;
+    z-index: 30;
+    background-color: inherit;
+    font-size: 0.8rem;
+}
+
+    .sdg-sticky-footer::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        height: 1px;
+        background-color: var(--bs-border-color, #dee2e6);
+    }
+
+.sdg-column-footers td {
+    padding: 0.2rem 0.5rem;
+    font-weight: 600;
+    background-color: #e9ecef;
+    border-top: 2px solid var(--bs-border-color, #dee2e6);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 0;
+    line-height: 1.1;
+}
+
+/* Ensure footer cells never visually overlap the sticky footer (frozen) */
+/* (Removed) tfoot z-index override: it can cause the footer to be painted behind the scrolling region in some browsers */
+
+/* Do not force stacking context on footer rows; sticky footer z-index handles overlay */
+
+/* Placeholder Row */
+.sdg-placeholder-row {
+    height: var(--sdg-row-height, 40px);
+}
+
+.sdg-placeholder-row td {
+    padding: 0;
+}
+
+.sdg-placeholder-cell {
+    height: 100%;
+    background: transparent;
+    border-radius: var(--bs-border-radius-sm, 0.25rem);
+}
+
+/* Loading Overlay */
+.sdg-loading-overlay {
+    position: sticky;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+    pointer-events: none;
+}
+
+.sdg-loading-spinner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Empty State */
+.sdg-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    color: var(--bs-secondary-color, #6c757d);
+}
+
+.sdg-empty-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+/* Text Alignment Classes */
+.sdg-text-left {
+    text-align: left;
+}
+
+.sdg-text-center {
+    text-align: center;
+}
+
+.sdg-text-right {
+    text-align: right;
+}
+
+/* Vertical Orientation (Property Grid) */
+.sdg-vertical-item td {
+    border-bottom: none !important;
+}
+
+.sdg-vertical-item-last td {
+    border-bottom: 2px solid var(--bs-border-color, #dee2e6) !important;
+}
+
+.sdg-vertical-row {
+    height: var(--sdg-row-height, 40px);
+}
+
+    .sdg-vertical-row:hover {
+        background-color: var(--bs-table-hover-bg, rgba(0, 0, 0, 0.075));
+    }
+
+.sdg-vertical-row-number {
+    width: var(--sdg-row-number-width, 50px);
+    min-width: var(--sdg-row-number-width, 50px);
+    max-width: var(--sdg-row-number-width, 50px);
+    text-align: center;
+    vertical-align: middle;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--bs-secondary-color, #adb5bd);
+    border-right: 1px solid var(--bs-border-color, #dee2e6);
+    background-color: #e9ecef;
+}
+
+.sdg-vertical-row-number.sdg-vertical-has-actions {
+    vertical-align: top;
+    padding-top: 0.3rem;
+}
+
+.sdg-vertical-num {
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--bs-secondary-color, #adb5bd);
+    padding-bottom: 0.25rem;
+}
+
+.sdg-vertical-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+}
+
+/* La table verticale fige les largeurs pour borner la colonne propriété */
+.sdg-container table.sdg-vertical-table {
+    table-layout: fixed;
+}
+
+.sdg-vertical-key-column {
+    width: 30%;
+    max-width: 30%;
+}
+
+.sdg-vertical-value-column {
+    width: auto;
+}
+
+.sdg-vertical-key {
+    width: 30%;
+    max-width: 30%;
+    min-width: 0;
+    padding: 0.1rem 0.4rem;
+    vertical-align: middle;
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: #212529;
+    background-color: #f8f9fa;
+    border-right: 1px solid var(--bs-border-color, #dee2e6);
+    overflow: hidden;
+}
+
+.sdg-vertical-key-text {
+    display: block;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sdg-vertical-value {
+    text-align: left !important;
+    padding: 0.1rem 0.4rem;
+    vertical-align: middle;
+    font-size: 0.8rem;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.sdg-vertical-item.sdg-row-current .sdg-vertical-row-number {
+    background-color: var(--sdg-current-row-bg, #3b95c6) !important;
+    color: #fff !important;
+}
+
+.sdg-vertical-item.sdg-row-current .sdg-vertical-key {
+    background-color: var(--sdg-current-row-bg, #3b95c6) !important;
+    color: #fff !important;
+}
+
+.sdg-vertical-item.sdg-row-current .sdg-vertical-value {
+    background-color: var(--sdg-current-row-bg, #3b95c6) !important;
+    color: #fff !important;
+}
+
+.sdg-vertical-item.sdg-row-selected .sdg-vertical-row-number,
+.sdg-vertical-item.sdg-row-selected .sdg-vertical-key,
+.sdg-vertical-item.sdg-row-selected .sdg-vertical-value {
+    background-color: var(--sdg-current-row-bg, #3b95c6) !important;
+    color: #fff !important;
+}

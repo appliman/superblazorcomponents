@@ -1,0 +1,36 @@
+﻿@namespace SuperBlazorComponents.Components.SuperLayout
+
+<aside class="super-chatpanel @StateClass @CssClass" style="@StyleString">
+    <div class="super-chatpanel-content">
+        @if (Header is not null)
+        {
+            <div class="super-chatpanel-header">
+                @Header
+            </div>
+        }
+        else
+        {
+            <div class="super-chatpanel-header">
+                <span class="super-chatpanel-title">@Title</span>
+                <button class="btn btn-sm btn-link super-chatpanel-close p-0 border-0"
+                        type="button"
+                        @onclick="OnCloseClick"
+                        aria-label="Fermer le chat"
+                        title="Fermer">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        }
+
+        <div class="super-chatpanel-body">
+            @ChildContent
+        </div>
+
+        @if (Footer is not null)
+        {
+            <div class="super-chatpanel-footer">
+                @Footer
+            </div>
+        }
+    </div>
+</aside>

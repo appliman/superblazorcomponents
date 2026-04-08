@@ -1,0 +1,130 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.JSInterop
+@using Microsoft.AspNetCore.Components.Web
+@inject SuperTabsService TabsService
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@implements IDisposable
+
+<CascadingValue Value="this" IsFixed="true">
+    <div class="super-tabs @GetPositionClass()"
+         tabindex="0"
+         @onkeydown="HandleKeyDown"
+         @ref="tabsContainer">
+
+        @* En-tête des onglets *@
+        <div class="super-tabs-header @GetHeaderPositionClass()">
+            <div class="super-tabs-scroll-container" style="@GetHeaderContainerStyle()">
+                <ul class="super-tabs-list" role="tablist">
+                    @foreach (var (tab, index) in GetVisibleTabs().Select((t, i) => (t, i)))
+                    {
+                        var tabIndex = GetActualIndex(tab);
+                        var isSelected = tabIndex == selectedIndex;
+
+                        <AuthorizeView Policy="@tab.PolicyName" Context="pol">
+                            <Authorized>
+                                <li class="super-tab-item @(isSelected ? "active" : "") @(tab.Disabled ? "disabled" : "")"
+                                    role="tab"
+                                    aria-selected="@isSelected.ToString().ToLower()"
+                                    aria-disabled="@tab.Disabled.ToString().ToLower()"
+                                    title="@tab.Tooltip"
+                                    @onclick="() => SelectTabAsync(tabIndex)"
+                                    @onclick:preventDefault="@tab.Disabled">
+
+                                    @* Icône FontAwesome *@
+                                    @if (!string.IsNullOrEmpty(tab.Icon))
+                                    {
+                                        <i class="@GetIconCssClass(tab)" style="@GetIconStyle(tab)" title="@tab.Title"></i>
+                                    }
+
+                                    @* Titre *@
+                                    <span class="super-tab-title">@tab.Title</span>
+
+                                    @* Badge *@
+                                    @if (!string.IsNullOrEmpty(tab.BadgeText) || !string.IsNullOrEmpty(tab.BadgeIcon))
+                                    {
+                                        <span class="super-tab-badge @tab.BadgeClass">
+                                            @if (!string.IsNullOrEmpty(tab.BadgeIcon))
+                                            {
+                                                <i class="@tab.BadgeIcon"></i>
+                                            }
+                                            @tab.BadgeText
+                                        </span>
+                                    }
+
+                                    @* Indicateur de modifications non sauvegardées *@
+                                    @if (tab.HasUnsavedChanges)
+                                    {
+                                        <span class="super-tab-unsaved" title="Modifications non sauvegardées">●</span>
+                                    }
+
+                                    @* Bouton de fermeture *@
+                                    @if (tab.Closable)
+                                    {
+                                        <button class="super-tab-close"
+                                                @onclick="() => CloseTabAsync(tabIndex)"
+                                                @onclick:stopPropagation="true"
+                                                title="Fermer">
+                                            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M1 1L11 11M11 1L1 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                                            </svg>
+                                        </button>
+                                    }
+                                </li>
+                            </Authorized>
+                        </AuthorizeView>
+                    }
+                </ul>
+            </div>
+
+            @* Bouton d'ajout d'onglet (si activé) *@
+            @if (AllowAddTab)
+            {
+                <button class="super-tab-add" @onclick="RequestAddTabAsync" title="Ajouter un onglet">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+            }
+        </div>
+
+        @* Déclaration optionnelle (composition) *@
+        <div style="display:none">
+            @ChildContent
+        </div>
+
+        @* Contenu des onglets *@
+        <div class="super-tabs-content">
+            @foreach (var (tab, index) in Tabs.Select((t, i) => (t, i)))
+            {
+                var isSelected = index == selectedIndex;
+                var shouldRender = !tab.LazyLoad || tab.HasBeenLoaded || isSelected;
+
+                if (tab.Visible && shouldRender)
+                {
+                    <div class="super-tab-panel @(isSelected ? "active" : "")"
+                         role="tabpanel"
+                         aria-hidden="@(!isSelected).ToString().ToLower()"
+                         style="@(isSelected ? "" : "display: none;")">
+
+                        @if (tab.Content is not null)
+                        {
+                            @tab.Content
+                        }
+                        else if (tab.ComponentType is not null)
+                        {
+                            if (isSelected)
+                            {
+                                <DynamicComponent Type="@tab.ComponentType" Parameters="@tab.ComponentParameters" />
+                            }
+                        }
+                        else
+                        {
+                            @ChildContent
+                        }
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</CascadingValue>
+
+

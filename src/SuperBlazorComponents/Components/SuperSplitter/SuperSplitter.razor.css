@@ -1,0 +1,120 @@
+﻿/* SuperSplitter Component Styles */
+
+.super-splitter-container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.super-splitter-horizontal {
+    flex-direction: column;
+}
+
+.super-splitter-vertical {
+    flex-direction: row;
+}
+
+.super-splitter-pane {
+    overflow: auto;
+    min-width: 0;
+    min-height: 0;
+    position: relative;
+}
+
+.super-splitter-pane-first,
+.super-splitter-pane-second {
+    flex-shrink: 0;
+}
+
+/* Forcer les dimensions pour les panes directs du splitter VERTICAL (gauche/droite) */
+.super-splitter-vertical > .super-splitter-pane-first,
+.super-splitter-vertical > .super-splitter-pane-second {
+    height: 100%;
+}
+
+/* Forcer les dimensions pour les panes directs du splitter HORIZONTAL (haut/bas) */
+.super-splitter-horizontal > .super-splitter-pane-first,
+.super-splitter-horizontal > .super-splitter-pane-second {
+    width: 100%;
+}
+
+.super-splitter-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    flex-shrink: 0;
+    user-select: none;
+    touch-action: none;
+    transition: background-color 0.2s ease;
+}
+
+/* Utiliser le sélecteur d'enfant direct > pour éviter les conflits avec les splitters imbriqués */
+.super-splitter-horizontal > .super-splitter-bar {
+    width: 100%;
+    height: 8px;
+    cursor: ns-resize;
+    border-left: none;
+    border-right: none;
+}
+
+.super-splitter-vertical > .super-splitter-bar {
+    width: 8px;
+    height: 100%;
+    cursor: ew-resize;
+    border-top: none;
+    border-bottom: none;
+}
+
+.super-splitter-bar:hover {
+    background-color: #6c757d;
+}
+
+.super-splitter-bar.dragging {
+    background-color: #0d6efd;
+}
+
+.super-splitter-grip {
+    color: #6c757d;
+    font-size: 0.625rem;
+    pointer-events: none;
+}
+
+.super-splitter-bar:hover .super-splitter-grip,
+.super-splitter-bar.dragging .super-splitter-grip {
+    color: #0d6efd;
+}
+
+.super-splitter-bar.dragging .super-splitter-grip {
+    color: white;
+}
+
+/* Support pour les splitters imbriqués */
+.super-splitter-pane > .super-splitter-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+/* Les divs de contenu dans les panes (pas les splitters) */
+.super-splitter-pane > div:not(.super-splitter-container) {
+    height: 100%;
+    width: 100%;
+    overflow: auto;
+}
+
+/* Règles spécifiques pour les panes du splitter VERTICAL (gauche/droite) */
+.super-splitter-vertical > .super-splitter-pane {
+    /* Les panes verticaux doivent avoir une hauteur de 100% */
+    height: 100%;
+}
+
+/* Règles spécifiques pour les panes du splitter HORIZONTAL (haut/bas) */
+.super-splitter-horizontal > .super-splitter-pane {
+    /* Les panes horizontaux doivent avoir une largeur de 100% */
+    width: 100%;
+}

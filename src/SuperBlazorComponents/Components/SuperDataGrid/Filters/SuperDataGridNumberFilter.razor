@@ -1,0 +1,108 @@
+﻿@using System.Globalization
+@inject SuperDialogService DialogService
+
+<div class="sdgnf-container">
+    <button type="button"
+            class="btn btn-sm btn-outline-secondary sdgnf-button"
+            @onclick="OpenDialogAsync">
+        <span class="sdgnf-button-content">
+            <i class="fa-solid fa-filter sdgnf-icon" title="Filtrer numériquement" aria-hidden="true"></i>
+            <span class="text-truncate">@GetDisplayText()</span>
+        </span>
+    </button>
+</div>
+
+@code {
+    private SuperDataGridNumberFilterSelection _selectedFilter = SuperDataGridNumberFilterSelection.Empty;
+
+    [Parameter]
+    public string PropertyName { get; set; } = string.Empty;
+
+    [Parameter]
+    public Type PropertyType { get; set; } = typeof(long?);
+
+    [Parameter]
+    public string Label { get; set; } = "Quantité";
+
+    [Parameter]
+    public EventCallback<SuperDataGridFilterInfo> ApplyFilter { get; set; }
+
+    private async Task OpenDialogAsync()
+    {
+        var result = await DialogService.OpenNumberFilterDialogAsync("Filtrer la colonne", Label, _selectedFilter);
+        if (result is null)
+        {
+            return;
+        }
+
+        _selectedFilter = NormalizeSelection(result);
+        await ApplySelectedFilterAsync(_selectedFilter);
+    }
+
+    private async Task ApplySelectedFilterAsync(SuperDataGridNumberFilterSelection selection)
+    {
+        if (!ApplyFilter.HasDelegate || string.IsNullOrWhiteSpace(PropertyName))
+        {
+            return;
+        }
+
+        var filterInfo = new SuperDataGridFilterInfo
+        {
+            PropertyName = PropertyName,
+            PropertyType = PropertyType,
+            Operator = selection.Operator ?? SuperDataGridFilterOperator.Equals,
+            PropertyValue = selection.Operator is not null && !SuperDataGridNumberFilterOperatorHelper.IsRangeOperator(selection.Operator.Value)
+                ? selection.Value?.ToString(CultureInfo.InvariantCulture)
+                : null,
+            FromNumericValue = selection.Value,
+            ToNumericValue = selection.Operator is not null && SuperDataGridNumberFilterOperatorHelper.IsRangeOperator(selection.Operator.Value)
+                ? selection.ValueTo
+                : null
+        };
+
+        await ApplyFilter.InvokeAsync(filterInfo);
+    }
+
+    private string GetDisplayText()
+    {
+        if (_selectedFilter.Operator is null)
+        {
+            return $"{Label}...";
+        }
+
+        var label = SuperDataGridNumberFilterOperatorHelper.GetLabel(_selectedFilter.Operator.Value);
+        if (SuperDataGridNumberFilterOperatorHelper.IsRangeOperator(_selectedFilter.Operator.Value))
+        {
+            return _selectedFilter.Value is not null && _selectedFilter.ValueTo is not null
+                ? $"{label} {_selectedFilter.Value.Value.ToString(CultureInfo.InvariantCulture)} - {_selectedFilter.ValueTo.Value.ToString(CultureInfo.InvariantCulture)}"
+                : label;
+        }
+
+        return _selectedFilter.Value is not null
+            ? $"{label} {_selectedFilter.Value.Value.ToString(CultureInfo.InvariantCulture)}"
+            : label;
+    }
+
+    private static SuperDataGridNumberFilterSelection NormalizeSelection(SuperDataGridNumberFilterSelection selection)
+    {
+        if (selection.Operator is null)
+        {
+            return SuperDataGridNumberFilterSelection.Empty;
+        }
+
+        if (!SuperDataGridNumberFilterOperatorHelper.IsRangeOperator(selection.Operator.Value))
+        {
+            return new SuperDataGridNumberFilterSelection(selection.Operator, selection.Value, null);
+        }
+
+        var fromValue = selection.Value;
+        var toValue = selection.ValueTo;
+
+        if (fromValue is not null && toValue is not null && fromValue > toValue)
+        {
+            (fromValue, toValue) = (toValue, fromValue);
+        }
+
+        return new SuperDataGridNumberFilterSelection(selection.Operator, fromValue, toValue);
+    }
+}

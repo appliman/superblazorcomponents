@@ -1,0 +1,20 @@
+﻿@inject NavigationManager NavigationManager
+
+@code {
+	[Parameter]
+	public string Path { get; set; } = string.Empty;
+
+	[Parameter]
+	public string Text { get; set; } = string.Empty;
+
+	protected override void OnInitialized()
+	{
+		var referer = NavigationManager.HistoryEntryState;
+		if (referer is not null)
+		{
+			Path = referer.ToString() ?? string.Empty;
+		}
+	}
+}
+
+<SuperBreadCrumbItem Path="@Path" Text="@Text" />

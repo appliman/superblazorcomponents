@@ -1,0 +1,84 @@
+﻿@*<script type="module" src="@Assets["Pages/Components/ThemeToggle.razor.js"]"></script>*@
+@inject IJSRuntime JSRuntime
+@implements IAsyncDisposable
+
+<button class="btn btn-link text-body-secondary p-1" @onclick="ToggleTheme" title="@GetThemeTitle()">
+    <i class="@GetThemeIcon() fa-lg"></i>
+</button>
+
+@code {
+    private IJSObjectReference? _module;
+    private string _currentTheme = "dark";
+    private bool _initialized = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await InitializeModuleAsync();
+        }
+    }
+
+    private async Task InitializeModuleAsync()
+    {
+        try
+        {
+            _module = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                "import", 
+                "./_content/SuperBlazorComponents/Components/Themes/ThemeToggle.razor.js");
+            
+            _currentTheme = await _module.InvokeAsync<string>("initialize");
+            _initialized = true;
+            StateHasChanged();
+        }
+        catch
+        {
+            _currentTheme = "dark";
+            _initialized = true;
+        }
+    }
+
+    private async Task ToggleTheme()
+    {
+        if (!_initialized || _module == null)
+            return;
+
+        try
+        {
+            _currentTheme = await _module.InvokeAsync<string>("toggleTheme");
+        }
+        catch
+        {
+            // En cas d'erreur, ne rien faire
+        }
+    }
+
+    private string GetThemeIcon()
+    {
+        return _currentTheme == "dark" ? "fa fa-sun" : "fa fa-moon";
+    }
+
+    private string GetThemeTitle()
+    {
+        return _currentTheme == "dark" ? "Passer en mode clair" : "Passer en mode sombre";
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_module != null)
+        {
+            try
+            {
+                await _module.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+                // Le circuit a été déconnecté, ignorer l'erreur
+            }
+            catch (Exception)
+            {
+                // Ignorer les autres erreurs de dispose
+            }
+        }
+    }
+}

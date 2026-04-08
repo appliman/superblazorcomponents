@@ -1,0 +1,36 @@
+﻿@page "/super-tabs-demo/declaratif"
+
+@using SuperBlazorComponents.Components.SuperTabs
+
+<PageTitle>SuperTabs déclaratif</PageTitle>
+
+<h1>SuperTabs - Déclaratif</h1>
+
+<p class="text-muted">Exemple: <code>&lt;SuperTabs&gt;&lt;Tabs&gt;&lt;TabItem&gt;...&lt;/TabItem&gt;&lt;/Tabs&gt;&lt;/SuperTabs&gt;</code></p>
+
+<SuperTabs InstanceId="@_instanceId"
+           PersistInUrl="false"
+           Position="@SuperTabPosition.Top"
+           LeftHeaderWidth="320px"
+           EnableAnimations="true"
+           EnableKeyboardNavigation="true"
+           Height="240px">
+    <Tabs>
+        <TabItem Id="decl-1" Title="Déclaratif 1" Icon="fa-solid fa-cube" BadgeText="A" BadgeClass="badge-primary">
+            <h2 class="h5">Déclaratif 1</h2>
+            <p>Contenu défini directement dans <code>TabItem</code>.</p>
+        </TabItem>
+        <TabItem Id="decl-2" Title="Déclaratif 2" Icon="fa-solid fa-cubes" Closable="true" BadgeText="2" BadgeClass="badge-secondary">
+            <h2 class="h5">Déclaratif 2</h2>
+            <p>Onglet fermable en mode déclaratif.</p>
+        </TabItem>
+        <TabItem Id="decl-3" Title="Lazy" Icon="fa-solid fa-bolt" LazyLoad="true" Tooltip="Rendu au premier affichage">
+            <h2 class="h5">Lazy (déclaratif)</h2>
+            <p>Rendu à la première sélection. Date/heure: @DateTimeOffset.Now</p>
+        </TabItem>
+    </Tabs>
+</SuperTabs>
+
+@code {
+    private readonly string _instanceId = "super-tabs-demo-declaratif";
+}

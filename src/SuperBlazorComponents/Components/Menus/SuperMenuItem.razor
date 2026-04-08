@@ -1,0 +1,67 @@
+﻿@namespace SuperBlazorComponents.Components
+
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Authorization
+
+@implements IDisposable
+
+@inject NavigationManager NavigationManager
+
+@if (string.IsNullOrWhiteSpace(PolicyName))
+{
+    @MenuItemContent
+}
+else
+{
+    <AuthorizeView Policy="@PolicyName">
+        <Authorized>
+            @MenuItemContent
+        </Authorized>
+    </AuthorizeView>
+}
+
+@code {
+    private RenderFragment MenuItemContent => @<div class="super-menu-item @parentcss">
+        <a href="@Href"
+           class="nav-link @css"
+           @onclick="ToggleExpanded"
+           @onclick:preventDefault="@HasChildren"
+           @attributes="CapturedAttributes">
+            @if (!string.IsNullOrWhiteSpace(Icon))
+            {
+                <i class="@IconCssClass" title="@Text" aria-hidden="true"></i>
+            }
+
+            @if (!IsCollapsed)
+            {
+                @if (!string.IsNullOrWhiteSpace(Text))
+                {
+                    <span class="super-menu-text">@Text</span>
+                }
+                else if (ChildContent is not null)
+                {
+                    @ChildContent
+                }
+
+                @if (!string.IsNullOrWhiteSpace(BadgeText))
+                {
+                    <span class="super-menu-item-badge @BadgeCssClass">@BadgeText</span>
+                }
+
+                @if (HasChildren)
+                {
+                    <span class="super-menu-item-chevron ms-auto" aria-hidden="true">
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </span>
+                }
+            }
+        </a>
+
+        @if (HasChildren && !IsCollapsed)
+        {
+            <div class="super-menu-submenu @(_expanded ? "show" : "")">
+                @Items
+            </div>
+        }
+    </div>;
+}

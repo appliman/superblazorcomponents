@@ -1,0 +1,155 @@
+﻿@using SuperBlazorComponents.Components.SuperDateRange
+
+<div class="super-date-range-dialog">
+    <div class="row g-0">
+        <div class="col-12 col-lg-4 border-end bg-white d-flex flex-column">
+            <div class="p-3 border-bottom" style="background-color:lightblue;">
+                <div class="fw-semibold">Personnalisée</div>
+            </div>
+
+            <div class="list-group list-group-flush super-date-range-presets">
+                @foreach (var preset in OrderedPresets)
+                {
+                    <button type="button"
+                            class="@GetPresetButtonClass(preset)"
+                            @onclick="() => SelectPreset(preset)">
+                        @GetPresetLabel(preset)
+                    </button>
+                }
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-8 bg-body">
+            <div class="p-3 border-bottom">
+                <div class="row g-2 align-items-end">
+                    <div class="col-sm-6">
+                        <label class="form-label small text-body-secondary mb-1">Date de début</label>
+                        <div class="input-group input-group-sm">
+                            <input type="date"
+                                   class="form-control"
+                                   value="@GetInputDateValue(_draftValue.StartDate)"
+                                   max="@GetMaxSelectableDateValue()"
+                                   @onchange="OnStartDateChanged" />
+                            <button type="button"
+                                    class="btn btn-outline-secondary"
+                                    @onclick="ClearStartDate"
+                                    disabled="@(_draftValue.StartDate is null)">
+                                Effacer
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label class="form-label small text-body-secondary mb-1">Date de fin</label>
+                        <div class="input-group input-group-sm">
+                            <input type="date"
+                                   class="form-control"
+                                   value="@GetInputDateValue(_draftValue.EndDate)"
+                                   max="@GetMaxSelectableDateValue()"
+                                   @onchange="OnEndDateChanged" />
+                            <button type="button"
+                                    class="btn btn-outline-secondary"
+                                    @onclick="ClearEndDate"
+                                    disabled="@(_draftValue.EndDate is null)">
+                                Effacer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-3">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <button type="button"
+                            class="btn btn-sm btn-link link-dark text-decoration-none px-0"
+                            @onclick="ShowPreviousMonth">
+                        &#8249;
+                    </button>
+                    <div class="small text-body-secondary">
+                        Sélection manuelle
+                    </div>
+                    <button type="button"
+                            class="btn btn-sm btn-link link-dark text-decoration-none px-0"
+                            @onclick="ShowNextMonth">
+                        &#8250;
+                    </button>
+                </div>
+
+                <div class="row g-3 super-date-range-calendars">
+                    @foreach (var month in GetVisibleMonths())
+                    {
+                        <div class="col-12 col-xl-6">
+                            <div class="super-date-range-calendar">
+                                <div class="fw-semibold text-uppercase small text-body-secondary mb-2">
+                                    @GetMonthTitle(month)
+                                </div>
+
+                                <div class="super-date-range-weekdays mb-2 @(DisplayWeekNumbers ? "with-week-numbers" : string.Empty)">
+                                    @if (DisplayWeekNumbers)
+                                    {
+                                        <div class="super-date-range-week-number-header small">Sem.</div>
+                                    }
+
+                                    @foreach (var dayHeader in DayHeaders)
+                                    {
+                                        <div class="small text-body-secondary">@dayHeader</div>
+                                    }
+                                </div>
+
+                                <div class="super-date-range-weeks">
+                                    @foreach (var week in GetMonthWeeks(month))
+                                    {
+                                        <div class="super-date-range-grid @(DisplayWeekNumbers ? "with-week-numbers" : string.Empty)">
+                                            @if (DisplayWeekNumbers)
+                                            {
+                                                <button type="button"
+                                                        class="@GetWeekNumberButtonClass(week)"
+                                                        disabled="@IsWeekDisabled(week)"
+                                                        @onclick="() => SelectWeek(week)">
+                                                    @week.WeekNumber
+                                                </button>
+                                            }
+
+                                            @foreach (var day in week.Days)
+                                            {
+                                                @if (day is null)
+                                                {
+                                                    <span class="super-date-range-empty"></span>
+                                                }
+                                                else
+                                                {
+                                                    var currentDay = day.Value;
+                                                    <button type="button"
+                                                            class="@GetDayButtonClass(currentDay)"
+                                                            disabled="@IsDayDisabled(currentDay)"
+                                                            @onclick="() => SelectDay(currentDay)">
+                                                        @currentDay.Day
+                                                    </button>
+                                                }
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="super-date-range-footer">
+        <div class="super-date-range-footer-summary small">
+            @GetSelectedDaysText()
+        </div>
+
+        <div class="super-date-range-footer-actions">
+            <button type="button" class="btn super-date-range-cancel-button" @onclick="CancelAsync">
+                Annuler
+            </button>
+            <button type="button" class="btn btn-primary super-date-range-apply-button" @onclick="ApplyAsync">
+                Appliquer
+            </button>
+        </div>
+    </div>
+</div>

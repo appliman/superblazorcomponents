@@ -1,0 +1,47 @@
+﻿.sdgef-container {
+    margin-bottom: 1px;
+    width: 100%;
+}
+
+.sdgef-button {
+    width: 100%;
+    min-width: 0;
+    padding: 0.125rem 0.375rem;
+    font-size: 0.875rem;
+    line-height: 1.2;
+    overflow: hidden;
+}
+
+.sdgef-button-content {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    flex-wrap: wrap;
+}
+
+.sdgef-button-content-empty {
+    justify-content: center;
+    white-space: nowrap;
+}
+
+.sdgef-icon {
+    flex: 0 0 auto;
+    color: var(--bs-secondary-color, #6c757d);
+}
+
+.sdgef-badge {
+    max-width: 100%;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sdgef-button:focus,
+.sdgef-button:focus-visible,
+.sdgef-button:active {
+    box-shadow: none !important;
+    outline: 0;
+}

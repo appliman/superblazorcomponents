@@ -1,0 +1,65 @@
+﻿@using System.Linq.Expressions
+@using Microsoft.AspNetCore.Components.Forms
+@typeparam TValue
+
+@implements IDisposable
+
+@code {
+
+	[CascadingParameter]
+	public EditContext CurrentEditContext { get; set; } = default!;
+
+	[Parameter]
+	public System.Linq.Expressions.Expression<Func<TValue>> For { get; set; } = null!;
+
+	// TValue? value = default!;
+	List<string> messages = default!;
+
+	protected override void OnAfterRender(bool firstRender)
+	{
+		if (firstRender 
+			&& CurrentEditContext is not null)
+		{
+			CurrentEditContext.OnValidationStateChanged += CurrentEditContextValidationRequested;
+		}
+	}
+
+	private void CurrentEditContextValidationRequested(object? sender, ValidationStateChangedEventArgs e)
+	{
+		messages?.Clear();
+		if (For.Body is MemberExpression memberExpression)
+		{
+			var memberName = memberExpression.Member.Name;
+			var fieldIdentifier = new FieldIdentifier(CurrentEditContext.Model, memberName);
+			var allErrors = CurrentEditContext.GetValidationMessages();
+			var errors = CurrentEditContext.GetValidationMessages(fieldIdentifier);
+			if (errors.Any())
+			{
+				messages = errors.ToList();
+				StateHasChanged();
+			}
+		}
+	}
+
+	public void Dispose()
+	{
+		if (CurrentEditContext is not null)
+		{
+			CurrentEditContext.OnValidationStateChanged -= CurrentEditContextValidationRequested;
+		}
+	}
+}
+@if (messages is not null)
+{
+	foreach (var error in messages)
+	{
+		if (error.StartsWith("Attention:"))
+		{
+			<div class="alert alert-warning mt-1 mb-1">@error</div>
+		}
+		else
+		{
+			<div class="alert alert-danger mt-1 mb-1">@error</div>
+		}
+	}
+}

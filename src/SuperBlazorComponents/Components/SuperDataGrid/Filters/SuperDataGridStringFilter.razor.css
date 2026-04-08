@@ -1,0 +1,32 @@
+﻿.stcf-container {
+    position: relative;
+    margin-bottom: 1px;
+}
+
+.stcf-input {
+    padding-right: 1.75rem;
+}
+
+.stcf-input:focus {
+    outline: none;
+    box-shadow: none;
+    border-color: var(--bs-border-color, #dee2e6);
+}
+
+.stcf-clear {
+    position: absolute;
+    right: 0.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 0;
+    background: transparent;
+    color: var(--bs-secondary-color, #6c757d);
+    padding: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+    line-height: 1;
+}
+
+.stcf-clear:hover {
+    color: var(--bs-body-color, #212529);
+}

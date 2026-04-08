@@ -1,0 +1,85 @@
+﻿@inject SuperDialogService DialogService
+
+<div class="sdgef-container">
+    <button type="button"
+            class="btn btn-sm btn-outline-secondary sdgef-button"
+            @onclick="OpenDialogAsync">
+        @if (_selectedOptions.Count == 0)
+        {
+            <span class="sdgef-button-content sdgef-button-content-empty">
+                <i class="fa-solid fa-filter sdgef-icon" title="@Label" aria-hidden="true"></i>
+            </span>
+        }
+        else
+        {
+            <span class="sdgef-button-content">
+                @foreach (var option in _selectedOptions)
+                {
+                    <span class="badge rounded-pill text-bg-secondary sdgef-badge">@option.Label</span>
+                }
+            </span>
+        }
+    </button>
+</div>
+
+@code {
+    private IReadOnlyList<SuperDataGridEnumFilterHelper.EnumOption> _options = [];
+    private IReadOnlyList<SuperDataGridEnumFilterHelper.EnumOption> _selectedOptions = [];
+    private SuperDataGridEnumFilterSelection _selectedFilter = SuperDataGridEnumFilterSelection.Empty;
+
+    [Parameter]
+    public string PropertyName { get; set; } = string.Empty;
+
+    [Parameter]
+    public Type PropertyType { get; set; } = typeof(Enum);
+
+    [Parameter]
+    public string Label { get; set; } = "Valeur";
+
+    [Parameter]
+    public EventCallback<SuperDataGridFilterInfo> ApplyFilter { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        _options = SuperDataGridEnumFilterHelper.GetOptions(PropertyType);
+        _selectedFilter = SuperDataGridEnumFilterHelper.NormalizeSelection(_selectedFilter, _options);
+        _selectedOptions = _options
+            .Where(option => _selectedFilter.SelectedValues.Contains(option.Value, StringComparer.Ordinal))
+            .ToList();
+    }
+
+    private async Task OpenDialogAsync()
+    {
+        var result = await DialogService.OpenEnumFilterDialogAsync("Filtrer la colonne", Label, PropertyType, _selectedFilter);
+        if (result is null)
+        {
+            return;
+        }
+
+        _selectedFilter = SuperDataGridEnumFilterHelper.NormalizeSelection(result, _options);
+        _selectedOptions = _options
+            .Where(option => _selectedFilter.SelectedValues.Contains(option.Value, StringComparer.Ordinal))
+            .ToList();
+
+        await ApplySelectedFilterAsync(_selectedFilter);
+    }
+
+    private async Task ApplySelectedFilterAsync(SuperDataGridEnumFilterSelection selection)
+    {
+        if (!ApplyFilter.HasDelegate || string.IsNullOrWhiteSpace(PropertyName))
+        {
+            return;
+        }
+
+        var filterInfo = new SuperDataGridFilterInfo
+        {
+            PropertyName = PropertyName,
+            PropertyType = PropertyType,
+            Operator = SuperDataGridFilterOperator.Equals,
+            PropertyValue = selection.SelectedValues.Count == 0 ? null : string.Join('|', selection.SelectedValues),
+            SelectedValues = selection.SelectedValues
+        };
+
+        await ApplyFilter.InvokeAsync(filterInfo);
+    }
+}

@@ -1,0 +1,80 @@
+﻿<div class="sdgbf-container">
+    <input type="checkbox"
+           class="@GetCheckboxClass()"
+           checked="@(_selectedValue == true)"
+           title="@GetTitle()"
+           aria-label="@GetTitle()"
+           aria-checked="@GetAriaChecked()"
+           @onclick="CycleStateAsync"
+           @onclick:preventDefault />
+</div>
+
+@code {
+    private bool? _selectedValue;
+
+    [Parameter]
+    public string PropertyName { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Label { get; set; } = "Valeur";
+
+    [Parameter]
+    public EventCallback<SuperDataGridFilterInfo> ApplyFilter { get; set; }
+
+    private async Task CycleStateAsync()
+    {
+        _selectedValue = _selectedValue switch
+        {
+            null => true,
+            true => false,
+            false => null
+        };
+
+        await ApplySelectedFilterAsync();
+    }
+
+    private async Task ApplySelectedFilterAsync()
+    {
+        if (!ApplyFilter.HasDelegate || string.IsNullOrWhiteSpace(PropertyName))
+        {
+            return;
+        }
+
+        var filterInfo = new SuperDataGridFilterInfo
+        {
+            PropertyName = PropertyName,
+            PropertyType = typeof(bool),
+            Operator = SuperDataGridFilterOperator.Equals,
+            PropertyValue = _selectedValue?.ToString()
+        };
+
+        await ApplyFilter.InvokeAsync(filterInfo);
+    }
+
+    private string GetCheckboxClass()
+    {
+        return _selectedValue is null
+            ? "form-check-input sdgbf-checkbox sdgbf-checkbox-neutral"
+            : "form-check-input sdgbf-checkbox";
+    }
+
+    private string GetTitle()
+    {
+        return _selectedValue switch
+        {
+            true => $"{Label} : Oui",
+            false => $"{Label} : Non",
+            _ => $"{Label} : Toutes les valeurs"
+        };
+    }
+
+    private string GetAriaChecked()
+    {
+        return _selectedValue switch
+        {
+            true => "true",
+            false => "false",
+            _ => "mixed"
+        };
+    }
+}

@@ -1,0 +1,55 @@
+﻿@page "/confirm-demo"
+
+@using SuperBlazorComponents.Components.Buttons
+@using SuperBlazorComponents.Components.Dialogs
+@using SuperBlazorComponents.Services
+
+@inject SuperDialogService DialogService
+
+<PageTitle>Confirm Dialog Demo</PageTitle>
+
+<h1>Confirm dialog</h1>
+
+<div class="card mt-3">
+    <div class="card-header">
+        Démo
+    </div>
+    <div class="card-body">
+        <div class="d-flex flex-wrap gap-2">
+            <SuperButton Text="Confirmer (default)" Style="SuperButtonStyle.Primary" Click="@ConfirmDefaultAsync" />
+            <SuperButton Text="Confirmer (custom)" Style="SuperButtonStyle.Secondary" Click="@ConfirmCustomAsync" />
+        </div>
+
+        @if (_lastResult is not null)
+        {
+            <div class="alert alert-info mt-3 mb-0">
+                Résultat: <strong>@(_lastResult.Value ? "OK" : "Annulé")</strong>
+            </div>
+        }
+    </div>
+</div>
+
+@code
+{
+    private bool? _lastResult;
+
+    private async Task ConfirmDefaultAsync()
+    {
+        _lastResult = await DialogService.Confirm(
+            "Confirmation",
+            "Voulez-vous continuer ?",
+            new ConfirmOptions());
+    }
+
+    private async Task ConfirmCustomAsync()
+    {
+        _lastResult = await DialogService.Confirm(
+            "Suppression",
+            "Confirmez-vous la suppression ?",
+            new ConfirmOptions
+            {
+                OkButtonText = "Oui",
+                CancelButtonText = "Non"
+            });
+    }
+}

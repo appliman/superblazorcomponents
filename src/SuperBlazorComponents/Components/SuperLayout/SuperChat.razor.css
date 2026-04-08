@@ -1,0 +1,86 @@
+﻿/* SuperChatPanel - CSS isolé avec support dark mode Bootstrap */
+.super-chatpanel {
+    grid-area: chatpanel;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bs-body-bg);
+    border-left: 1px solid var(--bs-border-color);
+    color: var(--bs-body-color);
+    transition: width 0.3s ease;
+    z-index: 1020;
+    overflow: hidden;
+}
+
+.super-chatpanel-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.super-chatpanel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--bs-border-color);
+    flex-shrink: 0;
+}
+
+.super-chatpanel-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.super-chatpanel-close {
+    color: var(--bs-body-color);
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.super-chatpanel-close:hover {
+    opacity: 0.75;
+}
+
+.super-chatpanel-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.75rem;
+}
+
+.super-chatpanel-footer {
+    padding: 0.75rem;
+    border-top: 1px solid var(--bs-border-color);
+    flex-shrink: 0;
+}
+
+/* States */
+.super-chatpanel-open {
+    width: var(--super-chatpanel-width, 380px);
+}
+
+.super-chatpanel-hidden {
+    width: 0;
+    border-left: none;
+}
+
+.super-chatpanel-hidden .super-chatpanel-content {
+    opacity: 0;
+    visibility: hidden;
+}
+
+@media (max-width: 575.98px) {
+    .super-chatpanel-open {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 100% !important;
+        z-index: 1040;
+        box-shadow: -4px 0 12px rgba(0, 0, 0, 0.15);
+    }
+}

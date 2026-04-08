@@ -1,0 +1,34 @@
+﻿@using SuperBlazorComponents
+@using SuperBlazorComponents.Components
+@using SuperBlazorComponents.Components.Buttons
+@using SuperBlazorComponents.Services
+
+@inject SuperDialogService DialogService
+
+<div class="d-flex flex-column gap-3">
+    <div>
+        <label class="form-label">Message</label>
+        <input class="form-control" @bind="Message" />
+    </div>
+
+    <div class="d-flex gap-2 justify-content-end">
+        <SuperButton Text="Annuler" Style="SuperButtonStyle.Secondary" Click="@CancelAsync" />
+        <SuperButton Text="Valider" Style="SuperButtonStyle.Primary" Click="@OkAsync" />
+    </div>
+</div>
+
+@code
+{
+    [Parameter]
+    public string Message { get; set; } = "";
+
+    private Task CancelAsync()
+    {
+        return DialogService.Close(null);
+    }
+
+    private Task OkAsync()
+    {
+        return DialogService.Close(Message);
+    }
+}

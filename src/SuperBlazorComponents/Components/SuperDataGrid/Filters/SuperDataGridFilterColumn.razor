@@ -1,0 +1,100 @@
+﻿@using SuperBlazorComponents.Configuration
+@typeparam TItem
+
+@if (filterComponent is not null)
+{
+    <DynamicComponent Type="filterComponent" Parameters="filterParameters" />
+}
+
+@code {
+
+    [CascadingParameter]
+    public SuperDataGrid<TItem> Grid { get; set; } = default!;
+
+    [Parameter]
+    public DataGridColumn<TItem> Column { get; set; } = default!;
+
+    [Parameter]
+    public string? FilterProperty { get; set; }
+
+    [Inject]
+    SuperComponentsConfiguration GlobalConfiguration { get; set; } = default!;
+
+
+    Type? filterComponent = default!;
+    Dictionary<string, object> filterParameters = new();
+
+    protected override void OnInitialized()
+    {
+        // On recherche le type de filtre à utiliser pour la colonne en fonction de son type de données
+        var propertyName = string.IsNullOrWhiteSpace(FilterProperty) ? Column.Property : FilterProperty;
+        var propertyType = typeof(TItem).GetProperty(propertyName)?.PropertyType;
+        var effectivePropertyType = Nullable.GetUnderlyingType(propertyType ?? typeof(object)) ?? propertyType;
+
+        if (propertyType is not null && effectivePropertyType is not null)
+        {
+            if (GlobalConfiguration.SuperDataGridFilterComponentList.Any(i => i.PropertyType == effectivePropertyType))
+            {
+                filterComponent = GlobalConfiguration.SuperDataGridFilterComponentList.First(i => i.PropertyType == effectivePropertyType).ComponentType;
+                filterParameters = new Dictionary<string, object>
+                {
+                    { "ApplyFilter", EventCallback.Factory.Create<SuperDataGridFilterInfo>(this, value => Grid.ApplyFilter(value)) },
+                    { "PropertyName", propertyName }
+                };
+            }
+            else if (effectivePropertyType == typeof(string))
+            {
+                filterComponent = typeof(SuperDataGridStringFilter);
+                filterParameters = new Dictionary<string, object>
+                {
+                    { "ApplyFilter", EventCallback.Factory.Create<SuperDataGridFilterInfo>(this, value => Grid.ApplyFilter(value)) },
+                    { "PropertyName", propertyName }
+                };
+            }
+            else if (effectivePropertyType == typeof(DateTime)
+                    || effectivePropertyType == typeof(DateOnly))
+            {
+                filterComponent = typeof(SuperDataGridPeriodFilter);
+                filterParameters = new Dictionary<string, object>
+                {
+                    { "ApplyFilter", EventCallback.Factory.Create<SuperDataGridFilterInfo>(this, value => Grid.ApplyFilter(value)) },
+                    { "PropertyName", propertyName },
+                    { "PropertyType", propertyType }
+                };
+            }
+            else if (effectivePropertyType == typeof(bool))
+            {
+                filterComponent = typeof(SuperDataGridBooleanFilter);
+                filterParameters = new Dictionary<string, object>
+                {
+                    { "ApplyFilter", EventCallback.Factory.Create<SuperDataGridFilterInfo>(this, value => Grid.ApplyFilter(value)) },
+                    { "PropertyName", propertyName },
+                    { "Label", string.IsNullOrWhiteSpace(Column.Title) ? propertyName : Column.Title }
+                };
+            }
+            else if (effectivePropertyType == typeof(int)
+                    || effectivePropertyType == typeof(long))
+            {
+                filterComponent = typeof(SuperDataGridNumberFilter);
+                filterParameters = new Dictionary<string, object>
+                {
+                    { "ApplyFilter", EventCallback.Factory.Create<SuperDataGridFilterInfo>(this, value => Grid.ApplyFilter(value)) },
+                    { "PropertyName", propertyName },
+                    { "PropertyType", propertyType },
+                    { "Label", string.IsNullOrWhiteSpace(Column.Title) ? propertyName : Column.Title }
+                };
+            }
+            else if (effectivePropertyType.IsEnum)
+            {
+                filterComponent = typeof(SuperDataGridEnumFilter);
+                filterParameters = new Dictionary<string, object>
+                {
+                    { "ApplyFilter", EventCallback.Factory.Create<SuperDataGridFilterInfo>(this, value => Grid.ApplyFilter(value)) },
+                    { "PropertyName", propertyName },
+                    { "PropertyType", propertyType },
+                    { "Label", string.IsNullOrWhiteSpace(Column.Title) ? propertyName : Column.Title }
+                };
+            }
+        }
+    }
+}

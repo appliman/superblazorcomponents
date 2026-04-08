@@ -1,0 +1,29 @@
+﻿/* SuperChat - Bouton toggle du panneau de chat */
+.super-chat-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--bs-body-color);
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: color 0.15s ease;
+}
+
+.super-chat-toggle:hover {
+    opacity: 0.75;
+    color: var(--bs-body-color);
+}
+
+.super-chat-toggle:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.super-chat-toggle.super-chat-active {
+    color: var(--bs-primary);
+}
+
+.super-chat-text {
+    font-size: 0.875rem;
+    font-weight: 500;
+}

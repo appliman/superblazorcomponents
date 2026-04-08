@@ -1,0 +1,41 @@
+﻿@namespace SuperBlazorComponents.Components.GoogleCharts
+@inherits ComponentBase
+@implements IAsyncDisposable
+
+<div class="google-combo-chart @(Options.Height == "100%" ? "full-height" : "")">
+	@if (_isLoading)
+	{
+		<div class="chart-loading">
+			<div class="spinner-border text-primary" role="status">
+				<span class="visually-hidden">Chargement...</span>
+			</div>
+			<p class="mt-2">Chargement du graphique...</p>
+		</div>
+	}
+	else if (!string.IsNullOrEmpty(_errorMessage))
+	{
+		<div class="alert alert-danger" role="alert">
+			<i class="fas fa-exclamation-triangle me-2"></i>
+			<strong>Erreur:</strong> @_errorMessage
+			<button type="button" class="btn btn-sm btn-outline-danger ms-3" @onclick="async () => { _isLoading = true; _errorMessage = null; await InitializeChart(); }">
+				<i class="fas fa-redo me-1"></i> Réessayer
+			</button>
+		</div>
+	}
+	else if (!Data.Any())
+	{
+		<div class="chart-no-data">
+			<p><i class="fas fa-info-circle me-2"></i>Aucune donnée à afficher</p>
+		</div>
+	}
+	else
+	{
+		<div id="@_chartId" class="chart-container"></div>
+		<div class="chart-info">
+			<small class="text-muted">
+				<i class="fas fa-chart-line me-1"></i>
+				@Data.Count points de données
+			</small>
+		</div>
+	}
+</div>

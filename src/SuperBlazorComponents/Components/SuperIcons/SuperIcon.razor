@@ -1,0 +1,122 @@
+﻿@using SuperBlazorComponents.Configuration
+
+@inject SuperComponentsConfiguration SuperComponentsConfiguration
+
+@if (!string.IsNullOrWhiteSpace(Icon))
+{
+    <i class="@CssClass" title="@ResolvedTitle" aria-hidden="true" @attributes="AdditionalAttributes"></i>
+}
+
+@code {
+    private readonly Dictionary<string, object> AdditionalAttributes = [];
+
+    [Parameter]
+    public string? Icon { get; set; }
+
+    [Parameter]
+    public SuperIconStyle IconStyle { get; set; } = SuperIconStyle.Configuration;
+
+    [Parameter]
+    public SuperIconSize Size { get; set; } = SuperIconSize.Default;
+
+    [Parameter]
+    public string? Title { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object> CapturedAttributes { get; set; } = [];
+
+    private string CssClass
+    {
+        get
+        {
+            var classes = new List<string>
+            {
+                ResolvedStylePrefix,
+                Icon!
+            };
+
+            var sizeClass = Size switch
+            {
+                SuperIconSize.Fs1 => "fs-1",
+                SuperIconSize.Fs2 => "fs-2",
+                SuperIconSize.Fs3 => "fs-3",
+                SuperIconSize.Fs4 => "fs-4",
+                SuperIconSize.Fs5 => "fs-5",
+                SuperIconSize.Fs6 => "fs-6",
+                _ => string.Empty
+            };
+
+            if (!string.IsNullOrWhiteSpace(sizeClass))
+            {
+                classes.Add(sizeClass);
+            }
+
+            if (CapturedAttributes.TryGetValue("class", out var cssClass) && cssClass is not null)
+            {
+                classes.Add(cssClass.ToString()!);
+            }
+
+            return string.Join(" ", classes);
+        }
+    }
+
+    private string ResolvedStylePrefix => ResolvedIconStyle switch
+    {
+        SuperIconStyle.Regular => "fa-regular",
+        SuperIconStyle.Brands => "fa-brands",
+        SuperIconStyle.Duotone => "fa-duotone",
+        _ => "fa-solid"
+    };
+
+    private SuperIconStyle ResolvedIconStyle
+    {
+        get
+        {
+            var resolvedStyle = IconStyle == SuperIconStyle.Configuration
+                ? SuperComponentsConfiguration.DefaultSuperIconeStyle
+                : IconStyle;
+
+            return resolvedStyle == SuperIconStyle.Configuration
+                ? SuperIconStyle.Solid
+                : resolvedStyle;
+        }
+    }
+
+    private string ResolvedTitle
+    {
+        get
+        {
+            if (!string.IsNullOrWhiteSpace(Title))
+            {
+                return Title;
+            }
+
+            if (CapturedAttributes.TryGetValue("title", out var title) && title is not null)
+            {
+                var titleValue = title.ToString();
+                if (!string.IsNullOrWhiteSpace(titleValue))
+                {
+                    return titleValue;
+                }
+            }
+
+            return Icon ?? string.Empty;
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        AdditionalAttributes.Clear();
+
+        foreach (var (key, value) in CapturedAttributes)
+        {
+            if (string.Equals(key, "class", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(key, "title", StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            AdditionalAttributes[key] = value;
+        }
+    }
+}

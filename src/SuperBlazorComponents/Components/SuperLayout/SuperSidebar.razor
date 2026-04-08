@@ -1,0 +1,37 @@
+﻿@namespace SuperBlazorComponents.Components.SuperLayout
+
+@if (Theme is not null)
+{
+    <HeadContent>
+        <link rel="stylesheet" href="@Assets[$"_content/SuperBlazorComponents/css/super-theme-software.css"]" />
+    </HeadContent>
+}
+
+<CascadingValue Value="this">
+    <aside class="super-sidebar @ThemeClass @StateClass @CssClass" style="@StyleString" data-sc-theme="@Theme">
+        <div class="super-sidebar-content">
+            @if (Header is not null)
+            {
+                <div class="super-sidebar-header">
+                    @Header
+                </div>
+            }
+
+            <nav class="super-sidebar-nav">
+                @ChildContent
+            </nav>
+
+            @if (Footer is not null)
+            {
+                <div class="super-sidebar-footer mt-auto">
+                    @Footer
+                </div>
+            }
+        </div>
+
+        @if (ShowOverlay && ParentLayout?.SidebarState != SidebarState.Hidden)
+        {
+            <div class="super-sidebar-overlay d-lg-none" @onclick="OnOverlayClick"></div>
+        }
+    </aside>
+</CascadingValue>

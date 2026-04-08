@@ -1,0 +1,124 @@
+﻿.super-menu-item {
+	width: 100%;
+	cursor: pointer;
+	border-bottom: 1px solid var(--bs-border-color);
+}
+
+
+	.super-menu-item a {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		width: 100%;
+		padding: 0.75rem 1rem;
+		color: var(--bs-body-color);
+		text-decoration: none;
+		background-color: transparent;
+	}
+
+
+		.super-menu-item a:hover {
+			color: var(--bs-body-color);
+			background-color: var(--bs-tertiary-bg);
+		}
+
+
+		.super-menu-item a:focus-visible {
+			outline: 2px solid rgba(var(--bs-primary-rgb), 0.35);
+			outline-offset: -2px;
+		}
+
+	.super-menu-item .fa-solid {
+		width: 1.25rem;
+		text-align: center;
+		color: var(--bs-body-color);
+	}
+
+
+	.super-menu-item a:hover .fa-solid {
+		color: var(--bs-body-color);
+	}
+
+	.super-menu-item .super-menu-text {
+		font-weight: 500;
+		line-height: 1;
+		white-space: nowrap;
+	}
+
+
+	.super-menu-item-badge {
+		margin-left: auto;
+		font-size: 0.65rem;
+		line-height: 1;
+		padding: 0.25rem 0.45rem;
+		border-radius: 0.4rem;
+		text-transform: uppercase;
+	}
+
+
+	.super-menu-item .nav-link.active {
+		box-shadow: inset 3px 0 0 0 var(--bs-primary);
+		color: var(--bs-body-color);
+		background-color: transparent;
+	}
+
+
+	.super-menu-item .nav-link.active .fa-solid {
+		color: var(--bs-primary);
+	}
+
+	.super-menu-item:has(.nav-link.active):not(.parent) {
+		border-left: 3px solid var(--bs-primary);
+	}
+
+
+
+.super-menu-item-chevron {
+	display: inline-flex;
+	align-items: center;
+	opacity: 0.75;
+	margin-left: auto;
+}
+
+	.super-menu-item-chevron :deep(i) {
+		transition: transform 0.15s ease;
+	}
+
+.super-menu-submenu {
+	width: 100%;
+	display: none;
+}
+
+	/* Sous-menu: la séparation doit aller jusqu'au bord gauche (le conteneur est indenté) */
+	.super-menu-submenu .super-menu-item {
+		padding-left: 0.75rem;
+	}
+
+	.super-menu-submenu .super-menu-item a {
+		/*border-bottom: 1px solid var(--bs-border-color); */
+		margin-left: -0.75rem;
+		padding-left: calc(1rem + 0.75rem);
+	}
+
+	.super-menu-submenu .super-menu-item:last-child a {
+		border-bottom: 0;
+	}
+
+	.super-menu-submenu.show {
+		display: block;
+	}
+
+.super-menu-item:has(.super-menu-submenu.show) > .nav-link .super-menu-item-chevron {
+	transform: rotate(180deg);
+}
+
+@media (max-width: 991.98px) {
+	.super-menu-item {
+		padding: 0;
+	}
+
+	.super-menu-submenu .super-menu-item {
+		padding-left: 12px !important;
+	}
+
+}

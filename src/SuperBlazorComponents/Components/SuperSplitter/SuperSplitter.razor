@@ -1,0 +1,36 @@
+﻿@inject IJSRuntime JSRuntime
+@implements IAsyncDisposable
+
+<CascadingValue Value="this">
+    @ChildContent
+</CascadingValue>
+
+<div class="super-splitter-container @OrientationClass" @ref="splitterContainer">
+    @if (FirstPane is not null)
+    {
+        <div class="@FirstPane.GetCombinedCssClass("super-splitter-pane super-splitter-pane-first")" 
+             style="@FirstPaneStyle"
+             @attributes="FirstPane.AdditionalAttributes">
+            @FirstPane.ChildContent
+        </div>
+    }
+
+    <div class="super-splitter-bar @(isDragging ? "dragging" : "")"
+         @onmousedown="StartDragging"
+         @ontouchstart="StartDraggingTouch">
+        <div class="super-splitter-grip">
+            <i class="fas @GripIcon"></i>
+        </div>
+    </div>
+
+    @if (SecondPane is not null)
+    {
+        <div class="@SecondPane.GetCombinedCssClass("super-splitter-pane super-splitter-pane-second")" 
+             style="@SecondPaneStyle"
+             @attributes="SecondPane.AdditionalAttributes">
+            @SecondPane.ChildContent
+        </div>
+    }
+</div>
+
+
