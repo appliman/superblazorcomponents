@@ -1,17 +1,38 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <Version>1.3.31.0</Version>
-    <GenerateDocumentationFile>false</GenerateDocumentationFile>
-    <Description>High-performance Blazor components including SuperDataGrid with frozen columns, headers/footers, column reordering and resizing.</Description>
-    <RootNamespace>SuperBlazorComponents</RootNamespace>
-    <AssemblyName>SuperBlazorComponents</AssemblyName>
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<Version>1.3.31.0</Version>
+		<GenerateDocumentationFile>false</GenerateDocumentationFile>
+		<RootNamespace>SuperBlazorComponents</RootNamespace>
+		<AssemblyName>SuperBlazorComponents</AssemblyName>
+
+		<!-- NuGet package metadata -->
+		<PackageId>SuperBlazorComponents</PackageId>
+		<Title>SuperBlazorComponents</Title>
+		<Authors>Appliman</Authors>
+		<Company>Appliman</Company>
+		<Description>High-performance Blazor component library for admin and line-of-business applications. Includes SuperDataGrid (frozen columns, headers/footers, column reordering/resizing, filtering, sorting, row selection), SuperTabs, SuperLayout (sidebar, header, footer, chat panel), SuperSplitter, SuperDateRangePicker, SuperConfirmDialog, SuperNotifications, ThemeToggle, and built-in JSON localization (FR/EN).</Description>
+		<Copyright>© $([System.DateTime]::Now.Year) Appliman</Copyright>
+		<PackageTags>blazor;blazor-components;datagrid;tabs;layout;sidebar;admin;dashboard;ui;components;dotnet;aspnetcore;razor;splitter;daterange;dialog;notifications;theme;localization</PackageTags>
 		<PackageProjectUrl>https://github.com/appliman/superblazorcomponents</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/appliman/superblazorcomponents.git</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-  </PropertyGroup>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<PackageReleaseNotes>https://github.com/appliman/superblazorcomponents/releases</PackageReleaseNotes>
+
+		<!-- Source Link & deterministic build for debugging -->
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<Deterministic>true</Deterministic>
+		<ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+	</PropertyGroup>
 
   <ItemGroup>
     <SupportedPlatform Include="browser" />
@@ -24,5 +45,17 @@
   <ItemGroup>
     <Folder Include="_temp\" />
   </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Localization\Resources\*.json" WithCulture="false" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\..\README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.*" PrivateAssets="All" />
+	</ItemGroup>
 
 </Project>

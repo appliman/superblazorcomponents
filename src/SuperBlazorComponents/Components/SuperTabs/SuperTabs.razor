@@ -21,58 +21,68 @@
                         var tabIndex = GetActualIndex(tab);
                         var isSelected = tabIndex == selectedIndex;
 
-                        <AuthorizeView Policy="@tab.PolicyName" Context="pol">
-                            <Authorized>
-                                <li class="super-tab-item @(isSelected ? "active" : "") @(tab.Disabled ? "disabled" : "")"
-                                    role="tab"
-                                    aria-selected="@isSelected.ToString().ToLower()"
-                                    aria-disabled="@tab.Disabled.ToString().ToLower()"
-                                    title="@tab.Tooltip"
-                                    @onclick="() => SelectTabAsync(tabIndex)"
-                                    @onclick:preventDefault="@tab.Disabled">
+                        RenderFragment tabHeader =
+                            @<li class="super-tab-item @(isSelected ? "active" : "") @(tab.Disabled ? "disabled" : "")"
+                                role="tab"
+                                aria-selected="@isSelected.ToString().ToLower()"
+                                aria-disabled="@tab.Disabled.ToString().ToLower()"
+                                title="@tab.Tooltip"
+                                @onclick="() => SelectTabAsync(tabIndex)"
+                                @onclick:preventDefault="@tab.Disabled">
 
-                                    @* Icône FontAwesome *@
-                                    @if (!string.IsNullOrEmpty(tab.Icon))
-                                    {
-                                        <i class="@GetIconCssClass(tab)" style="@GetIconStyle(tab)" title="@tab.Title"></i>
-                                    }
+                                @* Icône FontAwesome *@
+                                @if (!string.IsNullOrEmpty(tab.Icon))
+                                {
+                                    <i class="@GetIconCssClass(tab)" style="@GetIconStyle(tab)" title="@tab.Title"></i>
+                                }
 
-                                    @* Titre *@
-                                    <span class="super-tab-title">@tab.Title</span>
+                                @* Titre *@
+                                <span class="super-tab-title">@tab.Title</span>
 
-                                    @* Badge *@
-                                    @if (!string.IsNullOrEmpty(tab.BadgeText) || !string.IsNullOrEmpty(tab.BadgeIcon))
-                                    {
-                                        <span class="super-tab-badge @tab.BadgeClass">
-                                            @if (!string.IsNullOrEmpty(tab.BadgeIcon))
-                                            {
-                                                <i class="@tab.BadgeIcon"></i>
-                                            }
-                                            @tab.BadgeText
-                                        </span>
-                                    }
+                                @* Badge *@
+                                @if (!string.IsNullOrEmpty(tab.BadgeText) || !string.IsNullOrEmpty(tab.BadgeIcon))
+                                {
+                                    <span class="super-tab-badge @tab.BadgeClass">
+                                        @if (!string.IsNullOrEmpty(tab.BadgeIcon))
+                                        {
+                                            <i class="@tab.BadgeIcon"></i>
+                                        }
+                                        @tab.BadgeText
+                                    </span>
+                                }
 
-                                    @* Indicateur de modifications non sauvegardées *@
-                                    @if (tab.HasUnsavedChanges)
-                                    {
-                                        <span class="super-tab-unsaved" title="Modifications non sauvegardées">●</span>
-                                    }
+                                @* Indicateur de modifications non sauvegardées *@
+                                @if (tab.HasUnsavedChanges)
+                                {
+                                    <span class="super-tab-unsaved" title="Modifications non sauvegardées">●</span>
+                                }
 
-                                    @* Bouton de fermeture *@
-                                    @if (tab.Closable)
-                                    {
-                                        <button class="super-tab-close"
-                                                @onclick="() => CloseTabAsync(tabIndex)"
-                                                @onclick:stopPropagation="true"
-                                                title="Fermer">
-                                            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M1 1L11 11M11 1L1 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                                            </svg>
-                                        </button>
-                                    }
-                                </li>
-                            </Authorized>
-                        </AuthorizeView>
+                                @* Bouton de fermeture *@
+                                @if (tab.Closable)
+                                {
+                                    <button class="super-tab-close"
+                                            @onclick="() => CloseTabAsync(tabIndex)"
+                                            @onclick:stopPropagation="true"
+                                            title="Fermer">
+                                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M1 1L11 11M11 1L1 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                                        </svg>
+                                    </button>
+                                }
+                            </li>;
+
+                        @if (!string.IsNullOrEmpty(tab.PolicyName))
+                        {
+                            <AuthorizeView Policy="@tab.PolicyName" Context="pol">
+                                <Authorized>
+                                    @tabHeader
+                                </Authorized>
+                            </AuthorizeView>
+                        }
+                        else
+                        {
+                            @tabHeader
+                        }
                     }
                 </ul>
             </div>
@@ -126,5 +136,4 @@
         </div>
     </div>
 </CascadingValue>
-
 

@@ -1,6 +1,5 @@
 ﻿@using System.Timers
 @using Microsoft.Extensions.Logging
-@inject IJSRuntime JSRuntime
 @inject ILogger<SuperDataGridStringFilter> Logger
 @implements IDisposable
 
@@ -9,7 +8,6 @@
            type="text"
            placeholder="@Placeholder"
            value="@_value"
-           id="@_inputId"
            @oninput="OnInputChanged" />
 
     @if (!string.IsNullOrWhiteSpace(_value))
@@ -36,15 +34,13 @@
     [Parameter]
     public int DelayMilliseconds { get; set; } = 2000;
 
-    bool _isDisposed;
-    readonly string _inputId = $"filter_{Guid.NewGuid():N}";
     string _value = string.Empty;
     System.Timers.Timer _debouceTimer = new();
     SuperDataGridFilterInfo filterInfo = new();
 
     protected override void OnInitialized()
     {
-        _debouceTimer.AutoReset = true;
+        _debouceTimer.AutoReset = false;
         _debouceTimer.Elapsed += RaiseApplyFilter;
         _debouceTimer.Interval = DelayMilliseconds;
 
@@ -60,7 +56,8 @@
 
     private async Task OnInputChanged(ChangeEventArgs args)
     {
-        _value = await JSRuntime.InvokeAsync<string>("eval", $"document.getElementById('{_inputId}').value");
+        _value = args.Value?.ToString() ?? string.Empty;
+        _debouceTimer.Stop();
         _debouceTimer.Start();
     }
 
@@ -86,8 +83,7 @@
 
     private async Task ClearAsync()
     {
-        // On clean la textbox en javascript
-        await JSRuntime.InvokeVoidAsync("eval", $"document.getElementById('{_inputId}').value = ''");
+        _debouceTimer.Stop();
         _value = string.Empty;
 
         if (ApplyFilter.HasDelegate)
@@ -100,7 +96,6 @@
 
     public void Dispose()
     {
-        _isDisposed = true;
         _debouceTimer.Elapsed -= RaiseApplyFilter;
         _debouceTimer.Dispose();
     }

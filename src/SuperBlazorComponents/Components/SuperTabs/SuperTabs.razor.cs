@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 
 using SuperBlazorComponents.Components;
@@ -11,6 +12,9 @@ public partial class SuperTabs
 {
 	[Inject]
 	private SuperComponentsConfiguration SuperComponentsConfiguration { get; set; } = default!;
+
+	[Inject]
+	private ILogger<SuperTabs> Logger { get; set; } = default!;
 
 	private ElementReference tabsContainer;
 	private int selectedIndex;
@@ -520,9 +524,13 @@ public partial class SuperTabs
 			{
 				await JSRuntime.InvokeVoidAsync("localStorage.setItem", PersistenceKey, selectedIndex.ToString());
 			}
-			catch
+           catch (InvalidOperationException ex)
 			{
-				// Ignorer les erreurs de localStorage
+              Logger.LogDebug(ex, "Unable to persist selected tab in local storage for tabs instance {InstanceId}.", InstanceId);
+			}
+			catch (JSException ex)
+			{
+				Logger.LogDebug(ex, "Unable to persist selected tab in local storage for tabs instance {InstanceId}.", InstanceId);
 			}
 		}
 
@@ -534,9 +542,13 @@ public partial class SuperTabs
 				var newUrl = $"{uri.GetLeftPart(UriPartial.Path)}?tab={selectedIndex}";
 				await JSRuntime.InvokeVoidAsync("history.replaceState", null, "", newUrl);
 			}
-			catch
+           catch (InvalidOperationException ex)
 			{
-				// Ignorer les erreurs
+              Logger.LogDebug(ex, "Unable to persist selected tab in URL for tabs instance {InstanceId}.", InstanceId);
+			}
+			catch (JSException ex)
+			{
+				Logger.LogDebug(ex, "Unable to persist selected tab in URL for tabs instance {InstanceId}.", InstanceId);
 			}
 		}
 	}
@@ -556,9 +568,13 @@ public partial class SuperTabs
 					}
 				}
 			}
-			catch
+           catch (InvalidOperationException ex)
 			{
-				// Ignorer les erreurs de localStorage (ex: SSR)
+                Logger.LogDebug(ex, "Unable to restore selected tab from local storage for tabs instance {InstanceId}.", InstanceId);
+			}
+			catch (JSException ex)
+			{
+				Logger.LogDebug(ex, "Unable to restore selected tab from local storage for tabs instance {InstanceId}.", InstanceId);
 			}
 		}
 	}
@@ -572,15 +588,15 @@ public partial class SuperTabs
 
 		if (e.Index.HasValue)
 		{
-			_ = SelectTabAsync(e.Index.Value);
+          RunDeferredAction(() => SelectTabAsync(e.Index.Value), "select tab by index");
 		}
 		else if (!string.IsNullOrEmpty(e.Title))
 		{
-			_ = SelectTabByTitleAsync(e.Title);
+         RunDeferredAction(() => SelectTabByTitleAsync(e.Title), "select tab by title");
 		}
 		else if (!string.IsNullOrEmpty(e.TabId))
 		{
-			_ = SelectTabByIdAsync(e.TabId);
+            RunDeferredAction(() => SelectTabByIdAsync(e.TabId), "select tab by id");
 		}
 	}
 
@@ -596,7 +612,7 @@ public partial class SuperTabs
 
 		if (e.SelectAfterAdd)
 		{
-			_ = SelectTabAsync(Tabs.Count - 1);
+         RunDeferredAction(() => SelectTabAsync(Tabs.Count - 1), "select tab after add");
 		}
 	}
 
@@ -609,14 +625,14 @@ public partial class SuperTabs
 
 		if (e.Index.HasValue)
 		{
-			_ = RemoveTabAsync(e.Index.Value);
+          RunDeferredAction(() => RemoveTabAsync(e.Index.Value), "remove tab by index");
 		}
 		else if (!string.IsNullOrEmpty(e.TabId))
 		{
 			var index = Tabs.FindIndex(t => t.Id == e.TabId);
 			if (index >= 0)
 			{
-				_ = RemoveTabAsync(index);
+              RunDeferredAction(() => RemoveTabAsync(index), "remove tab by id");
 			}
 		}
 	}
@@ -638,15 +654,18 @@ public partial class SuperTabs
 		}
 	}
 
-	private async void HandleResetRequested(object? sender, string instanceId)
+  private void HandleResetRequested(object? sender, string instanceId)
 	{
 		if (!string.IsNullOrEmpty(instanceId) && instanceId != InstanceId)
 		{
 			return;
 		}
 
-		await UpdateSelectedIndex(0);
-		StateHasChanged();
+       RunDeferredAction(async () =>
+		{
+			await UpdateSelectedIndex(0);
+			StateHasChanged();
+		}, "reset tabs");
 	}
 
 	public void Dispose()
@@ -666,5 +685,24 @@ public partial class SuperTabs
 			selectedIndex = newIndex;
 			await SelectedIndexChanged.InvokeAsync(newIndex);
 		}
+	}
+
+	private void RunDeferredAction(Func<Task> action, string actionName)
+	{
+		_ = InvokeAsync(async () =>
+		{
+			try
+			{
+				await action();
+			}
+			catch (InvalidOperationException ex)
+			{
+				Logger.LogError(ex, "Failed to {ActionName} for tabs instance {InstanceId}.", actionName, InstanceId);
+			}
+			catch (JSException ex)
+			{
+				Logger.LogError(ex, "Failed to {ActionName} for tabs instance {InstanceId}.", actionName, InstanceId);
+			}
+		});
 	}
 }

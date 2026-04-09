@@ -1,6 +1,7 @@
 ﻿using SuperBlazorComponents.Services;
 
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Localization;
 
 namespace SuperBlazorComponents.Components.SuperDataGrid.Filters;
 
@@ -13,14 +14,18 @@ public partial class SuperDataGridNumberFilterDialog
     [Inject]
     private SuperDialogService DialogService { get; set; } = default!;
 
+    [Inject]
+    private IStringLocalizer Loc { get; set; } = default!;
+
     [Parameter]
-    public string Label { get; set; } = "Quantité";
+    public string? Label { get; set; }
 
     [Parameter]
     public SuperDataGridNumberFilterSelection Value { get; set; } = SuperDataGridNumberFilterSelection.Empty;
 
     protected override void OnParametersSet()
     {
+        Label ??= Loc["Filter.Number.Quantity"];
         var normalizedValue = NormalizeSelection(Value);
         _selectedOperator = normalizedValue.Operator ?? SuperDataGridFilterOperator.Equals;
         _value = normalizedValue.Value;

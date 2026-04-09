@@ -4,21 +4,20 @@
 @using SuperBlazorComponents.Services
 
 @inject SuperDialogService DialogService
+@inject IStringLocalizer Loc
 
 <div class="sdgpf-container">
     <button type="button"
             class="btn btn-sm btn-outline-secondary sdgpf-button"
             @onclick="OpenDialogAsync">
         <span class="sdgpf-button-content">
-            <i class="fa-solid fa-filter sdgpf-icon" title="Filtrer par période" aria-hidden="true"></i>
+            <i class="fa-solid fa-filter sdgpf-icon" title="@Loc["Filter.Period.Title"]" aria-hidden="true"></i>
             <span class="text-truncate">@GetDisplayText()</span>
         </span>
     </button>
 </div>
 
 @code {
-    private static readonly CultureInfo FrCulture = CultureInfo.GetCultureInfo("fr-FR");
-
     private SuperDateRangeSelection _selectedRange = new(null, null, SuperDateRangePreset.AllTime);
 
     [Parameter]
@@ -39,7 +38,7 @@
     private async Task OpenDialogAsync()
     {
         var result = await DialogService.OpenDateRangeDialogAsync(
-            "Sélectionner une période",
+            Loc["Filter.Period.DialogTitle"],
             _selectedRange,
             DisplayWeekNumbers,
             DisableFutureDates);
@@ -76,14 +75,14 @@
         await ApplyFilter.InvokeAsync(filterInfo);
     }
 
-    private static string GetPeriodName(SuperDateRangeSelection range)
+    private string GetPeriodName(SuperDateRangeSelection range)
     {
-        return SuperDateRangePresetCalculator.GetSummary(range, FrCulture);
+        return SuperDateRangePresetCalculator.GetSummary(range, Loc);
     }
 
     private string GetDisplayText()
     {
         var text = GetPeriodName(_selectedRange);
-        return string.IsNullOrWhiteSpace(text) ? "Période..." : text;
+        return string.IsNullOrWhiteSpace(text) ? Loc["Filter.Period.Placeholder"] : text;
     }
 }

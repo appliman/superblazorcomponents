@@ -1,5 +1,6 @@
 ﻿
 @inject SuperDialogService DialogService
+@inject IStringLocalizer Loc
 @implements IDisposable
 
 @if (_isVisible)
@@ -9,7 +10,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">@_title</h5>
-                    <button type="button" class="btn-close" aria-label="Fermer" @onclick="() => Close(false)"></button>
+                    <button type="button" class="btn-close" aria-label="@Loc["Dialog.Confirm.Close"]" @onclick="() => Close(false)"></button>
                 </div>
                 <div class="modal-body">
                     <p>@_message</p>

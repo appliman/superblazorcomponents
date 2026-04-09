@@ -1,12 +1,13 @@
 ﻿@using System.Globalization
 @inject SuperDialogService DialogService
+@inject IStringLocalizer Loc
 
 <div class="sdgnf-container">
     <button type="button"
             class="btn btn-sm btn-outline-secondary sdgnf-button"
             @onclick="OpenDialogAsync">
         <span class="sdgnf-button-content">
-            <i class="fa-solid fa-filter sdgnf-icon" title="Filtrer numériquement" aria-hidden="true"></i>
+            <i class="fa-solid fa-filter sdgnf-icon" title="@Loc["Filter.Number.Title"]" aria-hidden="true"></i>
             <span class="text-truncate">@GetDisplayText()</span>
         </span>
     </button>
@@ -22,14 +23,14 @@
     public Type PropertyType { get; set; } = typeof(long?);
 
     [Parameter]
-    public string Label { get; set; } = "Quantité";
+    public string? Label { get; set; }
 
     [Parameter]
     public EventCallback<SuperDataGridFilterInfo> ApplyFilter { get; set; }
 
     private async Task OpenDialogAsync()
     {
-        var result = await DialogService.OpenNumberFilterDialogAsync("Filtrer la colonne", Label, _selectedFilter);
+        var result = await DialogService.OpenNumberFilterDialogAsync(Loc["Filter.Number.DialogTitle"], Label ?? Loc["Filter.Number.Quantity"], _selectedFilter);
         if (result is null)
         {
             return;
@@ -67,10 +68,10 @@
     {
         if (_selectedFilter.Operator is null)
         {
-            return $"{Label}...";
+            return $"{Label ?? Loc["Filter.Number.Quantity"]}...";
         }
 
-        var label = SuperDataGridNumberFilterOperatorHelper.GetLabel(_selectedFilter.Operator.Value);
+        var label = Loc[$"Filter.Number.{_selectedFilter.Operator.Value}"];
         if (SuperDataGridNumberFilterOperatorHelper.IsRangeOperator(_selectedFilter.Operator.Value))
         {
             return _selectedFilter.Value is not null && _selectedFilter.ValueTo is not null

@@ -10,7 +10,7 @@ namespace SuperBlazorComponents.Services;
 public class SuperDialogService
 {
 	private TaskCompletionSource<bool>? _confirmTcs;
-	private TaskCompletionSource<dynamic?>? _dialogTcs;
+	private TaskCompletionSource<object?>? _dialogTcs;
 
 	/// <summary>
 	/// Événement déclenché lorsque la boîte de dialogue de confirmation doit être affichée.
@@ -36,14 +36,29 @@ public class SuperDialogService
 	/// <returns>True si l'utilisateur confirme, false sinon.</returns>
 	public async Task<bool> Confirm(string title, string message, ConfirmOptions confirmOptions)
 	{
-		_confirmTcs = new TaskCompletionSource<bool>();
-
-		if (OnShow != null)
+		if (_confirmTcs is { Task.IsCompleted: false })
 		{
-			await OnShow.Invoke(title, message, confirmOptions);
+			throw new InvalidOperationException("A confirmation dialog is already open.");
 		}
 
-		return await _confirmTcs.Task;
+		if (OnShow is null)
+		{
+			throw new InvalidOperationException("No confirmation dialog host is registered.");
+		}
+
+		var completionSource = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+		_confirmTcs = completionSource;
+
+		try
+		{
+			await OnShow.Invoke(title, message, confirmOptions);
+			return await completionSource.Task;
+		}
+		catch
+		{
+			Interlocked.CompareExchange(ref _confirmTcs, null, completionSource);
+			throw;
+		}
 	}
 
 	/// <summary>
@@ -52,7 +67,8 @@ public class SuperDialogService
 	/// <param name="result">Le résultat de la confirmation.</param>
 	internal void SetResult(bool result)
 	{
-		_confirmTcs?.TrySetResult(result);
+		var completionSource = Interlocked.Exchange(ref _confirmTcs, null);
+		completionSource?.TrySetResult(result);
 	}
 
 	/// <summary>
@@ -65,14 +81,29 @@ public class SuperDialogService
 	/// <returns>Le résultat retourné par le composant via Close().</returns>
 	public async Task<dynamic?> OpenAsync<T>(string title, Dictionary<string, object>? parameters = null, DialogOptions? options = null) where T : IComponent
 	{
-		_dialogTcs = new TaskCompletionSource<dynamic?>();
-
-		if (OnOpenDialog != null)
+		if (_dialogTcs is { Task.IsCompleted: false })
 		{
-			await OnOpenDialog.Invoke(typeof(T), title, parameters, options);
+			throw new InvalidOperationException("A dialog is already open.");
 		}
 
-		return await _dialogTcs.Task;
+		if (OnOpenDialog is null)
+		{
+			throw new InvalidOperationException("No dialog host is registered.");
+		}
+
+		var completionSource = new TaskCompletionSource<object?>(TaskCreationOptions.RunContinuationsAsynchronously);
+		_dialogTcs = completionSource;
+
+		try
+		{
+			await OnOpenDialog.Invoke(typeof(T), title, parameters, options);
+			return await completionSource.Task;
+		}
+		catch
+		{
+			Interlocked.CompareExchange(ref _dialogTcs, null, completionSource);
+			throw;
+		}
 	}
 
 	/// <summary>
@@ -177,11 +208,18 @@ public class SuperDialogService
 	/// <param name="result">Le résultat à retourner à l'appelant.</param>
 	public async Task Close(dynamic? result = null)
 	{
-		if (OnCloseDialog != null)
-		{
-			await OnCloseDialog.Invoke();
-		}
+		var completionSource = Interlocked.Exchange(ref _dialogTcs, null);
 
-		_dialogTcs?.TrySetResult(result);
+		try
+		{
+			if (OnCloseDialog is not null)
+			{
+				await OnCloseDialog.Invoke();
+			}
+		}
+		finally
+		{
+			completionSource?.TrySetResult(result);
+		}
 	}
 }
