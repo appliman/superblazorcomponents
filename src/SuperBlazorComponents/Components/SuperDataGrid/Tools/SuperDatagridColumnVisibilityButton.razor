@@ -1,8 +1,10 @@
 ﻿@using SuperBlazorComponents.Components.Buttons
 @using SuperBlazorComponents.Components.SuperDataGrid
-@using SuperBlazorComponents.Components.SuperLabel
+@using SuperBlazorComponents.Components.SuperSplitter
+
 @typeparam TItem
 @implements IDisposable
+@inject IStringLocalizer Loc
 
 @if (_effectiveSuperDataGrid is not null)
 {
@@ -12,15 +14,15 @@
                 data-bs-toggle="dropdown"
                 data-bs-auto-close="outside"
                 aria-expanded="false"
-                title="Colonnes visibles">
+                title="@Loc["DataGrid.Columns.Visible"]">
             <i class="fa-solid fa-eye"></i>
-            <SuperLabel fr="Colonnes" en="Columns" class="ms-1"/>
+            <span class="ms-1">@Loc["DataGrid.Columns.Label"]</span>
         </button>
 
         <ul class="dropdown-menu super-datagrid-columns-menu">
             <li class="dropdown-header super-datagrid-columns-title">
                 <i class="fa-solid fa-eye me-2" aria-hidden="true"></i>
-                <SuperLabel fr="Colonnes visibles" en="Visible columns"/>
+                @Loc["DataGrid.Columns.Visible"]
             </li>
             @foreach (var column in _columns)
             {

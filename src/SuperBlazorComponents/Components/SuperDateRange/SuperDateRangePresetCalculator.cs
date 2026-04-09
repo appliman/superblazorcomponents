@@ -1,5 +1,7 @@
 ﻿using System.Globalization;
 
+using Microsoft.Extensions.Localization;
+
 namespace SuperBlazorComponents.Components.SuperDateRange;
 
 internal static class SuperDateRangePresetCalculator
@@ -30,33 +32,16 @@ internal static class SuperDateRangePresetCalculator
         };
     }
 
-    public static string GetLabel(SuperDateRangePreset preset)
+    public static string GetLabel(SuperDateRangePreset preset, IStringLocalizer loc)
     {
         return preset switch
         {
-            SuperDateRangePreset.Today => "Aujourd'hui",
-            SuperDateRangePreset.Yesterday => "Hier",
-            SuperDateRangePreset.ThisWeek => "Cette semaine (lun. - aujourd'hui)",
-            SuperDateRangePreset.LastWeek => "La semaine dernière (lun. - dim.)",
-            SuperDateRangePreset.Last7Days => "7 derniers jours",
-            SuperDateRangePreset.Last14Days => "14 derniers jours",
-            SuperDateRangePreset.Last30Days => "30 derniers jours",
-            SuperDateRangePreset.Last90Days => "90 derniers jours",
-            SuperDateRangePreset.ThisMonth => "Ce mois-ci",
-            SuperDateRangePreset.LastMonth => "Le mois dernier",
-            SuperDateRangePreset.ThisQuarter => "Ce trimestre",
-            SuperDateRangePreset.LastQuarter => "Le trimestre dernier",
-            SuperDateRangePreset.ThisYear => "Cette année",
-            SuperDateRangePreset.LastYear => "L'année dernière",
-            SuperDateRangePreset.Last12Months => "12 derniers mois",
-            SuperDateRangePreset.Last13Months => "13 derniers mois",
-            SuperDateRangePreset.Last24Months => "24 derniers mois",
-            SuperDateRangePreset.AllTime => "Toute la période",
-            _ => "Personnalisée"
+            SuperDateRangePreset.Custom => loc["DateRange.Custom"],
+            _ => loc[$"DateRange.Preset.{preset}"]
         };
     }
 
-    public static string GetSummary(SuperDateRangeSelection range, CultureInfo culture)
+    public static string GetSummary(SuperDateRangeSelection range, IStringLocalizer loc)
     {
         if (!string.IsNullOrWhiteSpace(range.PeriodName))
         {
@@ -65,13 +50,15 @@ internal static class SuperDateRangePresetCalculator
 
         if (range.Preset != SuperDateRangePreset.Custom)
         {
-            return GetLabel(range.Preset);
+            return GetLabel(range.Preset, loc);
         }
 
         if (range.StartDate is null && range.EndDate is null)
         {
-            return GetLabel(SuperDateRangePreset.AllTime);
+            return GetLabel(SuperDateRangePreset.AllTime, loc);
         }
+
+        var culture = CultureInfo.CurrentUICulture;
 
         if (range.StartDate is not null && range.EndDate is not null)
         {
@@ -85,10 +72,10 @@ internal static class SuperDateRangePresetCalculator
 
         if (range.StartDate is not null)
         {
-            return $"Depuis le {range.StartDate.Value.ToString("d MMM yyyy", culture)}";
+            return string.Format(culture, loc["DateRange.Since"], range.StartDate.Value.ToString("d MMM yyyy", culture));
         }
 
-        return $"Jusqu'au {range.EndDate!.Value.ToString("d MMM yyyy", culture)}";
+        return string.Format(culture, loc["DateRange.Until"], range.EndDate!.Value.ToString("d MMM yyyy", culture));
     }
 
     private static SuperDateRangeSelection GetLastWeek(DateTime today)

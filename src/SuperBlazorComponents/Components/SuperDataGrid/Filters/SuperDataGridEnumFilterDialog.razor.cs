@@ -1,6 +1,7 @@
 ﻿using SuperBlazorComponents.Services;
 
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Localization;
 
 namespace SuperBlazorComponents.Components.SuperDataGrid.Filters;
 
@@ -13,6 +14,9 @@ public partial class SuperDataGridEnumFilterDialog
 
     [Inject]
     private SuperDialogService DialogService { get; set; } = default!;
+
+    [Inject]
+    private IStringLocalizer Loc { get; set; } = default!;
 
     [Parameter]
     public string Label { get; set; } = "Valeur";

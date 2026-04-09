@@ -3,14 +3,13 @@
 using SuperBlazorComponents.Services;
 
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Localization;
 
 namespace SuperBlazorComponents.Components.SuperDateRange;
 
 public partial class SuperDateRangeDialog
 {
-    private static readonly CultureInfo FR_CULTURE = CultureInfo.GetCultureInfo("fr-FR");
-
-    private static readonly IReadOnlyList<string> DayHeaders = ["L", "M", "M", "J", "V", "S", "D"];
+    private IReadOnlyList<string> DayHeaders => Loc["DateRange.DayHeaders"].Value.Split(',');
 
     private static readonly IReadOnlyList<SuperDateRangePreset> OrderedPresets =
     [
@@ -39,6 +38,9 @@ public partial class SuperDateRangeDialog
 
     [Inject]
     private SuperDialogService DialogService { get; set; } = default!;
+
+    [Inject]
+    private IStringLocalizer Loc { get; set; } = default!;
 
     [Parameter]
     public SuperDateRangeSelection Value { get; set; } = new(null, null, SuperDateRangePreset.AllTime);
@@ -115,7 +117,7 @@ public partial class SuperDateRangeDialog
             return;
         }
 
-        SetDraftRange(selectableRange.Value.StartDate, selectableRange.Value.EndDate, SuperDateRangePreset.Custom, $"Semaine {week.WeekNumber:D2}", resetVisibleMonth: false);
+        SetDraftRange(selectableRange.Value.StartDate, selectableRange.Value.EndDate, SuperDateRangePreset.Custom, string.Format(CultureInfo.CurrentUICulture, Loc["DateRange.Week"], week.WeekNumber.ToString("D2", CultureInfo.InvariantCulture)), resetVisibleMonth: false);
     }
 
     private void OnStartDateChanged(ChangeEventArgs args)
@@ -155,21 +157,21 @@ public partial class SuperDateRangeDialog
         {
             var dayCount = _draftValue.EndDate.Value.Day - _draftValue.StartDate.Value.Day + 1;
             return dayCount > 1
-                ? $"{dayCount} jours sélectionnés"
-                : "1 jour sélectionné";
+                ? string.Format(CultureInfo.CurrentUICulture, Loc["DateRange.DaysSelected"], dayCount)
+                : Loc["DateRange.OneDaySelected"];
         }
 
         if (_draftValue.StartDate is not null)
         {
-            return "Début sélectionné";
+            return Loc["DateRange.StartSelected"];
         }
 
         if (_draftValue.EndDate is not null)
         {
-            return "Fin sélectionnée";
+            return Loc["DateRange.EndSelected"];
         }
 
-        return "Toute la période";
+        return Loc["DateRange.AllPeriod"];
     }
 
     private string? GetMaxSelectableDateValue()
@@ -179,9 +181,9 @@ public partial class SuperDateRangeDialog
             : null;
     }
 
-    private static string GetPresetLabel(SuperDateRangePreset preset)
+    private string GetPresetLabel(SuperDateRangePreset preset)
     {
-        return SuperDateRangePresetCalculator.GetLabel(preset);
+        return SuperDateRangePresetCalculator.GetLabel(preset, Loc);
     }
 
     private string GetPresetButtonClass(SuperDateRangePreset preset)
@@ -244,9 +246,9 @@ public partial class SuperDateRangeDialog
         return string.Join(" ", classes);
     }
 
-    private string GetMonthTitle(DateTime month)
+    private static string GetMonthTitle(DateTime month)
     {
-        return month.ToString("MMMM yyyy", FR_CULTURE).ToUpper(FR_CULTURE);
+        return month.ToString("MMMM yyyy", CultureInfo.CurrentUICulture).ToUpper(CultureInfo.CurrentUICulture);
     }
 
     private string GetDayButtonClass(DateTime day)

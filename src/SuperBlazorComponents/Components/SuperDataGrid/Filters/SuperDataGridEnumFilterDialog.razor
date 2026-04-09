@@ -5,7 +5,7 @@
                type="checkbox"
                checked="@IsAllSelected"
                @onchange="ToggleAllSelection" />
-        <label class="form-check-label" for="@_selectAllId">Tous</label>
+        <label class="form-check-label" for="@_selectAllId">@Loc["Filter.Enum.SelectAll"]</label>
     </div>
 
     <div class="sdgefd-options">
@@ -33,9 +33,9 @@
 
 <div class="d-flex justify-content-end gap-2 border-top mt-4 pt-3">
     <button type="button" class="btn btn-secondary" @onclick="CancelAsync">
-        Annuler
+        @Loc["Filter.Enum.Cancel"]
     </button>
     <button type="button" class="btn btn-primary" @onclick="ApplyAsync">
-        Appliquer
+        @Loc["Filter.Enum.Apply"]
     </button>
 </div>

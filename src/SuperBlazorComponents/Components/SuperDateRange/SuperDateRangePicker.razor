@@ -20,7 +20,7 @@
             <div class="row g-0">
                 <div class="col-12 col-lg-4 border-end bg-body-tertiary d-flex flex-column">
                     <div class="p-3 border-bottom">
-                        <div class="fw-semibold">Personnalisée</div>
+                        <div class="fw-semibold">@Loc["DateRange.Custom"]</div>
                     </div>
 
                     <div class="list-group list-group-flush super-date-range-presets">
@@ -39,7 +39,7 @@
                     <div class="p-3 border-bottom">
                         <div class="row g-2 align-items-end">
                             <div class="col-sm-6">
-                                <label class="form-label small text-body-secondary mb-1">Date de début</label>
+                                <label class="form-label small text-body-secondary mb-1">@Loc["DateRange.StartDate"]</label>
                                 <div class="input-group input-group-sm">
                                     <input type="date"
                                            class="form-control"
@@ -50,13 +50,13 @@
                                             class="btn btn-outline-secondary"
                                             @onclick="ClearStartDate"
                                             disabled="@(_draftValue.StartDate is null)">
-                                        Effacer
+                                        @Loc["DateRange.Clear"]
                                     </button>
                                 </div>
                             </div>
 
                             <div class="col-sm-6">
-                                <label class="form-label small text-body-secondary mb-1">Date de fin</label>
+                                <label class="form-label small text-body-secondary mb-1">@Loc["DateRange.EndDate"]</label>
                                 <div class="input-group input-group-sm">
                                     <input type="date"
                                            class="form-control"
@@ -67,7 +67,7 @@
                                             class="btn btn-outline-secondary"
                                             @onclick="ClearEndDate"
                                             disabled="@(_draftValue.EndDate is null)">
-                                        Effacer
+                                        @Loc["DateRange.Clear"]
                                     </button>
                                 </div>
                             </div>
@@ -82,7 +82,7 @@
                                 &#8249;
                             </button>
                             <div class="small text-body-secondary">
-                                Sélection manuelle
+                                @Loc["DateRange.ManualSelection"]
                             </div>
                             <button type="button"
                                     class="btn btn-sm btn-link link-dark text-decoration-none px-0"
@@ -103,7 +103,7 @@
                                         <div class="super-date-range-weekdays mb-2 @(DisplayWeekNumbers ? "with-week-numbers" : string.Empty)">
                                             @if (DisplayWeekNumbers)
                                             {
-                                                <div class="super-date-range-week-number-header small">Sem.</div>
+                                                <div class="super-date-range-week-number-header small">@Loc["DateRange.WeekAbbr"]</div>
                                             }
 
                                             @foreach (var dayHeader in DayHeaders)
@@ -161,10 +161,10 @@
 
                 <div class="d-flex justify-content-end gap-2">
                     <button type="button" class="btn btn-outline-secondary" @onclick="CancelSelectionAsync">
-                        Annuler
+                        @Loc["DateRange.Cancel"]
                     </button>
                     <button type="button" class="btn btn-primary" @onclick="ApplySelectionAsync">
-                        Appliquer
+                        @Loc["DateRange.Apply"]
                     </button>
                 </div>
             </div>

@@ -3,13 +3,14 @@
 @using Microsoft.AspNetCore.Components.Web
 @typeparam TItem
 @implements IDisposable
+@inject IStringLocalizer Loc
 
 @if (_effectiveSuperDataGrid is not null)
 {
     <SuperButton Icon="fa-arrows-rotate"
                  Style="SuperButtonStyle.Secondary"
                  Size="@Size"
-                 title="Refraichir le contenu de la liste"
+                 title="@Loc["DataGrid.Refresh.Tooltip"]"
                  Click="OnRefreshAsync" />
 }
 

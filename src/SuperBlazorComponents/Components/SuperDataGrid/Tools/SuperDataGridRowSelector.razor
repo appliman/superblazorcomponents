@@ -1,6 +1,8 @@
 ﻿@using SuperBlazorComponents.Components.Buttons
+@using System.Globalization
 @typeparam TItem
 @implements IDisposable
+@inject IStringLocalizer Loc
 
 @{
     var hasProgrammaticItems = MenuItemsSource?.Any() == true;
@@ -15,8 +17,8 @@
                       Size="@Size"
                       ActionSelected="OnActionSelectedAsync">
         <Menu>
-            <SuperSplitButtonItem ActionName="selectAll" Text="Tout sélectionner" Icon="fa-square-check" IconStyle="SuperIconStyle.Regular" />
-            <SuperSplitButtonItem ActionName="clear" Text="Effacer la sélection" Icon="fa-square" IconStyle="SuperIconStyle.Regular" />
+            <SuperSplitButtonItem ActionName="selectAll" Text="@Loc["DataGrid.Selection.SelectAll"]" Icon="fa-square-check" IconStyle="SuperIconStyle.Regular" />
+            <SuperSplitButtonItem ActionName="clear" Text="@Loc["DataGrid.Selection.Clear"]" Icon="fa-square" IconStyle="SuperIconStyle.Regular" />
             @if (hasCustomItems)
             {
                 <SuperSplitDivider/>
@@ -58,11 +60,12 @@
     [Parameter]
     public SuperButtonSize Size { get; set; } = SuperButtonSize.Default;
 
-    string selectionText = "Sélection";
+    string selectionText = string.Empty;
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
+        selectionText = Loc["DataGrid.Selection.Label"];
         SuperDataGrid<TItem>.GridInstanceReady += OnGridInstanceReady;
     }
 
@@ -100,11 +103,11 @@
 
         if (selectionInfo.AllSelected && selectionInfo.ExcludedCount > 0)
         {
-            selectionText = $"Sélection (Tout sauf {selectionInfo.ExcludedCount})";
+            selectionText = string.Format(CultureInfo.CurrentUICulture, Loc["DataGrid.Selection.AllExcept"], selectionInfo.ExcludedCount);
         }
         else
         {
-            selectionText = selectionInfo.SelectedCount > 0 ? $"Sélection ({selectionInfo.SelectedCount})" : "Sélection";
+            selectionText = selectionInfo.SelectedCount > 0 ? string.Format(CultureInfo.CurrentUICulture, Loc["DataGrid.Selection.Count"], selectionInfo.SelectedCount) : Loc["DataGrid.Selection.Label"];
         }
 
         _ = InvokeAsync(StateHasChanged);

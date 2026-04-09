@@ -1,5 +1,5 @@
-﻿@*<script type="module" src="@Assets["Pages/Components/ThemeToggle.razor.js"]"></script>*@
-@inject IJSRuntime JSRuntime
+﻿@inject IJSRuntime JSRuntime
+@inject IStringLocalizer Loc
 @implements IAsyncDisposable
 
 <button class="btn btn-link text-body-secondary p-1" @onclick="ToggleTheme" title="@GetThemeTitle()">
@@ -60,7 +60,7 @@
 
     private string GetThemeTitle()
     {
-        return _currentTheme == "dark" ? "Passer en mode clair" : "Passer en mode sombre";
+        return _currentTheme == "dark" ? Loc["Theme.SwitchToLight"] : Loc["Theme.SwitchToDark"];
     }
 
     public async ValueTask DisposeAsync()
