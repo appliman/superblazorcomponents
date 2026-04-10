@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 
 namespace SuperBlazorComponents.Components.SuperSplitter;
@@ -10,6 +11,9 @@ public partial class SuperSplitter
 
 	[Inject]
 	private NavigationManager NavigationManager { get; set; } = default!;
+
+	[Inject]
+	private ILogger<SuperSplitter> Logger { get; set; } = default!;
 
 	[Parameter]
 	public RenderFragment? ChildContent { get; set; }
@@ -98,7 +102,14 @@ public partial class SuperSplitter
 	private async void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
 	{
 		_restoredFromStorage = false;
-		await TryRestoreSizeAsync();
+		try
+		{
+			await TryRestoreSizeAsync();
+		}
+		catch (Exception ex)
+		{
+			Logger.LogError(ex, "Failed to restore splitter size on navigation.");
+		}
 	}
 
 	private void StartDragging(MouseEventArgs e)

@@ -6,8 +6,6 @@ using Microsoft.AspNetCore.Components.Web.Virtualization;
 using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 
-using static System.Runtime.InteropServices.JavaScript.JSType;
-
 namespace SuperBlazorComponents.Components.SuperDataGrid;
 
 /// <summary>
@@ -318,13 +316,13 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 	/// </summary>
 	/// <remarks>Subscribe to this event to be notified when a data reload operation completes. Handlers can be used
 	/// to update UI elements or perform additional processing after the data is refreshed.</remarks>
-	public event Action DataReloaded = default!;
+	public event Action? DataReloaded;
 
 	/// <summary>
 	/// Gets the number of rows currently rendered in the table.
 	/// This represents the number of visible items (not the total count).
 	/// </summary>
-	public int RowCount => _columns.Count;
+	public int RowCount => _renderedItems.Count;
 
 	public int TotalRowCount => _totalItemCount;
 
