@@ -33,7 +33,7 @@ public partial class SuperDateRangeDialog
         SuperDateRangePreset.AllTime
     ];
 
-    private DateTime _visibleMonthStart;
+    private DateTimeOffset _visibleMonthStart;
     private SuperDateRangeSelection _draftValue = new(null, null, SuperDateRangePreset.AllTime);
 
     [Inject]
@@ -85,7 +85,7 @@ public partial class SuperDateRangeDialog
         _visibleMonthStart = _visibleMonthStart.AddMonths(1);
     }
 
-    private void SelectDay(DateTime day)
+    private void SelectDay(DateTimeOffset day)
     {
         if (IsDayDisabled(day))
         {
@@ -142,7 +142,7 @@ public partial class SuperDateRangeDialog
         SetDraftRange(_draftValue.StartDate, null, GetManualPreset(_draftValue.StartDate, null));
     }
 
-    private void SetDraftRange(DateTime? startDate, DateTime? endDate, SuperDateRangePreset preset, string? periodName = null, bool resetVisibleMonth = true)
+   private void SetDraftRange(DateTimeOffset? startDate, DateTimeOffset? endDate, SuperDateRangePreset preset, string? periodName = null, bool resetVisibleMonth = true)
     {
         _draftValue = NormalizeRange(new SuperDateRangeSelection(startDate, endDate, preset, periodName));
         if (resetVisibleMonth)
@@ -155,7 +155,7 @@ public partial class SuperDateRangeDialog
     {
         if (_draftValue.StartDate is not null && _draftValue.EndDate is not null)
         {
-            var dayCount = _draftValue.EndDate.Value.Day - _draftValue.StartDate.Value.Day + 1;
+         var dayCount = (_draftValue.EndDate.Value - _draftValue.StartDate.Value).Days + 1;
             return dayCount > 1
                 ? string.Format(CultureInfo.CurrentUICulture, Loc["DateRange.DaysSelected"], dayCount)
                 : Loc["DateRange.OneDaySelected"];
@@ -193,34 +193,34 @@ public partial class SuperDateRangeDialog
             : "list-group-item list-group-item-action";
     }
 
-    private static string GetInputDateValue(DateTime? value)
+    private static string GetInputDateValue(DateTimeOffset? value)
     {
         return value?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) ?? string.Empty;
     }
 
-    private IReadOnlyList<DateTime> GetVisibleMonths()
+  private IReadOnlyList<DateTimeOffset> GetVisibleMonths()
     {
         return [_visibleMonthStart, _visibleMonthStart.AddMonths(1)];
     }
 
-    private IReadOnlyList<SuperDateRangeCalendarWeek> GetMonthWeeks(DateTime month)
+ private IReadOnlyList<SuperDateRangeCalendarWeek> GetMonthWeeks(DateTimeOffset month)
     {
-        var firstDayOfMonth = new DateTime(month.Year, month.Month, 1);
-        var lastDayOfMonth = new DateTime(month.Year, month.Month, DateTime.DaysInMonth(month.Year, month.Month));
+     var firstDayOfMonth = CreateDate(month.Year, month.Month, 1);
+        var lastDayOfMonth = CreateDate(month.Year, month.Month, DateTime.DaysInMonth(month.Year, month.Month));
         var calendarStart = GetStartOfWeek(firstDayOfMonth);
         var calendarEnd = GetEndOfWeek(lastDayOfMonth);
         var weeks = new List<SuperDateRangeCalendarWeek>();
 
         for (var weekStart = calendarStart; weekStart <= calendarEnd; weekStart = weekStart.AddDays(7))
         {
-            var days = new List<DateTime?>(7);
+          var days = new List<DateTimeOffset?>(7);
             for (var dayOffset = 0; dayOffset < 7; dayOffset++)
             {
                 var currentDay = weekStart.AddDays(dayOffset);
                 days.Add(currentDay.Month == month.Month ? currentDay : null);
             }
 
-            var weekNumber = ISOWeek.GetWeekOfYear(weekStart);
+          var weekNumber = ISOWeek.GetWeekOfYear(weekStart.Date);
             weeks.Add(new SuperDateRangeCalendarWeek(weekNumber, weekStart, weekStart.AddDays(6), days));
         }
 
@@ -246,12 +246,12 @@ public partial class SuperDateRangeDialog
         return string.Join(" ", classes);
     }
 
-    private static string GetMonthTitle(DateTime month)
+ private static string GetMonthTitle(DateTimeOffset month)
     {
         return month.ToString("MMMM yyyy", CultureInfo.CurrentUICulture).ToUpper(CultureInfo.CurrentUICulture);
     }
 
-    private string GetDayButtonClass(DateTime day)
+  private string GetDayButtonClass(DateTimeOffset day)
     {
         var classes = new List<string> { "super-date-range-day" };
 
@@ -277,7 +277,7 @@ public partial class SuperDateRangeDialog
         return string.Join(" ", classes);
     }
 
-    private bool IsDayDisabled(DateTime day)
+    private bool IsDayDisabled(DateTimeOffset day)
     {
         return DisableFutureDates && day > GetToday();
     }
@@ -303,12 +303,12 @@ public partial class SuperDateRangeDialog
             && _draftValue.EndDate == selectableRange.Value.EndDate;
     }
 
-    private bool IsBoundaryDay(DateTime day)
+    private bool IsBoundaryDay(DateTimeOffset day)
     {
         return _draftValue.StartDate == day || _draftValue.EndDate == day;
     }
 
-    private bool IsInSelectedRange(DateTime day)
+    private bool IsInSelectedRange(DateTimeOffset day)
     {
         return _draftValue.StartDate is not null
             && _draftValue.EndDate is not null
@@ -319,7 +319,7 @@ public partial class SuperDateRangeDialog
     private void ResetVisibleMonth(SuperDateRangeSelection range)
     {
         var referenceDate = range.EndDate ?? range.StartDate ?? GetToday();
-        _visibleMonthStart = new DateTime(referenceDate.Year, referenceDate.Month, 1).AddMonths(-1);
+        _visibleMonthStart = CreateDate(referenceDate.Year, referenceDate.Month, 1).AddMonths(-1);
     }
 
     private SuperDateRangeSelection NormalizeRange(SuperDateRangeSelection range)
@@ -342,14 +342,14 @@ public partial class SuperDateRangeDialog
         return new SuperDateRangeSelection(startDate, endDate, preset, periodName);
     }
 
-    private static SuperDateRangePreset GetManualPreset(DateTime? startDate, DateTime? endDate)
+ private static SuperDateRangePreset GetManualPreset(DateTimeOffset? startDate, DateTimeOffset? endDate)
     {
         return startDate is null && endDate is null
             ? SuperDateRangePreset.AllTime
             : SuperDateRangePreset.Custom;
     }
 
-    private static DateTime? ParseDate(object? value)
+   private static DateTimeOffset? ParseDate(object? value)
     {
         var rawValue = value?.ToString();
         if (string.IsNullOrWhiteSpace(rawValue))
@@ -358,11 +358,11 @@ public partial class SuperDateRangeDialog
         }
 
         return DateTime.TryParseExact(rawValue, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsedDate)
-            ? parsedDate
+            ? CreateDate(parsedDate.Year, parsedDate.Month, parsedDate.Day)
             : null;
     }
 
-    private DateTime? NormalizeSelectableDate(DateTime? value)
+  private DateTimeOffset? NormalizeSelectableDate(DateTimeOffset? value)
     {
         if (value is null)
         {
@@ -371,14 +371,15 @@ public partial class SuperDateRangeDialog
 
         if (!DisableFutureDates)
         {
-            return value;
+           return NormalizeDate(value.Value);
         }
 
         var today = GetToday();
-        return value > today ? today : value;
+       var normalizedValue = NormalizeDate(value.Value);
+        return normalizedValue > today ? today : normalizedValue;
     }
 
-    private (DateTime StartDate, DateTime EndDate)? GetSelectableWeekRange(SuperDateRangeCalendarWeek week)
+ private (DateTimeOffset StartDate, DateTimeOffset EndDate)? GetSelectableWeekRange(SuperDateRangeCalendarWeek week)
     {
         ArgumentNullException.ThrowIfNull(week);
 
@@ -402,20 +403,31 @@ public partial class SuperDateRangeDialog
         return (startDate, endDate);
     }
 
-    private static DateTime GetToday()
+  private static DateTimeOffset GetToday()
     {
-        return DateTime.Today;
+      return NormalizeDate(DateTimeOffset.Now);
     }
 
-    private static DateTime GetEndOfWeek(DateTime date)
+ private static DateTimeOffset GetEndOfWeek(DateTimeOffset date)
     {
         var offset = 6 - ((int)date.DayOfWeek + 6) % 7;
         return date.AddDays(offset);
     }
 
-    private static DateTime GetStartOfWeek(DateTime date)
+   private static DateTimeOffset GetStartOfWeek(DateTimeOffset date)
     {
         var offset = ((int)date.DayOfWeek + 6) % 7;
         return date.AddDays(-offset);
+    }
+
+    private static DateTimeOffset NormalizeDate(DateTimeOffset value)
+    {
+        return CreateDate(value.Year, value.Month, value.Day);
+    }
+
+    private static DateTimeOffset CreateDate(int year, int month, int day)
+    {
+        var date = new DateTime(year, month, day, 0, 0, 0, DateTimeKind.Unspecified);
+        return new DateTimeOffset(date, TimeZoneInfo.Local.GetUtcOffset(date));
     }
 }

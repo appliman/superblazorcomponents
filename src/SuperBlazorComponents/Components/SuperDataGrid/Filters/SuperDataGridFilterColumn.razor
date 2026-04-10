@@ -52,6 +52,7 @@
                 };
             }
             else if (effectivePropertyType == typeof(DateTime)
+                    || effectivePropertyType == typeof(DateTimeOffset)
                     || effectivePropertyType == typeof(DateOnly))
             {
                 filterComponent = typeof(SuperDataGridPeriodFilter);

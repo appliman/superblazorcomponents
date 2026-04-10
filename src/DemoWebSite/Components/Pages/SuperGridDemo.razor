@@ -427,7 +427,7 @@
 
     private static IEnumerable<DemoItem> ApplyDateRangeFilter(
         IEnumerable<DemoItem> query,
-        Func<DemoItem, DateTime> selector,
+      Func<DemoItem, DateTimeOffset> selector,
         SuperDataGridFilterInfo filter)
     {
         if (filter.StartDate is not null)
@@ -461,7 +461,7 @@
                 Age = _random.Next(22, 65),
                 Salary = _random.Next(30000, 150000),
                 Department = _departments[_random.Next(_departments.Length)],
-                JoinDate = DateTime.Now.AddDays(-_random.Next(1, 3650)),
+                JoinDate = DateTimeOffset.Now.AddDays(-_random.Next(1, 3650)),
                 IsActive = _random.Next(100) > 20,
                 Score = _random.NextDouble() * 100
             });
@@ -495,7 +495,7 @@
         public int Age { get; set; }
         public decimal Salary { get; set; }
         public string Department { get; set; } = string.Empty;
-        public DateTime JoinDate { get; set; }
+      public DateTimeOffset JoinDate { get; set; }
         public bool IsActive { get; set; }
         public double Score { get; set; }
 

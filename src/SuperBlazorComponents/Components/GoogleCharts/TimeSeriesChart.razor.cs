@@ -15,8 +15,8 @@ public partial class TimeSeriesChart
 	private int _chartHeight;
 	private decimal _minValue;
 	private decimal _maxValue;
-	private DateTime _minDate;
-	private DateTime _maxDate;
+  private DateTimeOffset _minDate;
+	private DateTimeOffset _maxDate;
 	private CultureInfo _culture = null!;
 	private string _tooltipContent = string.Empty;
 	private double _tooltipX = 0;
@@ -35,8 +35,8 @@ public partial class TimeSeriesChart
 		{
 			_minValue = Options.MinValue ?? 0;
 			_maxValue = Options.MaxValue ?? 100;
-			_minDate = DateTime.Today;
-			_maxDate = DateTime.Today.AddMonths(1);
+          _minDate = GetToday();
+			_maxDate = _minDate.AddMonths(1);
 			_chartWidth = 1000;
 			_chartHeight = Options.Height;
 			return;
@@ -73,8 +73,8 @@ public partial class TimeSeriesChart
 			_maxValue = dataMaxValue + range * 0.1m;
 		}
 
-		_minDate = Data.Min(d => d.Date).Date;
-		_maxDate = Data.Max(d => d.Date).Date;
+      _minDate = NormalizeDate(Data.Min(d => d.Date));
+		_maxDate = NormalizeDate(Data.Max(d => d.Date));
 
 		_chartHeight = Options.Height;
 		_chartWidth = Options.Width > 0 ? Options.Width : 1000;
@@ -83,7 +83,7 @@ public partial class TimeSeriesChart
 	private int GetChartAreaWidth() => _chartWidth - Options.Padding.Left - Options.Padding.Right;
 	private int GetChartAreaHeight() => _chartHeight - Options.Padding.Top - Options.Padding.Bottom;
 
-	private double GetX(DateTime date)
+  private double GetX(DateTimeOffset date)
 	{
 		var totalDays = (_maxDate - _minDate).TotalDays;
 		if (totalDays == 0)
@@ -163,10 +163,10 @@ public partial class TimeSeriesChart
 		StateHasChanged();
 	}
 
-	private List<(DateTime Date, string Label)> GetMonthMarkers()
+   private List<(DateTimeOffset Date, string Label)> GetMonthMarkers()
 	{
-		var markers = new List<(DateTime, string)>();
-		var current = new DateTime(_minDate.Year, _minDate.Month, 1);
+       var markers = new List<(DateTimeOffset, string)>();
+		var current = CreateDate(_minDate.Year, _minDate.Month, 1);
 
 		while (current <= _maxDate)
 		{
@@ -180,9 +180,9 @@ public partial class TimeSeriesChart
 		return markers;
 	}
 
-	private List<(DateTime Start, DateTime End)> GetWeekendBands()
+  private List<(DateTimeOffset Start, DateTimeOffset End)> GetWeekendBands()
 	{
-		var bands = new List<(DateTime, DateTime)>();
+       var bands = new List<(DateTimeOffset, DateTimeOffset)>();
 		var current = _minDate;
 
 		while (current <= _maxDate)
@@ -197,9 +197,9 @@ public partial class TimeSeriesChart
 		return bands;
 	}
 
-	private List<DateTime> GetWeekSeparators()
+  private List<DateTimeOffset> GetWeekSeparators()
 	{
-		var separators = new List<DateTime>();
+      var separators = new List<DateTimeOffset>();
 		var current = _minDate;
 
 		while (current.DayOfWeek != DayOfWeek.Monday && current <= _maxDate)
@@ -232,9 +232,9 @@ public partial class TimeSeriesChart
 		return ticks;
 	}
 
-	private List<(DateTime Date, string Label)> GetXAxisTicks()
+ private List<(DateTimeOffset Date, string Label)> GetXAxisTicks()
 	{
-		var ticks = new List<(DateTime, string)>();
+     var ticks = new List<(DateTimeOffset, string)>();
 		var totalDays = (_maxDate - _minDate).TotalDays;
 
 		if (totalDays <= 7)
@@ -272,5 +272,21 @@ public partial class TimeSeriesChart
 		}
 
 		return ticks;
+	}
+
+	private static DateTimeOffset GetToday()
+	{
+		return NormalizeDate(DateTimeOffset.Now);
+	}
+
+	private static DateTimeOffset NormalizeDate(DateTimeOffset value)
+	{
+		return CreateDate(value.Year, value.Month, value.Day);
+	}
+
+	private static DateTimeOffset CreateDate(int year, int month, int day)
+	{
+		var date = new DateTime(year, month, day, 0, 0, 0, DateTimeKind.Unspecified);
+		return new DateTimeOffset(date, TimeZoneInfo.Local.GetUtcOffset(date));
 	}
 }

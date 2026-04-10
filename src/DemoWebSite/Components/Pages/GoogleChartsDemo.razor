@@ -46,12 +46,12 @@
 
     private readonly List<GoogleChartDataRow> _lineData =
     [
-        new GoogleChartDataRow { Label = new DateTime(2024, 1, 1), Values = [120m, 110m] },
-        new GoogleChartDataRow { Label = new DateTime(2024, 2, 1), Values = [135m, 130m] },
-        new GoogleChartDataRow { Label = new DateTime(2024, 3, 1), Values = [142m, 140m] },
-        new GoogleChartDataRow { Label = new DateTime(2024, 4, 1), Values = [128m, 135m] },
-        new GoogleChartDataRow { Label = new DateTime(2024, 5, 1), Values = [150m, 145m] },
-        new GoogleChartDataRow { Label = new DateTime(2024, 6, 1), Values = [162m, 155m] }
+     new GoogleChartDataRow { Label = CreateDate(2024, 1, 1), Values = [120m, 110m] },
+        new GoogleChartDataRow { Label = CreateDate(2024, 2, 1), Values = [135m, 130m] },
+        new GoogleChartDataRow { Label = CreateDate(2024, 3, 1), Values = [142m, 140m] },
+        new GoogleChartDataRow { Label = CreateDate(2024, 4, 1), Values = [128m, 135m] },
+        new GoogleChartDataRow { Label = CreateDate(2024, 5, 1), Values = [150m, 145m] },
+        new GoogleChartDataRow { Label = CreateDate(2024, 6, 1), Values = [162m, 155m] }
     ];
 
     private readonly GoogleChartOptions _lineOptions = new()
@@ -81,12 +81,12 @@
 
     private readonly List<GoogleChartDataRow> _columnData =
     [
-        new GoogleChartDataRow { Label = new DateTime(2024, 1, 1), Values = [420m, 380m] },
-        new GoogleChartDataRow { Label = new DateTime(2024, 2, 1), Values = [460m, 410m] },
-        new GoogleChartDataRow { Label = new DateTime(2024, 3, 1), Values = [510m, 480m] },
-        new GoogleChartDataRow { Label = new DateTime(2024, 4, 1), Values = [470m, 450m] },
-        new GoogleChartDataRow { Label = new DateTime(2024, 5, 1), Values = [530m, 500m] },
-        new GoogleChartDataRow { Label = new DateTime(2024, 6, 1), Values = [560m, 520m] }
+     new GoogleChartDataRow { Label = CreateDate(2024, 1, 1), Values = [420m, 380m] },
+        new GoogleChartDataRow { Label = CreateDate(2024, 2, 1), Values = [460m, 410m] },
+        new GoogleChartDataRow { Label = CreateDate(2024, 3, 1), Values = [510m, 480m] },
+        new GoogleChartDataRow { Label = CreateDate(2024, 4, 1), Values = [470m, 450m] },
+        new GoogleChartDataRow { Label = CreateDate(2024, 5, 1), Values = [530m, 500m] },
+        new GoogleChartDataRow { Label = CreateDate(2024, 6, 1), Values = [560m, 520m] }
     ];
 
     private readonly GoogleChartOptions _columnOptions = new()
@@ -116,12 +116,12 @@
 
     private readonly List<GoogleChartDataRow> _mixedData =
     [
-        new GoogleChartDataRow { Label = new DateTime(2024, 1, 1), Values = [980m, 0.054m] },
-        new GoogleChartDataRow { Label = new DateTime(2024, 2, 1), Values = [1040m, 0.061m] },
-        new GoogleChartDataRow { Label = new DateTime(2024, 3, 1), Values = [1110m, 0.067m] },
-        new GoogleChartDataRow { Label = new DateTime(2024, 4, 1), Values = [1060m, 0.058m] },
-        new GoogleChartDataRow { Label = new DateTime(2024, 5, 1), Values = [1180m, 0.071m] },
-        new GoogleChartDataRow { Label = new DateTime(2024, 6, 1), Values = [1250m, 0.076m] }
+       new GoogleChartDataRow { Label = CreateDate(2024, 1, 1), Values = [980m, 0.054m] },
+        new GoogleChartDataRow { Label = CreateDate(2024, 2, 1), Values = [1040m, 0.061m] },
+        new GoogleChartDataRow { Label = CreateDate(2024, 3, 1), Values = [1110m, 0.067m] },
+        new GoogleChartDataRow { Label = CreateDate(2024, 4, 1), Values = [1060m, 0.058m] },
+        new GoogleChartDataRow { Label = CreateDate(2024, 5, 1), Values = [1180m, 0.071m] },
+        new GoogleChartDataRow { Label = CreateDate(2024, 6, 1), Values = [1250m, 0.076m] }
     ];
 
     private readonly GoogleChartOptions _mixedOptions = new()
@@ -149,4 +149,9 @@
             }
         }
     };
+
+    private static DateTimeOffset CreateDate(int year, int month, int day)
+    {
+        return new DateTimeOffset(year, month, day, 0, 0, 0, TimeSpan.Zero);
+    }
 }

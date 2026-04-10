@@ -24,7 +24,7 @@
     public string PropertyName { get; set; } = string.Empty;
 
     [Parameter]
-    public Type PropertyType { get; set; } = typeof(DateTime?);
+    public Type PropertyType { get; set; } = typeof(DateTimeOffset?);
 
     [Parameter]
     public EventCallback<SuperDataGridFilterInfo> ApplyFilter { get; set; }

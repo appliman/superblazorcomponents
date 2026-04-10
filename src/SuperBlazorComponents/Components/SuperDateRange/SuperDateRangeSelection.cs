@@ -1,7 +1,7 @@
 ﻿namespace SuperBlazorComponents.Components.SuperDateRange;
 
 public sealed record SuperDateRangeSelection(
-    DateTime? StartDate,
-    DateTime? EndDate,
+    DateTimeOffset? StartDate,
+    DateTimeOffset? EndDate,
     SuperDateRangePreset Preset = SuperDateRangePreset.Custom,
     string? PeriodName = null);

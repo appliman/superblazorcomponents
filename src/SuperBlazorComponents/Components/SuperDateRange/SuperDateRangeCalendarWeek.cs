@@ -2,6 +2,6 @@
 
 internal sealed record SuperDateRangeCalendarWeek(
     int WeekNumber,
-    DateTime WeekStart,
-	DateTime WeekEnd,
-    IReadOnlyList<DateTime?> Days);
+    DateTimeOffset WeekStart,
+    DateTimeOffset WeekEnd,
+    IReadOnlyList<DateTimeOffset?> Days);
