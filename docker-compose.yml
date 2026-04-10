@@ -1,0 +1,6 @@
+services:
+  demowebsite:
+    image: ${DOCKER_REGISTRY-}demowebsite
+    build:
+      context: .
+      dockerfile: src/DemoWebSite/Dockerfile
