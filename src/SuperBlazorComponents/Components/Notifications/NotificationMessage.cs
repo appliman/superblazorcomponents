@@ -26,7 +26,7 @@ public sealed class NotificationMessage
 	// Value:
 	//     Used to store a custom payload that can be retreived later in the click event
 	//     handler.
-	public object Payload { get; set; } = default!;
+	public object? Payload { get; set; }
 	//
 	// Summary:
 	//     Gets or sets click on close action.
@@ -37,14 +37,14 @@ public sealed class NotificationMessage
 	//
 	// Summary:
 	//     Get or set the event for when the notification is closed
-	public Action<NotificationMessage> Close { get; set; } = default!;
+	public Action<NotificationMessage>? Close { get; set; }
 	//
 	// Summary:
 	//     Gets or sets the click event.
 	//
 	// Value:
 	//     This event handler is called when the notification is clicked on.
-	public Action<NotificationMessage> Click { get; set; } = default!;
+	public Action<NotificationMessage>? Click { get; set; }
 	//
 	// Summary:
 	//     Gets or sets the style.
@@ -65,7 +65,7 @@ public sealed class NotificationMessage
 	//
 	// Value:
 	//     The summary content.
-	public RenderFragment SummaryContent { get; set; } = default!;
+	public RenderFragment? SummaryContent { get; set; }
 	//
 	// Summary:
 	//     Gets or sets the severity.
@@ -86,5 +86,5 @@ public sealed class NotificationMessage
 	//
 	// Value:
 	//     The detail content.
-	public RenderFragment DetailContent { get; set; } = default!;
+	public RenderFragment? DetailContent { get; set; }
 }

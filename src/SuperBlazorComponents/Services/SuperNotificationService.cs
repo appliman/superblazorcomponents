@@ -44,10 +44,10 @@ public class SuperNotificationService
 			Summary = summary,
 			Detail = detail,
 			Duration = duration,
-			Click = click!,
+			Click = click,
 			CloseOnClick = closeOnClick,
-			Payload = payload!,
-			Close = close!
+			Payload = payload,
+			Close = close
 		};
 
 		_notifications.Add(notification);

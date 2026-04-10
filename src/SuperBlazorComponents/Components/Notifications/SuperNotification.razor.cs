@@ -116,7 +116,7 @@ public partial class SuperNotification
 
 	private bool ShouldShowProgress(NotificationMessage n)
 	{
-		return n.Duration is > 0 && (n.ShowProgress || n.Duration is not null);
+		return n.Duration is > 0;
 	}
 
 	private string GetProgressPercent(NotificationMessage n)
