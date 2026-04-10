@@ -78,5 +78,9 @@
   "DateRange.DayHeaders": "L,M,M,J,V,S,D",
 
   "Theme.SwitchToLight": "Passer en mode clair",
-  "Theme.SwitchToDark": "Passer en mode sombre"
+  "Theme.SwitchToDark": "Passer en mode sombre",
+
+  "DropDown.EmptyOption": "-- Sélectionner --",
+  "DropDown.RequiredField": "champ obligatoire",
+  "DropDown.PropertyNotFound": "La propriété '{0}' n'existe pas sur le type '{1}'"
 }

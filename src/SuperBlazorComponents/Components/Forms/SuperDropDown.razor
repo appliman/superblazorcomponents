@@ -4,6 +4,8 @@
 @using System.Reflection
 @using Microsoft.AspNetCore.Components.Forms
 
+@inject IStringLocalizer Loc
+
 @code {
     [CascadingParameter]
     public EditContext? CurrentEditContext { get; set; }
@@ -50,37 +52,44 @@
 
     PropertyInfo? _textPropertyInfo;
     PropertyInfo? _valuePropertyInfo;
+    string? _resolvedTextProperty;
+    string? _resolvedValueProperty;
 
     protected override void OnInitialized()
     {
-        if (string.IsNullOrWhiteSpace(Label))
-        {
-            labelColumnClass = "";
-            inputColumnClass = "col-md-12";
-        }
-
-        if (Data is not null && Data.Any())
-        {
-            var itemType = typeof(TItem);
-            _textPropertyInfo = itemType.GetProperty(TextProperty);
-            _valuePropertyInfo = itemType.GetProperty(ValueProperty);
-
-            if (_textPropertyInfo is null)
-            {
-                throw new InvalidOperationException($"La propriété '{TextProperty}' n'existe pas sur le type '{itemType.Name}'");
-            }
-
-            if (_valuePropertyInfo is null)
-            {
-                throw new InvalidOperationException($"La propriété '{ValueProperty}' n'existe pas sur le type '{itemType.Name}'");
-            }
-        }
-
         if (CapturedAttributes?.ContainsKey("class") == true)
         {
             var value = (string)CapturedAttributes["class"];
             css = $"{css} {value}";
             CapturedAttributes.Remove("class");
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        labelColumnClass = string.IsNullOrWhiteSpace(Label) ? "" : "col-sm-12 col-md-2";
+        inputColumnClass = string.IsNullOrWhiteSpace(Label) ? "col-md-12" : "col-sm-12 col-md-10";
+
+        if (_resolvedTextProperty != TextProperty || _resolvedValueProperty != ValueProperty)
+        {
+            var itemType = typeof(TItem);
+
+            var textProp = itemType.GetProperty(TextProperty);
+            if (textProp is null)
+            {
+                throw new InvalidOperationException(Loc["DropDown.PropertyNotFound", TextProperty, itemType.Name]);
+            }
+
+            var valueProp = itemType.GetProperty(ValueProperty);
+            if (valueProp is null)
+            {
+                throw new InvalidOperationException(Loc["DropDown.PropertyNotFound", ValueProperty, itemType.Name]);
+            }
+
+            _textPropertyInfo = textProp;
+            _valuePropertyInfo = valueProp;
+            _resolvedTextProperty = TextProperty;
+            _resolvedValueProperty = ValueProperty;
         }
     }
 
@@ -144,7 +153,7 @@
                 @Label
                 @if (Required)
                 {
-                    <span class="text-primary fs-4" title="champs obligatoire">*</span>
+                    <span class="text-primary fs-4" title="@Loc["DropDown.RequiredField"]">*</span>
                 }
             </label>
         </div>
@@ -161,7 +170,7 @@
             }
             else if (!Required)
             {
-                <option value="">-- Sélectionner --</option>
+                <option value="">@Loc["DropDown.EmptyOption"]</option>
             }
             @if (Data is not null)
             {
