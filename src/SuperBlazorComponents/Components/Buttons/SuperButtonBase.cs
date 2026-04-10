@@ -20,7 +20,9 @@ public abstract class SuperButtonBase : ComponentBase
     [Parameter]
     public bool IsBusy { get; set; } = false;
 
-	protected bool IsDisabled => IsBusy || Disabled || CapturedAttributes.ContainsKey("disabled");
+    private bool _isBusy;
+
+	protected bool IsDisabled => _isBusy || IsBusy || Disabled || CapturedAttributes.ContainsKey("disabled");
 
     protected async Task OnClick(MouseEventArgs e)
     {
@@ -36,12 +38,12 @@ public abstract class SuperButtonBase : ComponentBase
             return;
         }
 
-        if (IsBusy)
+        if (_isBusy || IsBusy)
         {
             return;
         }
 
-		IsBusy = true;
+		_isBusy = true;
         StateHasChanged();
 
         try
@@ -50,7 +52,7 @@ public abstract class SuperButtonBase : ComponentBase
         }
         finally
         {
-			IsBusy = false;
+			_isBusy = false;
             StateHasChanged();
         }
     }

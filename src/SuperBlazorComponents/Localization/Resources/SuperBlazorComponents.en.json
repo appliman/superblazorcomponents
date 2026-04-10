@@ -78,5 +78,9 @@
   "DateRange.DayHeaders": "M,T,W,T,F,S,S",
 
   "Theme.SwitchToLight": "Switch to light mode",
-  "Theme.SwitchToDark": "Switch to dark mode"
+  "Theme.SwitchToDark": "Switch to dark mode",
+
+  "DropDown.EmptyOption": "-- Select --",
+  "DropDown.RequiredField": "required field",
+  "DropDown.PropertyNotFound": "Property '{0}' does not exist on type '{1}'"
 }
