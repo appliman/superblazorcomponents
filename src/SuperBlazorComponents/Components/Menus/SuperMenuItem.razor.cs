@@ -4,7 +4,7 @@ using SuperBlazorComponents.Configuration;
 
 namespace SuperBlazorComponents.Components;
 
-public partial class SuperMenuItem
+public partial class SuperMenuItem : IDisposable
 {
 	[CascadingParameter]
 	public SuperLayout.SuperLayout MainLayout { get; set; } = default!;
