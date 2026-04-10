@@ -1,27 +1,210 @@
 ﻿@page "/superlayout"
 
 @using SuperBlazorComponents.Components.SuperLayout
+@using SuperBlazorComponents.Components.SuperTabs
+
+<PageTitle>SuperLayout</PageTitle>
+
+<h1 class="mb-2" style="font-size: 2.5rem; font-weight: 300;">SuperLayout</h1>
+<p class="text-muted mb-5">
+    Define the global layout of your application with header, sidebar, body, and footer regions using
+    <code>SuperLayout</code> components.
+</p>
+
+@* amamamamam Section 1: Sidebar, Header and Footer amamamamam *@
+<h3 class="mb-2">Sidebar, Header and Footer</h3>
+<p class="text-muted mb-3">
+    Create a standard layout with sidebar navigation, header, and footer sections using <code>SuperLayout</code> components.
+</p>
+
+<div class="card mb-5">
+    <div class="card-body p-0">
+        <SuperTabs InstanceId="layout-demo-sidebar-header-footer" PersistInUrl="false">
+            <Tabs>
+                <TabItem Id="shf-example" Title="Example" Icon="fa-solid fa-eye">
+                    <div class="p-3">
+                        <div style="border: 1px solid #dee2e6; border-radius: 0.5rem; overflow: hidden; min-height: 350px;">
+                            <SuperLayout Style="position: relative; height: 350px;">
+                                <SuperHeader BrandText="Brand">
+                                    <ChildContent>
+                                        <div class="d-flex flex-row w-100 align-items-center">
+                                            <div class="toolbar flex-grow-1">toolbar</div>
+                                            <div class="config">
+                                                <SuperChatButton />
+                                            </div>
+                                        </div>
+                                    </ChildContent>
+                                </SuperHeader>
+                                <SuperSidebar>
+                                    Sidebar
+                                </SuperSidebar>
+                                <SuperBody>
+                                    <p>Body</p>
+                                </SuperBody>
+                                <SuperChat Title="AI Chat">
+                                    <p>Welcome to the AI assistant.</p>
+                                </SuperChat>
+                                <SuperFooter>
+                                    Footer
+                                </SuperFooter>
+                            </SuperLayout>
+                        </div>
+                    </div>
+                </TabItem>
+                <TabItem Id="shf-source" Title="Source" Icon="fa-solid fa-code">
+                    <div class="p-3">
+                        <pre class="bg-light p-3 rounded"><code>@_sidebarHeaderFooterSource</code></pre>
+                    </div>
+                </TabItem>
+            </Tabs>
+        </SuperTabs>
+    </div>
+</div>
+
+@* amamamamam Section 2: Header and Footer only amamamamam *@
+<h3 class="mb-2">Header and Footer only</h3>
+<p class="text-muted mb-3">
+    A minimal layout with only a header and footer, without a sidebar.
+</p>
+
+<div class="card mb-5">
+    <div class="card-body p-0">
+        <SuperTabs InstanceId="layout-demo-header-footer" PersistInUrl="false">
+            <Tabs>
+                <TabItem Id="hf-example" Title="Example" Icon="fa-solid fa-eye">
+                    <div class="p-3">
+                        <div style="border: 1px solid #dee2e6; border-radius: 0.5rem; overflow: hidden; min-height: 250px;">
+                            <SuperLayout Style="position: relative; height: 250px;">
+                                <SuperHeader BrandText="My App" ShowSidebarToggle="false" />
+                                <SuperBody>
+                                    <p>Body content without sidebar</p>
+                                </SuperBody>
+                                <SuperFooter>
+                                    Footer
+                                </SuperFooter>
+                            </SuperLayout>
+                        </div>
+                    </div>
+                </TabItem>
+                <TabItem Id="hf-source" Title="Source" Icon="fa-solid fa-code">
+                    <div class="p-3">
+                        <pre class="bg-light p-3 rounded"><code>@_headerFooterSource</code></pre>
+                    </div>
+                </TabItem>
+            </Tabs>
+        </SuperTabs>
+    </div>
+</div>
+
+@* amamamamam Section 3: With Chat Panel amamamamam *@
+<h3 class="mb-2">With Chat Panel</h3>
+<p class="text-muted mb-3">
+    A full layout including a collapsible chat panel on the right side, toggled via <code>SuperChatButton</code>.
+</p>
+
+<div class="card mb-5">
+    <div class="card-body p-0">
+        <SuperTabs InstanceId="layout-demo-chat" PersistInUrl="false">
+            <Tabs>
+                <TabItem Id="chat-example" Title="Example" Icon="fa-solid fa-eye">
+                    <div class="p-3">
+                        <div style="border: 1px solid #dee2e6; border-radius: 0.5rem; overflow: hidden; min-height: 350px;">
+                            <SuperLayout Style="position: relative; height: 350px;">
+                                <SuperHeader BrandText="Brand">
+                                    <ChildContent>
+                                        <div class="d-flex flex-row w-100 align-items-center justify-content-end">
+                                            <SuperChatButton />
+                                        </div>
+                                    </ChildContent>
+                                </SuperHeader>
+                                <SuperSidebar>
+                                    Sidebar
+                                </SuperSidebar>
+                                <SuperBody>
+                                    <p>Body — click the chat button in the header to open the panel.</p>
+                                </SuperBody>
+                                <SuperChat Title="AI Chat">
+                                    <p>Welcome to the AI assistant. Ask your questions here.</p>
+                                </SuperChat>
+                                <SuperFooter>
+                                    Footer
+                                </SuperFooter>
+                            </SuperLayout>
+                        </div>
+                    </div>
+                </TabItem>
+                <TabItem Id="chat-source" Title="Source" Icon="fa-solid fa-code">
+                    <div class="p-3">
+                        <pre class="bg-light p-3 rounded"><code>@_chatPanelSource</code></pre>
+                    </div>
+                </TabItem>
+            </Tabs>
+        </SuperTabs>
+    </div>
+</div>
 
 @code {
+    private const string _sidebarHeaderFooterSource =
+        """
+        <SuperLayout>
+            <SuperHeader BrandText="Brand">
+                <ChildContent>
+                    <div class="d-flex flex-row w-100 align-items-center">
+                        <div class="toolbar flex-grow-1">toolbar</div>
+                        <div class="config">
+                            <SuperChatButton />
+                        </div>
+                    </div>
+                </ChildContent>
+            </SuperHeader>
+            <SuperSidebar>
+                Sidebar
+            </SuperSidebar>
+            <SuperBody>
+                <p>Body</p>
+            </SuperBody>
+            <SuperFooter>
+                Footer
+            </SuperFooter>
+        </SuperLayout>
+        """;
 
+    private const string _headerFooterSource =
+        """
+        <SuperLayout>
+            <SuperHeader BrandText="My App"
+                         ShowSidebarToggle="false" />
+            <SuperBody>
+                <p>Body content without sidebar</p>
+            </SuperBody>
+            <SuperFooter>
+                Footer
+            </SuperFooter>
+        </SuperLayout>
+        """;
+
+    private const string _chatPanelSource =
+        """
+        <SuperLayout>
+            <SuperHeader BrandText="Brand">
+                <ChildContent>
+                    <div class="d-flex ... justify-content-end">
+                        <SuperChatButton />
+                    </div>
+                </ChildContent>
+            </SuperHeader>
+            <SuperSidebar>
+                Sidebar
+            </SuperSidebar>
+            <SuperBody>
+                <p>Body</p>
+            </SuperBody>
+            <SuperChat Title="AI Chat">
+                <p>Welcome to the AI assistant.</p>
+            </SuperChat>
+            <SuperFooter>
+                Footer
+            </SuperFooter>
+        </SuperLayout>
+        """;
 }
-
-<SuperLayout>
-    <SuperHeader>
-        <Toolbar>
-            <SuperChatButton />
-        </Toolbar>
-    </SuperHeader>
-    <SuperSidebar>
-
-    </SuperSidebar>
-    <SuperBody>
-        <p>This is the Body</p>
-    </SuperBody>
-    <SuperChat Title="AI Chat">
-        <p>Welcome to the AI assistant. Ask your questions here.</p>
-    </SuperChat>
-    <SuperFooter>
-        <h3>This is the Footer</h3>
-    </SuperFooter>
-</SuperLayout>

@@ -7,28 +7,35 @@
 @inherits LayoutComponentBase
 
 <SuperLayout>
-    <SuperHeader BrandText="SuperComponents">
-        <div class="d-flex flex-row w-100 align-items-center">
-            <div class="toolbar flex-grow-1">
-                toolbar
+    <SuperHeader>
+        <Brand>
+            <b class="ms-1">SuperBlazorComponents</b>
+        </Brand>
+        <ChildContent>
+            <div class="d-flex flex-row w-100 align-items-center">
+                <div class="toolbar flex-grow-1">
+                    toolbar
+                </div>
+                <div class="config">
+                    <SuperChatButton />
+                    <ThemeToggle />
+                    <a href="https://github.com/appliman/superblazorcomponents" target="_blank" title="GitHub">
+                        <i class="fa-brands fa-github fa-lg"></i>
+                    </a>
+                </div>
             </div>
-            <div class="config">
-                <SuperChatButton />
-                <ThemeToggle />
-                <a href="https://github.com/appliman/superblazorcomponents" target="_blank" title="GitHub">
-                    <i class="fa-brands fa-github fa-lg"></i>
-                </a>
-            </div>
-        </div>
+        </ChildContent>
     </SuperHeader>
     <SuperSidebar Theme="software">
         <ChildContent>
             <SuperMenuItem Href="/" Match="NavLinkMatch.All" Icon="fa-house" Text="Home" />
             <SuperMenuItem Href="superlayout" Match="NavLinkMatch.Prefix" Icon="fa-layer-group" Text="Layout" BadgeText="Updated" BadgeCssClass="badge text-bg-info" />
-            <SuperMenuItem Href="counter" Match="NavLinkMatch.Prefix" Icon="fa-calculator" Text="Counter" />
-            <SuperMenuItem Href="weather" Match="NavLinkMatch.Prefix" Icon="fa-cloud-sun" Text="Weather" />
-            <SuperMenuItem Href="google-charts-demo" Match="NavLinkMatch.Prefix" Icon="fa-chart-line" Text="Google Charts" />
-            <SuperMenuItem Href="google-pie-chart-demo" Match="NavLinkMatch.Prefix" Icon="fa-chart-pie" Text="Google Pie Chart" />
+            <SuperMenuItem Icon="fa-chart-line" Text="Charts">
+                <Items>
+                    <SuperMenuItem Href="google-charts-demo" Match="NavLinkMatch.Prefix" Icon="fa-chart-line" Text="Google Charts" />
+                    <SuperMenuItem Href="google-pie-chart-demo" Match="NavLinkMatch.Prefix" Icon="fa-chart-pie" Text="Google Pie Chart" />
+                </Items>
+            </SuperMenuItem>
             <SuperMenuItem Href="super-date-range-picker-demo" Match="NavLinkMatch.Prefix" Icon="fa-calendar-days" Text="Date Range Picker" />
             <SuperMenuItem Href="superbutton-demo" Match="NavLinkMatch.Prefix" Icon="fa-toggle-on" Text="SuperButton Demo" />
             <SuperMenuItem Href="breadcrumb" Match="NavLinkMatch.Prefix" Icon="fa-ellipsis" Text="SuperBreadCrumb" />
@@ -64,7 +71,7 @@
             </SuperMenuItem>
         </ChildContent>
         <Footer>
-            <small>© @DateTimeOffset.Now.Year - Appliman</small>
+            © @DateTimeOffset.Now.Year - <a href="https://www.appliman.com" target="_blank" class="text-decoration-none text-white">Appliman</a>
         </Footer>
     </SuperSidebar>
     <SuperChat Title="AI Chat">
@@ -73,9 +80,6 @@
     <SuperBody>
         @Body
     </SuperBody>
-    <SuperFooter>
-        <small>This is the Footer</small>
-    </SuperFooter>
 </SuperLayout>
 
 <SuperDialog />

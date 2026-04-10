@@ -57,10 +57,10 @@ public partial class SuperLayout : ComponentBase
     [Parameter]
     public int ChatPanelWidth { get; set; } = 380;
 
-    /// <summary>
-    /// Indique l'état actuel de la sidebar.
-    /// </summary>
-    public SidebarState SidebarState
+	/// <summary>
+	/// Indique l'état actuel de la sidebar.
+	/// </summary>
+	public SidebarState SidebarState
     {
         get => _sidebarState;
         private set

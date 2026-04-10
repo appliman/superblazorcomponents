@@ -1,7 +1,213 @@
 ﻿@page "/"
 
-<PageTitle>Home</PageTitle>
+<PageTitle>SuperBlazorComponents — Blazor UI Library</PageTitle>
 
-<h1>Hello, world!</h1>
+<div class="landing-page">
 
-Welcome to your new app.
+    @* ───────── HERO ───────── *@
+    <section class="hero-section full-bleed">
+        <div class="hero-orb hero-orb--1"></div>
+        <div class="hero-orb hero-orb--2"></div>
+        <div class="hero-orb hero-orb--3"></div>
+        <div class="hero-grid-overlay"></div>
+        <div class="hero-inner">
+            <div class="hero-badge">
+                <i class="fa-solid fa-bolt"></i>
+                Open Source &bull; MIT License
+            </div>
+            <h1 class="hero-title">
+                Build stunning Blazor apps<br />
+                with <em>SuperBlazorComponents</em>
+            </h1>
+            <p class="hero-subtitle">
+                A high-performance, native Blazor component library for admin dashboards
+                and line-of-business applications. DataGrid, Tabs, Layout, Splitter,
+                DateRange, Dialogs, Notifications&nbsp;&mdash; all crafted in pure C#&nbsp;/&nbsp;Razor.
+            </p>
+            <div class="hero-buttons">
+                <a href="https://github.com/appliman/superblazorcomponents" target="_blank" class="btn-hero btn-hero--primary">
+                    <i class="fa-brands fa-github"></i> View on GitHub
+                </a>
+                <a href="https://www.nuget.org/packages/SuperBlazorComponents" target="_blank" class="btn-hero btn-hero--ghost">
+                    <i class="fa-solid fa-download"></i> NuGet Package
+                </a>
+            </div>
+            <div class="hero-cli">
+                <span class="hero-cli-prompt">$</span>
+                <code>dotnet add package SuperBlazorComponents</code>
+            </div>
+        </div>
+    </section>
+
+    @* ───────── STATS ───────── *@
+    <section class="stats-bar full-bleed">
+        <div class="stats-row">
+            <div>
+                <div class="stat-value">15+</div>
+                <div class="stat-label">Components</div>
+            </div>
+            <div>
+                <div class="stat-value">.NET 10</div>
+                <div class="stat-label">Latest Framework</div>
+            </div>
+            <div>
+                <div class="stat-value">MIT</div>
+                <div class="stat-label">License</div>
+            </div>
+            <div>
+                <div class="stat-value">0</div>
+                <div class="stat-label">JS Dependencies</div>
+            </div>
+        </div>
+    </section>
+
+    @* ───────── FEATURES ───────── *@
+    <section class="section-pad features-bg full-bleed">
+        <div class="section-header">
+            <h2 class="section-title">Why SuperBlazorComponents?</h2>
+            <p class="section-desc">
+                Everything you need to build responsive, data-driven web apps&nbsp;&mdash; right out of the box.
+            </p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fa-solid fa-code"></i></div>
+                <h3>100 % Native Blazor</h3>
+                <p>Pure C# / Razor with zero JavaScript wrappers. Full interop with the .NET ecosystem.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fa-solid fa-gauge-high"></i></div>
+                <h3>High Performance</h3>
+                <p>Virtualized rendering, efficient diffing, and lazy-loading in every data-heavy component.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fa-solid fa-palette"></i></div>
+                <h3>Themeable</h3>
+                <p>Built-in theme toggle with light &amp; dark modes. Bootstrap CSS variables for easy customization.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fa-solid fa-language"></i></div>
+                <h3>Localization Ready</h3>
+                <p>JSON-based localization out of the box (FR / EN included). Extend with your own languages.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fa-solid fa-lock-open"></i></div>
+                <h3>Open &amp; Flexible</h3>
+                <p>Open source under the MIT license. No vendor lock-in. Extend, fork, or contribute freely.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fa-solid fa-mobile-screen-button"></i></div>
+                <h3>Responsive Design</h3>
+                <p>Every component adapts to any screen size with responsive layouts and collapsible sidebars.</p>
+            </div>
+        </div>
+    </section>
+
+    @* ───────── COMPONENT SHOWCASE ───────── *@
+    <section class="section-pad showcase-bg full-bleed">
+        <div class="section-header">
+            <h2 class="section-title">Component Showcase</h2>
+            <p class="section-desc">
+                Explore the rich set of UI components designed for real-world business applications.
+            </p>
+        </div>
+        <div class="showcase-grid">
+            <a href="supergrid-demo" class="showcase-card">
+                <div class="showcase-icon"><i class="fa-solid fa-table-cells"></i></div>
+                <h4>SuperDataGrid</h4>
+                <p>Frozen columns, resizing, reordering, filtering, sorting, row selection, custom filters, and footer templates.</p>
+                <span class="showcase-arrow">Explore <i class="fa-solid fa-arrow-right"></i></span>
+            </a>
+            <a href="super-tabs-demo/horizontal" class="showcase-card">
+                <div class="showcase-icon"><i class="fa-solid fa-table-cells-large"></i></div>
+                <h4>SuperTabs</h4>
+                <p>Dynamic horizontal &amp; vertical tabs with add, close, reorder, badges, and declarative or service-driven API.</p>
+                <span class="showcase-arrow">Explore <i class="fa-solid fa-arrow-right"></i></span>
+            </a>
+            <a href="superlayout" class="showcase-card">
+                <div class="showcase-icon"><i class="fa-solid fa-layer-group"></i></div>
+                <h4>SuperLayout</h4>
+                <p>Application shell with collapsible sidebar, header, footer, and integrated chat panel.</p>
+                <span class="showcase-arrow">Explore <i class="fa-solid fa-arrow-right"></i></span>
+            </a>
+            <a href="splitter-demo/both" class="showcase-card">
+                <div class="showcase-icon"><i class="fa-solid fa-grip"></i></div>
+                <h4>SuperSplitter</h4>
+                <p>Resizable split panels in vertical, horizontal, or nested orientations for flexible layouts.</p>
+                <span class="showcase-arrow">Explore <i class="fa-solid fa-arrow-right"></i></span>
+            </a>
+            <a href="super-date-range-picker-demo" class="showcase-card">
+                <div class="showcase-icon"><i class="fa-solid fa-calendar-days"></i></div>
+                <h4>SuperDateRangePicker</h4>
+                <p>Intuitive date range selector with presets, calendar weeks, and customizable calculations.</p>
+                <span class="showcase-arrow">Explore <i class="fa-solid fa-arrow-right"></i></span>
+            </a>
+            <a href="dialog-demo" class="showcase-card">
+                <div class="showcase-icon"><i class="fa-solid fa-window-restore"></i></div>
+                <h4>Dialogs &amp; Confirm</h4>
+                <p>Dynamic dialogs, confirmation prompts, and modal services with full customization.</p>
+                <span class="showcase-arrow">Explore <i class="fa-solid fa-arrow-right"></i></span>
+            </a>
+            <a href="notifications-demo" class="showcase-card">
+                <div class="showcase-icon"><i class="fa-solid fa-bell"></i></div>
+                <h4>Notifications</h4>
+                <p>Toast-style notifications with severity levels, custom positioning, and auto-dismiss.</p>
+                <span class="showcase-arrow">Explore <i class="fa-solid fa-arrow-right"></i></span>
+            </a>
+            <a href="superbutton-demo" class="showcase-card">
+                <div class="showcase-icon"><i class="fa-solid fa-toggle-on"></i></div>
+                <h4>SuperButton</h4>
+                <p>Versatile variants: split buttons, link buttons, dropdown menus, and multiple sizes / styles.</p>
+                <span class="showcase-arrow">Explore <i class="fa-solid fa-arrow-right"></i></span>
+            </a>
+            <a href="google-charts-demo" class="showcase-card">
+                <div class="showcase-icon"><i class="fa-solid fa-chart-line"></i></div>
+                <h4>Google Charts</h4>
+                <p>Integrated combo charts, pie charts, and time series for rich data visualization.</p>
+                <span class="showcase-arrow">Explore <i class="fa-solid fa-arrow-right"></i></span>
+            </a>
+        </div>
+    </section>
+
+    @* ───────── GETTING STARTED ───────── *@
+    <section class="section-pad gs-bg full-bleed">
+        <div class="section-header">
+            <h2 class="section-title">Get Started in Minutes</h2>
+            <p class="section-desc">Three simple steps to integrate SuperBlazorComponents into your project.</p>
+        </div>
+        <div class="gs-grid">
+            <div class="gs-card">
+                <div class="gs-number">1</div>
+                <h4>Install the Package</h4>
+                <div class="gs-code"><code>dotnet add package SuperBlazorComponents</code></div>
+            </div>
+            <div class="gs-card">
+                <div class="gs-number">2</div>
+                <h4>Register Services</h4>
+                <div class="gs-code"><code>builder.Services.AddSuperComponents();</code></div>
+            </div>
+            <div class="gs-card">
+                <div class="gs-number">3</div>
+                <h4>Use Components</h4>
+                <div class="gs-code"><code>&lt;SuperDataGrid Items="@@items" /&gt;</code></div>
+            </div>
+        </div>
+    </section>
+
+    @* ───────── CTA ───────── *@
+    <section class="cta-section full-bleed">
+        <div class="cta-inner">
+            <h2>Ready to build something amazing?</h2>
+            <p>SuperBlazorComponents is free, open source, and actively maintained. Join the community today.</p>
+            <div class="cta-buttons">
+                <a href="https://github.com/appliman/superblazorcomponents" target="_blank" class="btn-hero btn-hero--primary">
+                    <i class="fa-brands fa-github"></i> Star on GitHub
+                </a>
+                <a href="supergrid-demo" class="btn-hero btn-hero--ghost">
+                    <i class="fa-solid fa-play"></i> Try the Demos
+                </a>
+            </div>
+        </div>
+    </section>
+
+</div>
