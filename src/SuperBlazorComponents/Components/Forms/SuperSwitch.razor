@@ -61,7 +61,7 @@
 
     private async Task OnValueChanged(ChangeEventArgs e)
     {
-        var newValue = e.Value is bool b ? b : false;
+        var newValue = e.Value is bool b && b;
         Value = newValue;
 
         if (ValueChanged.HasDelegate)
