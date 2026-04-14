@@ -310,7 +310,7 @@ public partial class SuperDateRangePicker : ComponentBase, IAsyncDisposable
     {
         if (_draftValue.StartDate is not null && _draftValue.EndDate is not null)
         {
-         var dayCount = (_draftValue.EndDate.Value - _draftValue.StartDate.Value).Days + 1;
+            var dayCount = (_draftValue.EndDate.Value.Date - _draftValue.StartDate.Value.Date).Days + 1;
             return dayCount > 1
                 ? string.Format(CultureInfo.CurrentUICulture, Loc["DateRange.DaysSelected"], dayCount)
                 : Loc["DateRange.OneDaySelected"];
