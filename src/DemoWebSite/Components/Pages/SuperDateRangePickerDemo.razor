@@ -61,7 +61,7 @@
         return Task.CompletedTask;
     }
 
-    private static string GetDateText(DateTime? value)
+  private static string GetDateText(DateTimeOffset? value)
     {
         return value?.ToString("d MMM yyyy", FrCulture) ?? "Not set";
     }

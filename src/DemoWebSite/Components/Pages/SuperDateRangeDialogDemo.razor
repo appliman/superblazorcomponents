@@ -78,7 +78,7 @@
             disableFutureDates: false);
     }
 
-    private static string GetDateText(DateTime? date)
+   private static string GetDateText(DateTimeOffset? date)
     {
         return date?.ToString("d MMM yyyy", FrCulture) ?? "Not set";
     }

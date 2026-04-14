@@ -6,7 +6,7 @@ namespace SuperBlazorComponents.Components.SuperDateRange;
 
 internal static class SuperDateRangePresetCalculator
 {
-    public static SuperDateRangeSelection Resolve(SuperDateRangePreset preset, DateTime today)
+  public static SuperDateRangeSelection Resolve(SuperDateRangePreset preset, DateTimeOffset today)
     {
         return preset switch
         {
@@ -18,12 +18,12 @@ internal static class SuperDateRangePresetCalculator
             SuperDateRangePreset.Last14Days => new SuperDateRangeSelection(today.AddDays(-13), today, preset),
             SuperDateRangePreset.Last30Days => new SuperDateRangeSelection(today.AddDays(-29), today, preset),
             SuperDateRangePreset.Last90Days => new SuperDateRangeSelection(today.AddDays(-89), today, preset),
-            SuperDateRangePreset.ThisMonth => new SuperDateRangeSelection(new DateTime(today.Year, today.Month, 1), today, preset),
+         SuperDateRangePreset.ThisMonth => new SuperDateRangeSelection(CreateDate(today.Year, today.Month, 1), today, preset),
             SuperDateRangePreset.LastMonth => GetLastMonth(today),
             SuperDateRangePreset.ThisQuarter => new SuperDateRangeSelection(GetQuarterStart(today), today, preset),
             SuperDateRangePreset.LastQuarter => GetLastQuarter(today),
-            SuperDateRangePreset.ThisYear => new SuperDateRangeSelection(new DateTime(today.Year, 1, 1), today, preset),
-            SuperDateRangePreset.LastYear => new SuperDateRangeSelection(new DateTime(today.Year - 1, 1, 1), new DateTime(today.Year - 1, 12, 31), preset),
+            SuperDateRangePreset.ThisYear => new SuperDateRangeSelection(CreateDate(today.Year, 1, 1), today, preset),
+            SuperDateRangePreset.LastYear => new SuperDateRangeSelection(CreateDate(today.Year - 1, 1, 1), CreateDate(today.Year - 1, 12, 31), preset),
             SuperDateRangePreset.Last12Months => GetLastMonths(today, 12, preset),
             SuperDateRangePreset.Last13Months => GetLastMonths(today, 13, preset),
             SuperDateRangePreset.Last24Months => GetLastMonths(today, 24, preset),
@@ -78,22 +78,22 @@ internal static class SuperDateRangePresetCalculator
         return string.Format(culture, loc["DateRange.Until"], range.EndDate!.Value.ToString("d MMM yyyy", culture));
     }
 
-    private static SuperDateRangeSelection GetLastWeek(DateTime today)
+  private static SuperDateRangeSelection GetLastWeek(DateTimeOffset today)
     {
         var startOfCurrentWeek = GetStartOfWeek(today);
         var startOfLastWeek = startOfCurrentWeek.AddDays(-7);
         return new SuperDateRangeSelection(startOfLastWeek, startOfLastWeek.AddDays(6), SuperDateRangePreset.LastWeek);
     }
 
-    private static SuperDateRangeSelection GetLastMonth(DateTime today)
+ private static SuperDateRangeSelection GetLastMonth(DateTimeOffset today)
     {
-        var firstDayOfCurrentMonth = new DateTime(today.Year, today.Month, 1);
+      var firstDayOfCurrentMonth = CreateDate(today.Year, today.Month, 1);
         var lastDayOfLastMonth = firstDayOfCurrentMonth.AddDays(-1);
-        var firstDayOfLastMonth = new DateTime(lastDayOfLastMonth.Year, lastDayOfLastMonth.Month, 1);
+       var firstDayOfLastMonth = CreateDate(lastDayOfLastMonth.Year, lastDayOfLastMonth.Month, 1);
         return new SuperDateRangeSelection(firstDayOfLastMonth, lastDayOfLastMonth, SuperDateRangePreset.LastMonth);
     }
 
-    private static SuperDateRangeSelection GetLastQuarter(DateTime today)
+   private static SuperDateRangeSelection GetLastQuarter(DateTimeOffset today)
     {
         var currentQuarterStart = GetQuarterStart(today);
         var lastQuarterEnd = currentQuarterStart.AddDays(-1);
@@ -101,22 +101,28 @@ internal static class SuperDateRangePresetCalculator
         return new SuperDateRangeSelection(lastQuarterStart, lastQuarterEnd, SuperDateRangePreset.LastQuarter);
     }
 
-    private static SuperDateRangeSelection GetLastMonths(DateTime today, int monthCount, SuperDateRangePreset preset)
+   private static SuperDateRangeSelection GetLastMonths(DateTimeOffset today, int monthCount, SuperDateRangePreset preset)
     {
-        var currentMonthStart = new DateTime(today.Year, today.Month, 1);
+       var currentMonthStart = CreateDate(today.Year, today.Month, 1);
         var rangeStart = currentMonthStart.AddMonths(-(monthCount - 1));
         return new SuperDateRangeSelection(rangeStart, today, preset);
     }
 
-    private static DateTime GetQuarterStart(DateTime date)
+  private static DateTimeOffset GetQuarterStart(DateTimeOffset date)
     {
         var quarterMonth = ((date.Month - 1) / 3) * 3 + 1;
-        return new DateTime(date.Year, quarterMonth, 1);
+        return CreateDate(date.Year, quarterMonth, 1);
     }
 
-    private static DateTime GetStartOfWeek(DateTime date)
+   private static DateTimeOffset GetStartOfWeek(DateTimeOffset date)
     {
         var offset = ((int)date.DayOfWeek + 6) % 7;
         return date.AddDays(-offset);
+    }
+
+    private static DateTimeOffset CreateDate(int year, int month, int day)
+    {
+        var date = new DateTime(year, month, day, 0, 0, 0, DateTimeKind.Unspecified);
+        return new DateTimeOffset(date, TimeZoneInfo.Local.GetUtcOffset(date));
     }
 }

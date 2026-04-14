@@ -177,11 +177,11 @@
     {
         _items =
         [
-            new TodoItem { Id = _nextId++, Title = "Prepare Monday's meeting", Priority = "High", IsCompleted = false, CreatedAt = DateTime.Now.AddDays(-2) },
-            new TodoItem { Id = _nextId++, Title = "Update the documentation", Priority = "Normal", IsCompleted = false, CreatedAt = DateTime.Now.AddDays(-1) },
-            new TodoItem { Id = _nextId++, Title = "Fix bug #1234", Priority = "High", IsCompleted = true, CreatedAt = DateTime.Now.AddDays(-3) },
-            new TodoItem { Id = _nextId++, Title = "Deploy version 2.1", Priority = "Normal", IsCompleted = false, CreatedAt = DateTime.Now.AddHours(-5) },
-            new TodoItem { Id = _nextId++, Title = "Archive old tasks", Priority = "Low", IsCompleted = false, CreatedAt = DateTime.Now.AddHours(-1) },
+          new TodoItem { Id = _nextId++, Title = "Prepare Monday's meeting", Priority = "High", IsCompleted = false, CreatedAt = DateTimeOffset.Now.AddDays(-2) },
+            new TodoItem { Id = _nextId++, Title = "Update the documentation", Priority = "Normal", IsCompleted = false, CreatedAt = DateTimeOffset.Now.AddDays(-1) },
+            new TodoItem { Id = _nextId++, Title = "Fix bug #1234", Priority = "High", IsCompleted = true, CreatedAt = DateTimeOffset.Now.AddDays(-3) },
+            new TodoItem { Id = _nextId++, Title = "Deploy version 2.1", Priority = "Normal", IsCompleted = false, CreatedAt = DateTimeOffset.Now.AddHours(-5) },
+            new TodoItem { Id = _nextId++, Title = "Archive old tasks", Priority = "Low", IsCompleted = false, CreatedAt = DateTimeOffset.Now.AddHours(-1) },
     ];
     }
 
@@ -241,7 +241,7 @@
             Title = _newTitle.Trim(),
             Priority = _newPriority,
             IsCompleted = false,
-            CreatedAt = DateTime.Now
+            CreatedAt = DateTimeOffset.Now
         });
 
         _newTitle = string.Empty;
@@ -277,6 +277,6 @@
         public string Title { get; set; } = string.Empty;
         public string Priority { get; set; } = "Normal";
         public bool IsCompleted { get; set; }
-        public DateTime CreatedAt { get; set; }
+     public DateTimeOffset CreatedAt { get; set; }
     }
 }

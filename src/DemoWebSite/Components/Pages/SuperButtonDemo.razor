@@ -298,8 +298,8 @@
 
     private async Task SimulateFiveSecondsAsync(MouseEventArgs _)
     {
-        _lastClickMessage = $"Click received at {DateTime.Now:HH:mm:ss}. Waiting 5 seconds...";
+     _lastClickMessage = $"Click received at {DateTimeOffset.Now:HH:mm:ss}. Waiting 5 seconds...";
         await Task.Delay(TimeSpan.FromSeconds(5));
-        _lastClickMessage = $"Completed at {DateTime.Now:HH:mm:ss}.";
+       _lastClickMessage = $"Completed at {DateTimeOffset.Now:HH:mm:ss}.";
     }
 }
