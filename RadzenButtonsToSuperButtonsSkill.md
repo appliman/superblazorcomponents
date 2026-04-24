@@ -106,7 +106,7 @@ renders icons using Font Awesome 7 CSS classes. Control the FA style with `IconS
 
 | `SuperIconStyle` value | FA7 prefix applied | When to use |
 |---|---|---|
-| `Configuration` *(default)* | Uses `DefaultSuperIconeStyle` from `Program.cs` | Default — follows app-wide setting |
+| `Configuration` *(default)* | Uses `DefaultSuperIconStyle` from `Program.cs` | Default — follows app-wide setting |
 | `Solid` | `fa-solid` | Filled icons |
 | `Regular` | `fa-regular` | Outline icons (requires FA Pro or free if available) |
 | `Brands` | `fa-brands` | Brand logos (GitHub, Google, etc.) |
