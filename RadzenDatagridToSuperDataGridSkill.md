@@ -41,7 +41,7 @@ builder.Services.AddRadzenComponents();
 builder.Services.AddSuperComponents(options =>
 {
     options.DataGridSettingsStorageMode = DataGridSettingsStorageMode.LocalStorage;
-    options.DefaultSuperIconeStyle = SuperIconStyle.Solid;
+    options.DefaultSuperIconStyle = SuperIconStyle.Solid;
 });
 ```
 
