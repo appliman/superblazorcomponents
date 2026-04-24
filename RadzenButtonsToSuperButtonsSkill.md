@@ -63,7 +63,7 @@ in icon names, style variants, sizing, and event signatures.
 | `BusyText="Saving..."` | `BusyText="Saving..."` | Identical |
 | `Click="@OnClick"` | `Click="@OnClick"` | Identical — same `EventCallback<MouseEventArgs>` |
 | `class="my-class"` | `class="my-class"` | Captured via `CapturedAttributes` in both |
-| `style="..."` | `class="..."` | Prefer a CSS class over inline style |
+| `style="..."` | `style="..."` | Passed through unchanged; optionally replace with `class="..."` plus stylesheet updates |
 
 ### Style / Variant mapping
 
