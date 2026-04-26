@@ -1,14 +1,17 @@
+using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
-
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 
 namespace SuperBlazorComponents.Components.Tooltips;
 
 public partial class SuperTooltip : IAsyncDisposable
 {
+	[Inject] private ILogger<SuperTooltip> Logger { get; set; } = default!;
+
 	private ElementReference _targetRef;
 	private IJSObjectReference? _module;
 	private bool _initialized;
@@ -171,10 +174,8 @@ public partial class SuperTooltip : IAsyncDisposable
 		var inCodeBlock = false;
 		var codeBuffer = new StringBuilder();
 
-		for (var i = 0; i < lines.Length; i++)
+		foreach (var line in lines.Select(static rawLine => rawLine.TrimEnd()))
 		{
-			var rawLine = lines[i];
-			var line = rawLine.TrimEnd();
 			var trimmed = line.Trim();
 
 			if (trimmed.StartsWith("```", StringComparison.Ordinal))
@@ -442,8 +443,9 @@ public partial class SuperTooltip : IAsyncDisposable
 
 			await _module.DisposeAsync();
 		}
-		catch (JSDisconnectedException)
+		catch (JSDisconnectedException ex)
 		{
+			Logger.LogDebug(ex, "JS disconnected while disposing tooltip JavaScript resources.");
 		}
 	}
 }
