@@ -1,6 +1,7 @@
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Linq;
 
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
@@ -174,9 +175,8 @@ public partial class SuperTooltip : IAsyncDisposable
 		var inCodeBlock = false;
 		var codeBuffer = new StringBuilder();
 
-		foreach (var rawLine in lines)
+		foreach (var line in lines.Select(static rawLine => rawLine.TrimEnd()))
 		{
-			var line = rawLine.TrimEnd();
 			var trimmed = line.Trim();
 
 			if (trimmed.StartsWith("```", StringComparison.Ordinal))
