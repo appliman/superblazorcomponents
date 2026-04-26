@@ -18,6 +18,7 @@
 | **SuperSplitter** | Resizable split panels — horizontal/vertical, collapsible, state persistence | [📖 SuperSplitter.md](src/SuperBlazorComponents/Components/SuperSplitter/SuperSplitter.md) |
 | **SuperDateRangePicker** | Calendar-based date range picker with presets | |
 | **SuperButtons** | Buttons, split buttons, toggle buttons, link buttons, confirmation buttons | |
+| **SuperTooltip** | Tooltips for Blazor or HTML elements — text, HTML, Markdown, positions, delay, duration, click closing and manual control | [📖 SuperTooltip.md](src/SuperBlazorComponents/Components/Tooltips/SuperTooltip.md) |
 | **SuperDialog** | Modal dialog system with dynamic component rendering | |
 | **SuperConfirmDialog** | Confirmation dialog with customizable buttons | |
 | **SuperNotifications** | Toast notifications with auto-dismiss and severity levels | |

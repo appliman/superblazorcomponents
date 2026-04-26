@@ -1,0 +1,56 @@
+.super-tooltip-target {
+	display: inline-block;
+}
+
+.super-tooltip-content {
+	max-width: min(24rem, calc(100vw - 2rem));
+	text-align: left;
+}
+
+.super-tooltip-content .tooltip-inner {
+	max-width: inherit;
+	padding: .55rem .7rem;
+	text-align: left;
+}
+
+.super-tooltip-content p,
+.super-tooltip-content ul,
+.super-tooltip-content ol,
+.super-tooltip-content pre,
+.super-tooltip-content h1,
+.super-tooltip-content h2,
+.super-tooltip-content h3,
+.super-tooltip-content h4,
+.super-tooltip-content h5,
+.super-tooltip-content h6 {
+	margin-top: 0;
+	margin-bottom: .35rem;
+}
+
+.super-tooltip-content :last-child {
+	margin-bottom: 0;
+}
+
+.super-tooltip-content ul,
+.super-tooltip-content ol {
+	padding-left: 1.15rem;
+}
+
+.super-tooltip-content code {
+	padding: .05rem .25rem;
+	border-radius: .25rem;
+	background: rgba(255, 255, 255, .16);
+	color: inherit;
+}
+
+.super-tooltip-content pre {
+	overflow: auto;
+	padding: .45rem;
+	border-radius: .35rem;
+	background: rgba(0, 0, 0, .25);
+}
+
+.super-tooltip-content pre code {
+	padding: 0;
+	background: transparent;
+}
