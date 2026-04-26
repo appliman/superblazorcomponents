@@ -174,8 +174,9 @@ public partial class SuperTooltip : IAsyncDisposable
 		var inCodeBlock = false;
 		var codeBuffer = new StringBuilder();
 
-		foreach (var line in lines.Select(static rawLine => rawLine.TrimEnd()))
+		for (int i = 0; i < lines.Length; i++)
 		{
+			var line = lines[i];
 			var trimmed = line.Trim();
 
 			if (trimmed.StartsWith("```", StringComparison.Ordinal))
