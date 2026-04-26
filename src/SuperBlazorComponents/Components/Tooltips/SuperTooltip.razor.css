@@ -54,3 +54,22 @@
 	padding: 0;
 	background: transparent;
 }
+
+:global(.super-tooltip-content table) {
+	width: 100%;
+	margin-bottom: .35rem;
+	border-collapse: collapse;
+	font-size: .875rem;
+}
+
+:global(.super-tooltip-content th),
+:global(.super-tooltip-content td) {
+	padding: .2rem .35rem;
+	border: 1px solid rgba(255, 255, 255, .25);
+	vertical-align: top;
+}
+
+:global(.super-tooltip-content th) {
+	font-weight: 600;
+	background: rgba(255, 255, 255, .12);
+}

@@ -72,6 +72,19 @@
 
 <div class="card mt-3">
     <div class="card-header">
+        Tableau Markdown
+    </div>
+    <div class="card-body">
+        <SuperTooltip Markdown="@MarkdownTableContent"
+                      Position="SuperTooltipPosition.Bottom"
+                      TooltipCssClass="super-tooltip-demo-table">
+            <button class="btn btn-outline-info">Show Markdown table tooltip</button>
+        </SuperTooltip>
+    </div>
+</div>
+
+<div class="card mt-3">
+    <div class="card-header">
         Delai et duree
     </div>
     <div class="card-body">
@@ -138,6 +151,21 @@
     - Supporte **gras** et *italique*
     - Affiche du `code inline`
     - Ouvre les liens HTTP : [Appliman](https://www.appliman.com)
+
+    | Champ | Statut |
+    |---|:---:|
+    | Nom | **OK** |
+    | Code | `unique` |
+    """;
+
+    private const string MarkdownTableContent = """
+    ### Validation
+
+    | Champ | Regle | Statut |
+    |---|---|:---:|
+    | Nom | Obligatoire | **OK** |
+    | Code | Unique | `OK` |
+    | Email | Format valide | A revoir |
     """;
 
     private Task ShowManualTooltipAsync()
