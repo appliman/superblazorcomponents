@@ -1,0 +1,56 @@
+.super-tooltip-target {
+	display: inline-block;
+}
+
+:global(.super-tooltip-content) {
+	max-width: min(24rem, calc(100vw - 2rem));
+	text-align: left;
+}
+
+:global(.super-tooltip-content .tooltip-inner) {
+	max-width: inherit;
+	padding: .55rem .7rem;
+	text-align: left;
+}
+
+:global(.super-tooltip-content p),
+:global(.super-tooltip-content ul),
+:global(.super-tooltip-content ol),
+:global(.super-tooltip-content pre),
+:global(.super-tooltip-content h1),
+:global(.super-tooltip-content h2),
+:global(.super-tooltip-content h3),
+:global(.super-tooltip-content h4),
+:global(.super-tooltip-content h5),
+:global(.super-tooltip-content h6) {
+	margin-top: 0;
+	margin-bottom: .35rem;
+}
+
+:global(.super-tooltip-content :last-child) {
+	margin-bottom: 0;
+}
+
+:global(.super-tooltip-content ul),
+:global(.super-tooltip-content ol) {
+	padding-left: 1.15rem;
+}
+
+:global(.super-tooltip-content code) {
+	padding: .05rem .25rem;
+	border-radius: .25rem;
+	background: rgba(255, 255, 255, .16);
+	color: inherit;
+}
+
+:global(.super-tooltip-content pre) {
+	overflow: auto;
+	padding: .45rem;
+	border-radius: .35rem;
+	background: rgba(0, 0, 0, .25);
+}
+
+:global(.super-tooltip-content pre code) {
+	padding: 0;
+	background: transparent;
+}

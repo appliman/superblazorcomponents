@@ -1,0 +1,10 @@
+@using Microsoft.AspNetCore.Components
+@using Microsoft.JSInterop
+
+@implements IAsyncDisposable
+
+<span @ref="_targetRef"
+	  class="@WrapperCssClass"
+	  @attributes="_additionalAttributes">
+	@ChildContent
+</span>
