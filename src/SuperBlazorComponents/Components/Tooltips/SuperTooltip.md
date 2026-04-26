@@ -19,7 +19,7 @@ builder.Services.AddSuperComponents();
 | `HtmlContent` | `string?` | - | Contenu HTML brut affiche dans le tooltip. A utiliser avec du contenu de confiance. |
 | `Markdown` | `string?` | - | Contenu Markdown converti en HTML par le composant. Prioritaire sur `HtmlContent` et `Text`. |
 | `Position` | `SuperTooltipPosition` | `Top` | Position : `Top`, `Right`, `Bottom`, `Left`, `Auto`. |
-| `Trigger` | `SuperTooltipTrigger` | `Hover` | Declencheur : `Hover`, `Click`, `Focus`, `Manual`. |
+| `Trigger` | `SuperTooltipTrigger` | `Hover` | Declencheur : `Hover`, `Click`, `Focus`, `Manual`. `Hover` ouvre le tooltip au survol et au focus clavier (comportement Bootstrap `hover focus`). |
 | `Delay` | `int` | `0` | Delai d'ouverture en millisecondes. |
 | `Duration` | `int` | `0` | Duree d'affichage en millisecondes. `0` laisse le tooltip ouvert selon le trigger. |
 | `CloseOnDocumentClick` | `bool` | `false` | Ferme le tooltip lorsqu'un clic intervient ailleurs dans la page. |
