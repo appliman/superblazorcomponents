@@ -168,6 +168,22 @@ function ensureStyles() {
 .super-tooltip-content pre code {
     padding: 0;
     background: transparent;
+}
+.super-tooltip-content table {
+    width: 100%;
+    margin-bottom: .35rem;
+    border-collapse: collapse;
+    font-size: .875rem;
+}
+.super-tooltip-content th,
+.super-tooltip-content td {
+    padding: .2rem .35rem;
+    border: 1px solid rgba(255, 255, 255, .25);
+    vertical-align: top;
+}
+.super-tooltip-content th {
+    font-weight: 600;
+    background: rgba(255, 255, 255, .12);
 }`;
 
     document.head.appendChild(style);

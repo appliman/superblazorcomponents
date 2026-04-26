@@ -36,6 +36,7 @@ Le parseur integre couvre volontairement un sous-ensemble simple et previsible :
 - listes `-`, `*` et listes numerotees `1.` ;
 - gras `**texte**`, italique `*texte*`, code inline `` `code` `` ;
 - blocs de code fences ``` ;
+- tableaux Markdown avec en-tete et separateur `|---|---|` ;
 - liens HTTP/HTTPS `[texte](https://exemple.com)`.
 
 Le Markdown est encode avant la transformation inline afin de limiter les injections HTML. Pour afficher du HTML volontairement, utilisez `HtmlContent`.
@@ -74,6 +75,11 @@ Le Markdown est encode avant la transformation inline afin de limiter les inject
     - **Nom** obligatoire
     - `Code` unique
     - Lien : [Appliman](https://www.appliman.com)
+
+    | Champ | Regle |
+    |---|---|
+    | Nom | Obligatoire |
+    | Code | Unique |
     """;
 }
 ```

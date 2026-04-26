@@ -171,8 +171,9 @@ public partial class SuperTooltip : IAsyncDisposable
 		var inCodeBlock = false;
 		var codeBuffer = new StringBuilder();
 
-		foreach (var rawLine in lines)
+		for (var i = 0; i < lines.Length; i++)
 		{
+			var rawLine = lines[i];
 			var line = rawLine.TrimEnd();
 			var trimmed = line.Trim();
 
@@ -204,6 +205,13 @@ public partial class SuperTooltip : IAsyncDisposable
 			if (string.IsNullOrWhiteSpace(trimmed))
 			{
 				CloseLists(html, ref inUnorderedList, ref inOrderedList);
+				continue;
+			}
+
+			if (i + 1 < lines.Length && IsTableRow(trimmed) && IsTableSeparator(lines[i + 1].Trim()))
+			{
+				CloseLists(html, ref inUnorderedList, ref inOrderedList);
+				i = RenderTable(lines, i, html);
 				continue;
 			}
 
@@ -264,6 +272,111 @@ public partial class SuperTooltip : IAsyncDisposable
 
 		CloseLists(html, ref inUnorderedList, ref inOrderedList);
 		return html.ToString();
+	}
+
+	private static int RenderTable(string[] lines, int headerIndex, StringBuilder html)
+	{
+		var headerCells = SplitTableCells(lines[headerIndex].Trim());
+		var alignments = SplitTableCells(lines[headerIndex + 1].Trim())
+			.Select(GetTableAlignment)
+			.ToArray();
+
+		html.Append("<table><thead><tr>");
+		for (var columnIndex = 0; columnIndex < headerCells.Count; columnIndex++)
+		{
+			AppendTableCell(html, "th", headerCells[columnIndex], GetAlignment(alignments, columnIndex));
+		}
+
+		html.Append("</tr></thead><tbody>");
+
+		var lastTableLineIndex = headerIndex + 1;
+		for (var i = headerIndex + 2; i < lines.Length; i++)
+		{
+			var trimmed = lines[i].Trim();
+			if (!IsTableRow(trimmed))
+			{
+				break;
+			}
+
+			var rowCells = SplitTableCells(trimmed);
+			html.Append("<tr>");
+			for (var columnIndex = 0; columnIndex < headerCells.Count; columnIndex++)
+			{
+				var cellContent = columnIndex < rowCells.Count ? rowCells[columnIndex] : string.Empty;
+				AppendTableCell(html, "td", cellContent, GetAlignment(alignments, columnIndex));
+			}
+
+			html.Append("</tr>");
+			lastTableLineIndex = i;
+		}
+
+		html.Append("</tbody></table>");
+		return lastTableLineIndex;
+	}
+
+	private static void AppendTableCell(StringBuilder html, string tagName, string content, string? alignment)
+	{
+		html.Append('<');
+		html.Append(tagName);
+		if (!string.IsNullOrWhiteSpace(alignment))
+		{
+			html.Append(" style=\"text-align:");
+			html.Append(alignment);
+			html.Append("\"");
+		}
+
+		html.Append('>');
+		html.Append(RenderInlineMarkdown(content.Trim()));
+		html.Append("</");
+		html.Append(tagName);
+		html.Append('>');
+	}
+
+	private static string? GetAlignment(string?[] alignments, int columnIndex)
+	{
+		return columnIndex < alignments.Length ? alignments[columnIndex] : null;
+	}
+
+	private static string? GetTableAlignment(string separator)
+	{
+		var value = separator.Trim();
+		var startsWithColon = value.StartsWith(':');
+		var endsWithColon = value.EndsWith(':');
+
+		return (startsWithColon, endsWithColon) switch
+		{
+			(true, true) => "center",
+			(false, true) => "right",
+			(true, false) => "left",
+			_ => null
+		};
+	}
+
+	private static bool IsTableRow(string line)
+	{
+		return line.Contains('|') && SplitTableCells(line).Count > 1;
+	}
+
+	private static bool IsTableSeparator(string line)
+	{
+		var cells = SplitTableCells(line);
+		return cells.Count > 1 && cells.All(cell => Regex.IsMatch(cell.Trim(), @"^:?-{3,}:?$"));
+	}
+
+	private static List<string> SplitTableCells(string line)
+	{
+		var trimmed = line.Trim();
+		if (trimmed.StartsWith('|'))
+		{
+			trimmed = trimmed[1..];
+		}
+
+		if (trimmed.EndsWith('|'))
+		{
+			trimmed = trimmed[..^1];
+		}
+
+		return trimmed.Split('|').Select(cell => cell.Trim()).ToList();
 	}
 
 	private static int GetHeadingLevel(string line)
