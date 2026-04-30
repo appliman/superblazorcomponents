@@ -122,7 +122,7 @@
                                         <td class="sdg-vertical-key">
                                             <span class="sdg-vertical-key-text" title="@column.Title">@column.Title</span>
                                         </td>
-                                        <td class="sdg-vertical-value"
+                                        <td class="sdg-vertical-value sdg-text-left"
                                             @onclick="@(() => OnCellClick(item, column))"
                                             @onclick:stopPropagation="@CellClicked.HasDelegate">
                                             @if ((EditionMode == SuperDataGridEditionMode.Edit || IsRowInEditMode(item)) && column.EditTemplate is not null)
@@ -331,7 +331,7 @@
                         </Placeholder>
                     </Virtualize>
                 </tbody>
-                @if (_columns.Any(i => i.FooterTemplate is not null))
+                @if (DisplayFooter && _columns.Any(i => i.FooterTemplate is not null))
                 {
                     <tfoot class="@(FreezeFooter ? "sdg-sticky-footer" : "")">
                         <tr class="sdg-column-footers">
@@ -363,13 +363,13 @@
         </div>
         }
 
-        @if (FooterTemplate is not null)
+        @if (DisplayFooter && FooterTemplate is not null)
         {
             <div class="sdg-footer-section">
                 @FooterTemplate
             </div>
         }
-        else if (DisplayDefaultFooterTemplate)
+        else if (DisplayFooter && DisplayDefaultFooterTemplate)
         {
             <div class="sdg-footer-section">
                 @FooterText
@@ -377,7 +377,7 @@
         }
 
         @if (_isLoading
-                    && LoadingTemplate is not null)
+            && LoadingTemplate is not null)
         {
             <div class="sdg-loading-overlay">
                 <div class="sdg-loading-spinner">

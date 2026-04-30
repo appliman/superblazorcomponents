@@ -10,21 +10,21 @@ using Microsoft.JSInterop;
 /// </summary>
 public partial class SuperLayout : ComponentBase
 {
-	private IJSObjectReference? jsModule;
-	private SidebarState _sidebarState = SidebarState.Expanded;
-	private ChatState _chatPanelState = ChatState.Hidden;
-	private Device? _deviceInfo;
+    private IJSObjectReference? jsModule;
+    private SidebarState _sidebarState = SidebarState.Expanded;
+    private ChatState _chatPanelState = ChatState.Hidden;
+    private Device? _deviceInfo;
 
-	[Inject]
+    [Inject]
     IJSRuntime JSRuntime { get; set; } = default!;
 
     [Inject]
     ILogger<SuperLayout> Logger { get; set; } = default!;
 
-	/// <summary>
-	/// Contenu enfant du layout (SuperHeader, SuperSidebar, SuperBody, SuperFooter).
-	/// </summary>
-	[Parameter]
+    /// <summary>
+    /// Contenu enfant du layout (SuperHeader, SuperSidebar, SuperBody, SuperFooter).
+    /// </summary>
+    [Parameter]
     public RenderFragment? ChildContent { get; set; }
 
     /// <summary>
@@ -57,10 +57,10 @@ public partial class SuperLayout : ComponentBase
     [Parameter]
     public int ChatPanelWidth { get; set; } = 380;
 
-	/// <summary>
-	/// Indique l'état actuel de la sidebar.
-	/// </summary>
-	public SidebarState SidebarState
+    /// <summary>
+    /// Indique l'état actuel de la sidebar.
+    /// </summary>
+    public SidebarState SidebarState
     {
         get => _sidebarState;
         private set
@@ -145,6 +145,19 @@ public partial class SuperLayout : ComponentBase
     }
 
     /// <summary>
+    /// Définit la largeur du panneau de chat (en pixels) et déclenche un rafraîchissement.
+    /// </summary>
+    public void SetChatPanelWidth(int width)
+    {
+        if (width <= 0 || ChatPanelWidth == width)
+        {
+            return;
+        }
+        ChatPanelWidth = width;
+        StateHasChanged();
+    }
+
+    /// <summary>
     /// Calcule la largeur actuelle de la sidebar.
     /// </summary>
     public int CurrentSidebarWidth => SidebarState switch
@@ -202,21 +215,21 @@ public partial class SuperLayout : ComponentBase
         }
     }
 
-	protected override async Task OnAfterRenderAsync(bool firstRender)
-	{
-		if (firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
         {
-			jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
-				"import", "./_content/SuperBlazorComponents/Components/SuperLayout/SuperLayout.razor.js");
+            jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                "import", "./_content/SuperBlazorComponents/Components/SuperLayout/SuperLayout.razor.js");
 
             try
             {
-				_deviceInfo = await jsModule.InvokeAsync<Device>("getDeviceInfo");
-			}
-            catch(Exception ex) 
+                _deviceInfo = await jsModule.InvokeAsync<Device>("getDeviceInfo");
+            }
+            catch (Exception ex)
             {
                 Logger.LogError(ex, ex.Message);
             }
-		}
-	}
+        }
+    }
 }

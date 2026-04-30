@@ -31,6 +31,7 @@ public sealed record SuperDataGridSettings
 	public bool DisplayRowNumberColumn { get; set; } = true;
 	public bool DisplayRefreshButton { get; set; } = false;
 	public bool DisplayColumnVisibilityToggle { get; set; } = true;
+	public bool DisplayFooter { get; set; } = true;
 	public bool DisplayDefaultFooterTemplate { get; set; } = true;
 
 	// --- Appearance ---
