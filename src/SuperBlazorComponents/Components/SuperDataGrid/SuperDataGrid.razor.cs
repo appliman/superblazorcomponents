@@ -303,6 +303,9 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 	public bool DisplayColumnVisibilityToggle { get; set; } = true;
 
 	[Parameter]
+	public bool DisplayFooter { get; set; } = true;
+
+	[Parameter]
 	public bool DisplayDefaultFooterTemplate { get; set; } = true;
 
 	[Parameter]
@@ -596,6 +599,7 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 		if (!parameters.TryGetValue<bool>(nameof(DisplayRowNumberColumn), out _)) { DisplayRowNumberColumn = preset.DisplayRowNumberColumn; }
 		if (!parameters.TryGetValue<bool>(nameof(DisplayRefreshButton), out _)) { DisplayRefreshButton = preset.DisplayRefreshButton; }
 		if (!parameters.TryGetValue<bool>(nameof(DisplayColumnVisibilityToggle), out _)) { DisplayColumnVisibilityToggle = preset.DisplayColumnVisibilityToggle; }
+		if (!parameters.TryGetValue<bool>(nameof(DisplayFooter), out _)) { DisplayFooter = preset.DisplayFooter; }
 		if (!parameters.TryGetValue<bool>(nameof(DisplayDefaultFooterTemplate), out _)) { DisplayDefaultFooterTemplate = preset.DisplayDefaultFooterTemplate; }
 		if (!parameters.TryGetValue<string>(nameof(CurrentRowBackground), out _)) { CurrentRowBackground = preset.CurrentRowBackground; }
 		if (!parameters.TryGetValue<string?>(nameof(ContainerCssClass), out _)) { ContainerCssClass = preset.ContainerCssClass; }

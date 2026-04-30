@@ -8,24 +8,30 @@
 
 ---
 
+## 🖼️ Demo
+
+![SuperBlazorComponents demo website home page](docs/screenshots/demo-home.png)
+
+---
+
 ## ✨ Components
 
 | Component | Description | Docs |
 |---|---|---|
 | **SuperDataGrid** | Virtualized data grid — frozen columns/rows, reordering, resizing, filtering, sorting, inline editing, row selection, settings persistence | [📖 SUPERDATAGRID.md](SUPERDATAGRID.md) |
-| **SuperLayout** | Responsive app layout — header, sidebar, body, footer, chat panel with collapsible sidebar | |
-| **SuperTabs** | Dynamic tabbed interface — badges, closable tabs, lazy loading, persistence (URL + localStorage), keyboard navigation, service-driven management | |
+| **SuperLayout** | Responsive app layout — header, sidebar, body, footer, chat panel with collapsible sidebar | [📖 SUPERLAYOUT.md](SUPERLAYOUT.md) |
+| **SuperTabs** | Dynamic tabbed interface — badges, closable tabs, lazy loading, persistence (URL + localStorage), keyboard navigation, service-driven management | [📖 SUPERTABS.md](SUPERTABS.md) |
 | **SuperSplitter** | Resizable split panels — horizontal/vertical, collapsible, state persistence | [📖 SuperSplitter.md](src/SuperBlazorComponents/Components/SuperSplitter/SuperSplitter.md) |
-| **SuperDateRangePicker** | Calendar-based date range picker with presets | |
-| **SuperButtons** | Buttons, split buttons, toggle buttons, link buttons, confirmation buttons | |
+| **SuperDateRangePicker** | Calendar-based date range picker with presets | [📖 SUPERDATERANGEPICKER.md](SUPERDATERANGEPICKER.md) |
+| **SuperButtons** | Buttons, split buttons, toggle buttons, link buttons, confirmation buttons | [📖 SUPERBUTTONS.md](SUPERBUTTONS.md) |
 | **SuperTooltip** | Tooltips for Blazor or HTML elements — text, HTML, Markdown, positions, delay, duration, click closing and manual control | [📖 SuperTooltip.md](src/SuperBlazorComponents/Components/Tooltips/SuperTooltip.md) |
-| **SuperDialog** | Modal dialog system with dynamic component rendering | |
-| **SuperConfirmDialog** | Confirmation dialog with customizable buttons | |
-| **SuperNotifications** | Toast notifications with auto-dismiss and severity levels | |
-| **SuperBreadCrumb** | Breadcrumb navigation with back-navigation support | |
-| **SuperMenuItem** | Sidebar menu items with icons, badges, and nested submenus | |
-| **ThemeToggle** | Dark/light theme toggle with system preference detection and localStorage persistence | |
-| **Google Charts** | Combo charts, pie charts, and pure SVG time series charts | |
+| **SuperDialog** | Modal dialog system with dynamic component rendering | [📖 SUPERDIALOGS.md](SUPERDIALOGS.md) |
+| **SuperConfirmDialog** | Confirmation dialog with customizable buttons | [📖 SUPERDIALOGS.md](SUPERDIALOGS.md) |
+| **SuperNotifications** | Toast notifications with auto-dismiss and severity levels | [📖 SUPERNOTIFICATIONS.md](SUPERNOTIFICATIONS.md) |
+| **SuperBreadCrumb** | Breadcrumb navigation with back-navigation support | [📖 SUPERBREADCRUMB.md](SUPERBREADCRUMB.md) |
+| **SuperMenuItem** | Sidebar menu items with icons, badges, and nested submenus | [📖 SUPERMENUITEM.md](SUPERMENUITEM.md) |
+| **ThemeToggle** | Dark/light theme toggle with system preference detection and localStorage persistence | [📖 THEMETOGGLE.md](THEMETOGGLE.md) |
+| **Google Charts** | Combo charts, pie charts, and pure SVG time series charts | [📖 GOOGLECHARTS.md](GOOGLECHARTS.md) |
 
 ---
 

@@ -9,6 +9,45 @@
     transition: width 0.3s ease;
     z-index: 1020;
     overflow: hidden;
+    position: relative;
+}
+
+/* Resizer handle on the left edge */
+.super-chatpanel-resizer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 8px;
+    margin-left: -4px;
+    cursor: ew-resize;
+    background-color: transparent;
+    z-index: 1030;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    touch-action: none;
+    transition: background-color 0.2s ease;
+}
+
+.super-chatpanel-resizer:hover,
+.super-chatpanel-resizer.dragging {
+    background-color: rgba(13, 110, 253, 0.25);
+}
+
+.super-chatpanel-resizer-grip {
+    color: #6c757d;
+    font-size: 0.625rem;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.super-chatpanel-resizer:hover .super-chatpanel-resizer-grip,
+.super-chatpanel-resizer.dragging .super-chatpanel-resizer-grip {
+    opacity: 1;
+    color: #0d6efd;
 }
 
 .super-chatpanel-content {

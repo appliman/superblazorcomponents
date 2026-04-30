@@ -1,6 +1,14 @@
 ﻿@namespace SuperBlazorComponents.Components.SuperLayout
 
 <aside class="super-chatpanel @StateClass @CssClass" style="@StyleString">
+    @if (Resizable && ParentLayout?.ChatPanelState == ChatState.Open)
+    {
+        <div class="super-chatpanel-resizer" @ref="resizerHandle" role="separator" aria-orientation="vertical" aria-label="Redimensionner le panneau de chat">
+            <div class="super-chatpanel-resizer-grip">
+                <i class="fas fa-grip-lines-vertical"></i>
+            </div>
+        </div>
+    }
     <div class="super-chatpanel-content">
         @if (Header is not null)
         {

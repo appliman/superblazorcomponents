@@ -758,6 +758,11 @@
     word-break: break-word;
 }
 
+.sdg-container table.sdg-vertical-table td.sdg-vertical-value,
+.sdg-container table.sdg-vertical-table td.sdg-vertical-value ::deep * {
+    text-align: left !important;
+}
+
 .sdg-vertical-item.sdg-row-current .sdg-vertical-row-number {
     background-color: var(--sdg-current-row-bg, #3b95c6) !important;
     color: #fff !important;
