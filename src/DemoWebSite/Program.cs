@@ -1,5 +1,10 @@
 ﻿using DemoWebSite.Components;
 
+using DemoWebSite.Mcp;
+
+using ModelContextProtocol.AspNetCore;
+using ModelContextProtocol.Server;
+
 using SuperBlazorComponents;
 using SuperBlazorComponents.Components.SuperDataGrid;
 
@@ -10,6 +15,24 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorComponents()
 	.AddInteractiveServerComponents();
+
+builder.Services.AddCors(options =>
+{
+	options.AddPolicy("McpClients", policy =>
+	{
+		policy.AllowAnyOrigin()
+			.AllowAnyHeader()
+			.AllowAnyMethod();
+	});
+});
+
+builder.Services.AddSingleton<SuperComponentGuideCatalog>();
+builder.Services.AddMcpServer()
+	.WithHttpTransport(options =>
+	{
+		options.Stateless = true;
+	})
+	.WithToolsFromAssembly();
 
 builder.Services.AddSuperComponents(options =>
 {
@@ -65,7 +88,25 @@ if (!app.Environment.IsDevelopment())
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
 app.UseHttpsRedirection();
 
+app.UseCors("McpClients");
 app.UseAntiforgery();
+
+app.MapGet("/mcp/health", () => Results.Ok("healthy"));
+app.MapGet("/mcp", (SuperComponentGuideCatalog catalog) => Results.Ok(new
+{
+	name = "SuperBlazorComponents MCP Server",
+	protocol = "Model Context Protocol over Streamable HTTP",
+	endpoint = "/mcp",
+	health = "/mcp/health",
+	note = "Use POST /mcp from an MCP client. This GET response is only a browser-friendly discovery endpoint.",
+	tools = catalog.List().Select(component => new
+	{
+		component.Key,
+		component.Name,
+		component.Summary
+	})
+}));
+app.MapMcp("/mcp");
 
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
