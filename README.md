@@ -96,6 +96,125 @@ A live demo site is available at **[blazor.appliman.com](https://blazor.appliman
 
 ---
 
+## 🤖 MCP Server
+
+The demo site also exposes a public **Model Context Protocol (MCP)** server for AI-assisted development.
+
+Use it when you want an MCP-compatible assistant to discover how to install and implement SuperBlazorComponents in another Blazor application.
+
+- **MCP endpoint:** `https://blazor.appliman.com/mcp`
+- **Health check:** `https://blazor.appliman.com/mcp/health`
+- **Transport:** Streamable HTTP
+- **Authentication:** none
+
+The server exposes tools such as:
+
+- `list_super_components`
+- `get_super_component_guide`
+- `get_super_data_grid_guide`
+- `get_super_buttons_guide`
+- `get_super_tabs_guide`
+- `get_super_layout_guide`
+- `get_super_dialogs_guide`
+
+Example prompts:
+
+- `Use the SuperBlazorComponents MCP server and show me how to add SuperDataGrid to this Blazor app.`
+- `Get the SuperButtons guide and implement a confirmation delete button.`
+- `List the available SuperBlazorComponents guides.`
+
+### VS Code
+
+In VS Code, open **Command Palette** → **MCP: Add Server**, choose **HTTP**, and enter:
+
+```text
+https://blazor.appliman.com/mcp
+```
+
+Or create `.vscode/mcp.json` in your workspace:
+
+```json
+{
+  "servers": {
+    "superblazorcomponents": {
+      "type": "http",
+      "url": "https://blazor.appliman.com/mcp"
+    }
+  }
+}
+```
+
+Then open Copilot Chat in **Agent** mode and ask for a component guide.
+
+### Visual Studio
+
+Visual Studio can discover MCP server configuration from several locations, including:
+
+- `%USERPROFILE%\.mcp.json`
+- `<SOLUTIONDIR>\.mcp.json`
+- `<SOLUTIONDIR>\.vs\mcp.json`
+- `<SOLUTIONDIR>\.vscode\mcp.json`
+
+Example `.mcp.json`:
+
+```json
+{
+  "servers": [
+    {
+      "name": "superblazorcomponents",
+      "transport": "http",
+      "url": "https://blazor.appliman.com/mcp"
+    }
+  ]
+}
+```
+
+After saving the file, restart or reload GitHub Copilot Agent mode in Visual Studio so the MCP tools are discovered.
+
+### Docker Desktop MCP Toolkit
+
+Docker Desktop MCP Toolkit can be used as a gateway between MCP clients and a profile of MCP servers.
+
+1. Enable **Docker Desktop → Settings → Beta features → MCP Toolkit**.
+2. Open **Docker Desktop → MCP Toolkit → Profiles**.
+3. Create a profile, for example `superblazor-docs`.
+4. Add a remote HTTP MCP server with this URL:
+
+```text
+https://blazor.appliman.com/mcp
+```
+
+5. Connect your client from the **Clients** tab, or configure the gateway manually.
+
+Manual VS Code-style gateway configuration:
+
+```json
+{
+  "servers": {
+    "MCP_DOCKER": {
+      "type": "stdio",
+      "command": "docker",
+      "args": ["mcp", "gateway", "run", "--profile", "superblazor-docs"]
+    }
+  }
+}
+```
+
+You can also run the gateway directly:
+
+```bash
+docker mcp gateway run --profile superblazor-docs
+```
+
+### References
+
+- [MCP C# SDK](https://csharp.sdk.modelcontextprotocol.io/)
+- [VS Code MCP configuration](https://code.visualstudio.com/docs/copilot/reference/mcp-configuration)
+- [Visual Studio MCP servers](https://learn.microsoft.com/visualstudio/ide/mcp-servers)
+- [Docker Desktop MCP Toolkit](https://docs.docker.com/ai/mcp-catalog-and-toolkit/)
+
+---
+
 ## 🔗 Links
 
 - **Live Demo:** [blazor.appliman.com](https://blazor.appliman.com/)

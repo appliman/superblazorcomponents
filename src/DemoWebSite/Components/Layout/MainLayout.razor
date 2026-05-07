@@ -1,4 +1,5 @@
-﻿@using SuperBlazorComponents.Components
+﻿@using Microsoft.AspNetCore.Components.Sections
+@using SuperBlazorComponents.Components
 @using SuperBlazorComponents.Components.Dialogs
 @using SuperBlazorComponents.Components.Notifications
 @using SuperBlazorComponents.Components.SuperLayout
@@ -14,7 +15,7 @@
         <ChildContent>
             <div class="d-flex flex-row w-100 align-items-center">
                 <div class="toolbar flex-grow-1">
-                    toolbar
+                    <SectionOutlet SectionName="toolbar" />
                 </div>
                 <div class="config">
                     <SuperChatButton />
@@ -29,51 +30,70 @@
     <SuperSidebar Theme="software">
         <ChildContent>
             <SuperMenuItem Href="/" Match="NavLinkMatch.All" Icon="fa-house" Text="Home" />
-            <SuperMenuItem Href="superlayout" Match="NavLinkMatch.Prefix" Icon="fa-layer-group" Text="Layout" BadgeText="Updated" BadgeCssClass="badge text-bg-info" />
+            <SuperMenuItem Href="superlayout" Match="NavLinkMatch.Prefix" Icon="fa-layer-group" Text="Layout"
+                           BadgeText="Updated" BadgeCssClass="badge text-bg-info" />
             <SuperMenuItem Icon="fa-chart-line" Text="Charts">
                 <Items>
-                    <SuperMenuItem Href="google-charts-demo" Match="NavLinkMatch.Prefix" Icon="fa-chart-line" Text="Google Charts" />
-                    <SuperMenuItem Href="google-pie-chart-demo" Match="NavLinkMatch.Prefix" Icon="fa-chart-pie" Text="Google Pie Chart" />
+                    <SuperMenuItem Href="google-charts-demo" Match="NavLinkMatch.Prefix" Icon="fa-chart-line"
+                                   Text="Google Charts" />
+                    <SuperMenuItem Href="google-pie-chart-demo" Match="NavLinkMatch.Prefix" Icon="fa-chart-pie"
+                                   Text="Google Pie Chart" />
                 </Items>
             </SuperMenuItem>
-            <SuperMenuItem Href="super-date-range-picker-demo" Match="NavLinkMatch.Prefix" Icon="fa-calendar-days" Text="Date Range Picker" />
-            <SuperMenuItem Href="superbutton-demo" Match="NavLinkMatch.Prefix" Icon="fa-toggle-on" Text="SuperButton Demo" />
-            <SuperMenuItem Href="supertooltip-demo" Match="NavLinkMatch.Prefix" Icon="fa-comment-dots" Text="SuperTooltip" BadgeText="New" BadgeCssClass="badge text-bg-success" />
+            <SuperMenuItem Href="super-date-range-picker-demo" Match="NavLinkMatch.Prefix" Icon="fa-calendar-days"
+                           Text="Date Range Picker" />
+            <SuperMenuItem Href="superbutton-demo" Match="NavLinkMatch.Prefix" Icon="fa-toggle-on"
+                           Text="SuperButton Demo" />
+            <SuperMenuItem Href="supertooltip-demo" Match="NavLinkMatch.Prefix" Icon="fa-comment-dots"
+                           Text="SuperTooltip" BadgeText="New" BadgeCssClass="badge text-bg-success" />
             <SuperMenuItem Href="forms-demo" Match="NavLinkMatch.Prefix" Icon="fa-list-ul" Text="Forms" />
             <SuperMenuItem Href="breadcrumb" Match="NavLinkMatch.Prefix" Icon="fa-ellipsis" Text="SuperBreadCrumb" />
             <SuperMenuItem Icon="fa-window-restore" Match="NavLinkMatch.Prefix" Text="Dialogs">
                 <Items>
-                    <SuperMenuItem Href="confirm-demo" Match="NavLinkMatch.Prefix" Icon="fa-circle-question" Text="Confirm" />
-                    <SuperMenuItem Href="dialog-demo" Match="NavLinkMatch.Prefix" Icon="fa-window-maximize" Text="Dynamic dialog" />
-                    <SuperMenuItem Href="super-date-range-dialog-demo" Match="NavLinkMatch.Prefix" Icon="fa-calendar-days" Text="Date range dialog" />
+                    <SuperMenuItem Href="confirm-demo" Match="NavLinkMatch.Prefix" Icon="fa-circle-question"
+                                   Text="Confirm" />
+                    <SuperMenuItem Href="dialog-demo" Match="NavLinkMatch.Prefix" Icon="fa-window-maximize"
+                                   Text="Dynamic dialog" />
+                    <SuperMenuItem Href="super-date-range-dialog-demo" Match="NavLinkMatch.Prefix"
+                                   Icon="fa-calendar-days" Text="Date range dialog" />
                 </Items>
             </SuperMenuItem>
             <SuperMenuItem Href="notifications-demo" Match="NavLinkMatch.Prefix" Icon="fa-bell" Text="Notifications" />
             <SuperMenuItem Icon="fa-table-cells" Match="NavLinkMatch.Prefix" Text="SuperDataGrid">
                 <Items>
-                    <SuperMenuItem Href="supergrid-simple-demo" Match="NavLinkMatch.Prefix" Icon="fa-table" Text="SuperGrid Simple" />
-                    <SuperMenuItem Href="supergrid-demo" Match="NavLinkMatch.Prefix" Icon="fa-table-cells" Text="SuperGrid Demo" />
-                    <SuperMenuItem Href="supergrid-vertical-demo" Match="NavLinkMatch.Prefix" Icon="fa-grip-lines-vertical" Text="SuperGrid Vertical" />
-                    <SuperMenuItem Href="todo-supergrid-demo" Match="NavLinkMatch.Prefix" Icon="fa-list-check" Text="Todo List (Edition)" />
+                    <SuperMenuItem Href="supergrid-simple-demo" Match="NavLinkMatch.Prefix" Icon="fa-table"
+                                   Text="SuperGrid Simple" />
+                    <SuperMenuItem Href="supergrid-demo" Match="NavLinkMatch.Prefix" Icon="fa-table-cells"
+                                   Text="SuperGrid Demo" />
+                    <SuperMenuItem Href="supergrid-vertical-demo" Match="NavLinkMatch.Prefix"
+                                   Icon="fa-grip-lines-vertical" Text="SuperGrid Vertical" />
+                    <SuperMenuItem Href="todo-supergrid-demo" Match="NavLinkMatch.Prefix" Icon="fa-list-check"
+                                   Text="Todo List (Edition)" />
                 </Items>
             </SuperMenuItem>
             <SuperMenuItem Icon="fa-table-cells-large" Match="NavLinkMatch.Prefix" Text="SuperTabs">
                 <Items>
-                    <SuperMenuItem Href="super-tabs-demo/horizontal" Match="NavLinkMatch.Prefix" Icon="fa-grip-lines" Text="SuperTabs horizontal" />
-                    <SuperMenuItem Href="super-tabs-demo/vertical" Match="NavLinkMatch.Prefix" Icon="fa-grip-lines-vertical" Text="SuperTabs vertical" />
-                    <SuperMenuItem Href="super-tabs-demo/declaratif" Match="NavLinkMatch.Prefix" Icon="fa-code" Text="SuperTabs declarative" />
+                    <SuperMenuItem Href="super-tabs-demo/horizontal" Match="NavLinkMatch.Prefix" Icon="fa-grip-lines"
+                                   Text="SuperTabs horizontal" />
+                    <SuperMenuItem Href="super-tabs-demo/vertical" Match="NavLinkMatch.Prefix"
+                                   Icon="fa-grip-lines-vertical" Text="SuperTabs vertical" />
+                    <SuperMenuItem Href="super-tabs-demo/declaratif" Match="NavLinkMatch.Prefix" Icon="fa-code"
+                                   Text="SuperTabs declarative" />
                 </Items>
             </SuperMenuItem>
             <SuperMenuItem Icon="fa-grip" Match="NavLinkMatch.Prefix" Text="SuperSplitter">
                 <Items>
-                    <SuperMenuItem Href="splitter-demo/vertical" Match="NavLinkMatch.Prefix" Icon="fa-grip-lines-vertical" Text="Splitter vertical" />
-                    <SuperMenuItem Href="splitter-demo/horizontal" Match="NavLinkMatch.Prefix" Icon="fa-grip-lines" Text="Splitter horizontal" />
+                    <SuperMenuItem Href="splitter-demo/vertical" Match="NavLinkMatch.Prefix"
+                                   Icon="fa-grip-lines-vertical" Text="Splitter vertical" />
+                    <SuperMenuItem Href="splitter-demo/horizontal" Match="NavLinkMatch.Prefix" Icon="fa-grip-lines"
+                                   Text="Splitter horizontal" />
                     <SuperMenuItem Href="splitter-demo/both" Match="NavLinkMatch.Prefix" Icon="fa-grip" Text="Both" />
                 </Items>
             </SuperMenuItem>
         </ChildContent>
         <Footer>
-            © @DateTimeOffset.Now.Year - <a href="https://www.appliman.com" target="_blank" class="text-decoration-none text-white">Appliman</a>
+            © @DateTimeOffset.Now.Year - <a href="https://www.appliman.com" target="_blank"
+                                            class="text-decoration-none text-white">Appliman</a>
         </Footer>
     </SuperSidebar>
     <SuperChat Title="AI Chat">
