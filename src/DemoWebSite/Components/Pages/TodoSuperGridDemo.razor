@@ -268,12 +268,14 @@ isCompleted))
     {
         if (filter.StartDate is not null)
         {
-            query = query.Where(task => selector(task) >= filter.StartDate.Value);
+            var startDate = filter.StartDate.Value;
+            query = query.Where(task => selector(task) >= startDate);
         }
 
         if (filter.EndDate is not null)
         {
-            query = query.Where(task => selector(task) <= filter.EndDate.Value);
+            var endDate = filter.EndDate.Value;
+            query = query.Where(task => selector(task) <= endDate);
         }
 
         return query;
