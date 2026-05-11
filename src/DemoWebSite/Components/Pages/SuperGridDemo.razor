@@ -59,6 +59,8 @@
                    AllowColumnReorder="true"
                    AllowColumnResize="true"
                    AllowSorting="true"
+                   Hierarchical="true"
+                   HierarchyKeySelector="@(item => item.Id)"
                    FreezeLeftColumns="1"
                    GridId="supergrid-demo"
                    CurrentRowBackground="#3b95c6"
@@ -72,7 +74,11 @@
         </SelectorMenuItemsContent>
 
         <HeaderTemplate>
-            <span>Header</span>
+            <div class="d-flex align-items-center gap-2">
+                <span>Header</span>
+                <button type="button" class="btn btn-sm btn-outline-primary" @onclick="ExpandAllHierarchyAsync">Expand all</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" @onclick="CollapseAllHierarchyAsync">Collapse all</button>
+            </div>
         </HeaderTemplate>
 
         <ChildContent>
@@ -169,6 +175,8 @@
     private int _totalItemCount;
     private int _filteredCount;
     private int _simulatedDelayMs = 100;
+    private const int MaxHierarchyDemoItems = 200;
+    private int _hierarchyDemoItemsLoaded;
     private readonly Random _random = new(42);
 
     // Selection state
@@ -246,6 +254,23 @@
         }
     }
 
+    private async Task ExpandAllHierarchyAsync()
+    {
+        if (_grid is not null)
+        {
+            _hierarchyDemoItemsLoaded = 0;
+            await _grid.ExpandAllAsync();
+        }
+    }
+
+    private async Task CollapseAllHierarchyAsync()
+    {
+        if (_grid is not null)
+        {
+            await _grid.CollapseAllAsync();
+        }
+    }
+
     /// <summary>
     /// Simulates loading items from a database with pagination and sorting support.
     /// </summary>
@@ -258,8 +283,15 @@
             await Task.Delay(_simulatedDelayMs, request.CancellationToken);
         }
 
-        // Start with all items (simulating a database query)
-        IEnumerable<DemoItem> query = _allItems;
+        // Start with root or child items (simulating a database query)
+        if (!request.IsHierarchyRequest)
+        {
+            _hierarchyDemoItemsLoaded = 0;
+        }
+
+        IEnumerable<DemoItem> query = request.IsHierarchyRequest && request.ParentItem is not null
+            ? GenerateChildItems(request.ParentItem, request.HierarchyLevel)
+            : _allItems;
 
         // Apply grid filters
         query = ApplyGridFilters(query, request.Filters);
@@ -317,8 +349,23 @@
             };
         }
 
-        // Get total count after filtering and calculate aggregates
+        // Get total count after filtering
         var filteredList = query.ToList();
+        if (request.IsHierarchyRequest)
+        {
+            var remainingHierarchyItems = Math.Max(0, MaxHierarchyDemoItems - _hierarchyDemoItemsLoaded);
+            filteredList = filteredList.Take(remainingHierarchyItems).ToList();
+            _hierarchyDemoItemsLoaded += filteredList.Count;
+
+            for (var i = 0; i < filteredList.Count; i++)
+            {
+                filteredList[i].RowNumber = i + 1;
+            }
+
+            Console.WriteLine($"[DB] Loaded {filteredList.Count} child item(s) for parent {request.ParentKey} ({_hierarchyDemoItemsLoaded}/{MaxHierarchyDemoItems} demo hierarchy cap)");
+            return GridItemsProviderResult<DemoItem>.From(filteredList, filteredList.Count);
+        }
+
         _filteredCount = filteredList.Count;
 
         // Calculate footer aggregates
@@ -342,6 +389,42 @@
         Console.WriteLine($"[DB] Loaded {items.Count} items starting at index {request.StartIndex} (Filtered: {_filteredCount}/{_totalItemCount})");
 
         return GridItemsProviderResult<DemoItem>.From(items, _filteredCount);
+    }
+
+    private IEnumerable<DemoItem> GenerateChildItems(DemoItem parent, int hierarchyLevel)
+    {
+        if (hierarchyLevel > 3 || parent.Id % 5 == 0)
+        {
+            return [];
+        }
+
+        var count = parent.Id % 3 + 1;
+        var children = new List<DemoItem>();
+
+        for (var i = 1; i <= count; i++)
+        {
+            var childId = parent.Id * 100 + hierarchyLevel * 10 + i;
+            children.Add(new DemoItem
+            {
+                Id = childId,
+                FirstName = $"{parent.FirstName}.{i}",
+                LastName = parent.LastName,
+                Email = $"child-{childId}@example.com",
+                Age = Math.Max(18, parent.Age - hierarchyLevel),
+                Salary = Math.Max(25000, parent.Salary - hierarchyLevel * 2500),
+                Department = parent.Department,
+                JoinDate = parent.JoinDate.AddDays(hierarchyLevel * 30 + i),
+                IsActive = parent.IsActive,
+                Score = Math.Max(0, parent.Score - hierarchyLevel * 3 - i),
+                Coordinates = new Coordinates
+                {
+                    X = parent.Coordinates.X + hierarchyLevel,
+                    Y = parent.Coordinates.Y + i
+                }
+            });
+        }
+
+        return children;
     }
 
     private static IEnumerable<DemoItem> ApplyGridFilters(

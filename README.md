@@ -18,7 +18,7 @@
 
 | Component | Description | Docs |
 |---|---|---|
-| **SuperDataGrid** | Virtualized data grid — frozen columns/rows, reordering, resizing, filtering, sorting, inline editing, row selection, settings persistence | [📖 SUPERDATAGRID.md](SUPERDATAGRID.md) |
+| **SuperDataGrid** | Virtualized data grid — frozen columns/rows, hierarchical lazy-loading rows, reordering, resizing, filtering, sorting, inline editing, row selection, settings persistence | [📖 SUPERDATAGRID.md](SUPERDATAGRID.md) |
 | **SuperLayout** | Responsive app layout — header, sidebar, body, footer, chat panel with collapsible sidebar | [📖 SUPERLAYOUT.md](SUPERLAYOUT.md) |
 | **SuperTabs** | Dynamic tabbed interface — badges, closable tabs, lazy loading, persistence (URL + localStorage), keyboard navigation, service-driven management | [📖 SUPERTABS.md](SUPERTABS.md) |
 | **SuperSplitter** | Resizable split panels — horizontal/vertical, collapsible, state persistence | [📖 SuperSplitter.md](src/SuperBlazorComponents/Components/SuperSplitter/SuperSplitter.md) |
@@ -69,6 +69,8 @@ builder.Services.AddSuperComponents();
     <DataGridColumn Title="Category" For="@(c => c.Category)" Width="150" />
 </SuperDataGrid>
 ```
+
+For tree-like datasets, enable `Hierarchical="true"` and branch inside `ItemsProvider` when `request.IsHierarchyRequest` is true. Parent and child rows use the same `TItem` type.
 
 ---
 
@@ -220,3 +222,4 @@ docker mcp gateway run --profile superblazor-docs
 - **Live Demo:** [blazor.appliman.com](https://blazor.appliman.com/)
 - **GitHub:** [github.com/appliman/superblazorcomponents](https://github.com/appliman/superblazorcomponents)
 - **NuGet:** [nuget.org/packages/SuperBlazorComponents](https://www.nuget.org/packages/SuperBlazorComponents)
+- **Changelog:** [CHANGELOG.md](CHANGELOG.md)

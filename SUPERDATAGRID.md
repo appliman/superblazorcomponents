@@ -1,6 +1,6 @@
 ﻿# 📊 SuperDataGrid — Complete Documentation
 
-> A high-performance, virtualized data grid component for Blazor with frozen columns/rows, column reordering & resizing, filtering, sorting, inline editing, row selection, and settings persistence.
+> A high-performance, virtualized data grid component for Blazor with frozen columns/rows, hierarchical lazy-loading rows, column reordering & resizing, filtering, sorting, inline editing, row selection, and settings persistence.
 
 **[← Back to main README](README.md)**
 
@@ -15,6 +15,7 @@
 - [Data Provider](#data-provider)
   - [GridItemsProvider Delegate](#griditemsprovider-delegate)
   - [GridItemsProviderRequest](#griditemsproviderrequest)
+  - [Hierarchical Requests](#hierarchical-requests)
   - [GridItemsProviderResult](#griditemsproviderresult)
   - [IDataItem Interface](#idataitem-interface)
 - [SuperDataGrid Parameters](#superdatagrid-parameters)
@@ -50,6 +51,7 @@
   - [18 — Programmatic Grid Control](#18--programmatic-grid-control)
   - [19 — Custom Filter Component Registration](#19--custom-filter-component-registration)
   - [20 — Selector Menu Items (Bulk Actions)](#20--selector-menu-items-bulk-actions)
+  - [21 — Hierarchical Lazy Loading](#21--hierarchical-lazy-loading)
 - [Filter System](#filter-system)
   - [Built-in Filter Components](#built-in-filter-components)
   - [SuperDataGridFilterInfo](#superdatagridfilterinfo)
@@ -144,6 +146,51 @@ The request object sent to your data provider:
 | `SortDirection` | `SortDirection` | `None`, `Ascending`, or `Descending` |
 | `Filters` | `IEnumerable<SuperDataGridFilterInfo>` | Active filters from the UI |
 | `CancellationToken` | `CancellationToken` | Token cancelled when a new request supersedes this one |
+| `ParentItem` | `TItem?` | Parent row when the request loads hierarchical child rows |
+| `ParentKey` | `object?` | Parent key when the request loads hierarchical child rows |
+| `HierarchyLevel` | `int` | Zero-based hierarchy level for root requests; child requests use parent level + 1 |
+| `IsHierarchyRequest` | `bool` | `true` when `ParentKey` is set |
+
+### Hierarchical Requests
+
+When `Hierarchical="true"`, SuperDataGrid reuses the same `ItemsProvider` for root rows and child rows:
+
+- Root requests keep the normal virtualized paging behavior.
+- Child requests are sent when a row is expanded.
+- Child requests use `StartIndex = 0`, `Count = null`, the current sort/filter state, and parent context through `ParentItem`, `ParentKey`, and `HierarchyLevel`.
+- Parent and child rows must be the same `TItem` type.
+- Child rows are not cached by the grid. Collapsing removes loaded descendants, and expanding again calls `ItemsProvider` again.
+- If a child request returns no rows, the expander is hidden for that row until the next grid reload/filter/sort refresh.
+
+Example provider branching:
+
+```csharp
+private async ValueTask<GridItemsProviderResult<CategoryRow>> LoadRows(
+    GridItemsProviderRequest<CategoryRow> request)
+{
+    if (request.IsHierarchyRequest && request.ParentItem is not null)
+    {
+        var children = await _service.GetChildrenAsync(
+            request.ParentKey,
+            request.Filters,
+            request.SortColumn,
+            request.SortDirection,
+            request.CancellationToken);
+
+        return GridItemsProviderResult<CategoryRow>.From(children, children.Count);
+    }
+
+    var page = await _service.GetRootPageAsync(
+        request.StartIndex,
+        request.Count ?? 50,
+        request.Filters,
+        request.SortColumn,
+        request.SortDirection,
+        request.CancellationToken);
+
+    return GridItemsProviderResult<CategoryRow>.From(page.Items, page.TotalCount);
+}
+```
 
 ### GridItemsProviderResult
 
@@ -202,6 +249,8 @@ When your model implements `IDataItem`:
 | `OverscanCount` | `int` | `5` | Number of extra items rendered outside the visible area |
 | `GridOrientation` | `SuperDataGridOrientation` | `Horizontal` | `Horizontal` (table) or `Vertical` (property grid) |
 | `DefaultSettingsName` | `string?` | `null` | Name of a preset from `SuperComponentsConfiguration.SuperDataGridSettingsList` |
+| `Hierarchical` | `bool` | `false` | Enable hierarchical lazy-loading rows in horizontal orientation |
+| `HierarchyKeySelector` | `Func<TItem, object?>?` | `null` | Optional key selector for hierarchy state; falls back to `IDataItem.KeyValue` or the item instance |
 
 ### Frozen Columns & Rows
 
@@ -356,6 +405,8 @@ Each column supports four templates:
 | Method | Returns | Description |
 |---|---|---|
 | `ReloadAsync()` | `Task` | Refreshes the grid data from the `ItemsProvider` |
+| `ExpandAllAsync(CancellationToken)` | `Task` | Expands all currently rendered root rows and recursively loads descendants |
+| `CollapseAllAsync()` | `Task` | Collapses all expanded hierarchy rows and removes loaded descendants |
 | `ResetColumnSettingsAsync()` | `Task` | Resets all columns to their default width, visibility, and order |
 | `GetColumnSettings()` | `IEnumerable<SuperDataGridColumnSettings>` | Returns the current column settings |
 | `GetColumnVisibilityInfo()` | `IReadOnlyList<SuperDataGridColumnVisibilityInfo>` | Returns visibility metadata for all columns |
@@ -1379,6 +1430,72 @@ protected override async Task OnAfterRenderAsync(bool firstRender)
     }
 }
 ```
+
+---
+
+### 21 — Hierarchical Lazy Loading
+
+Enable hierarchical mode when parent and child rows share the same `TItem` type and child rows should be loaded only when a parent row is expanded.
+
+```razor
+<SuperDataGrid @ref="_grid"
+               TItem="CategoryRow"
+               ItemsProvider="LoadRows"
+               Height="500px"
+               Hierarchical="true"
+               HierarchyKeySelector="@(row => row.Id)">
+    <ChildContent>
+        <DataGridColumn For="@(r => r.Name)" Title="Name" Width="220px" />
+        <DataGridColumn For="@(r => r.Status)" Title="Status" Width="120px" />
+        <DataGridColumn For="@(r => r.Amount)" Title="Amount" Width="120px" FormatString="{0:C}" />
+    </ChildContent>
+</SuperDataGrid>
+
+<div class="mt-2">
+    <button class="btn btn-sm btn-outline-primary" @onclick="ExpandAll">Expand all visible roots</button>
+    <button class="btn btn-sm btn-outline-secondary" @onclick="CollapseAll">Collapse all</button>
+</div>
+
+@code {
+    private SuperDataGrid<CategoryRow>? _grid;
+
+    private async Task ExpandAll() => await _grid!.ExpandAllAsync();
+    private async Task CollapseAll() => await _grid!.CollapseAllAsync();
+
+    private async ValueTask<GridItemsProviderResult<CategoryRow>> LoadRows(
+        GridItemsProviderRequest<CategoryRow> request)
+    {
+        if (request.IsHierarchyRequest && request.ParentItem is not null)
+        {
+            var children = await _service.GetChildrenAsync(
+                request.ParentKey,
+                request.Filters,
+                request.SortColumn,
+                request.SortDirection,
+                request.CancellationToken);
+
+            return GridItemsProviderResult<CategoryRow>.From(children, children.Count);
+        }
+
+        var roots = await _service.GetRootPageAsync(
+            request.StartIndex,
+            request.Count ?? 50,
+            request.Filters,
+            request.SortColumn,
+            request.SortDirection,
+            request.CancellationToken);
+
+        return GridItemsProviderResult<CategoryRow>.From(roots.Items, roots.TotalCount);
+    }
+}
+```
+
+Notes:
+
+- The row-number column becomes the hierarchy column and displays `+`, `-`, or an empty placeholder.
+- Root rows remain virtualized; `ExpandAllAsync` expands only root rows currently rendered by virtualization.
+- Child rows are requested with `Count = null` and are expected to be returned without paging.
+- Collapsing a row or calling `CollapseAllAsync` discards loaded descendants, so the next expansion performs a fresh provider call.
 
 ---
 

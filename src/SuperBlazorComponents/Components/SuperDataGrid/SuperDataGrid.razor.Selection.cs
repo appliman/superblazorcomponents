@@ -432,7 +432,7 @@ public partial class SuperDataGrid<TItem>
 	{
 		if (DisplayRowNumberColumn)
 		{
-			return $"inset-inline-start: {ROW_NUMBER_WIDTH}px;";
+			return $"inset-inline-start: {GetRowNumberWidth()}px;";
 		}
 
 		return "inset-inline-start: 0;";
@@ -443,7 +443,7 @@ public partial class SuperDataGrid<TItem>
 		var left = 0;
 		if (DisplayRowNumberColumn)
 		{
-			left += ROW_NUMBER_WIDTH;
+			left += GetRowNumberWidth();
 		}
 
 		if (DisplaySelectionColumn)
