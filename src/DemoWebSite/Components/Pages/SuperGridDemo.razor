@@ -375,9 +375,10 @@
         _activeCount = filteredList.Count(x => x.IsActive);
 
         // Apply pagination (simulating OFFSET/FETCH in SQL)
+        var takeCount = request.Count ?? MaxHierarchyDemoItems;
         var items = filteredList
             .Skip(request.StartIndex)
-            .Take(request.Count.GetValueOrDefault(1))
+            .Take(takeCount)
             .ToList();
 
         for (var i = 0; i < items.Count; i++)
