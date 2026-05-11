@@ -1,0 +1,11 @@
+.super-tristate-checkbox {
+    min-height: 1.5rem;
+}
+
+.super-tristate-checkbox-input {
+    cursor: pointer;
+}
+
+.super-tristate-checkbox-input:disabled {
+    cursor: default;
+}
