@@ -2,11 +2,12 @@
 
 All notable changes to SuperBlazorComponents are documented in this file.
 
-## 1.5.42.0
+## 1.6.43.0
 
 ### Added
 
 - Added `SuperDataGrid` hierarchical lazy-loading mode with the `Hierarchical` parameter.
+- Added `SuperTriStateCheckbox` for nullable boolean values with isolated CSS and JavaScript.
 - Added `HierarchyKeySelector` to customize row identity for hierarchy state.
 - Extended `GridItemsProviderRequest<TItem>` with `ParentItem`, `ParentKey`, `HierarchyLevel`, and `IsHierarchyRequest` so the existing `ItemsProvider` can load child rows.
 - Added `ExpandAllAsync(CancellationToken)` and `CollapseAllAsync()` public methods for external hierarchy control through `@ref`.

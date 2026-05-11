@@ -1,12 +1,13 @@
 ﻿@page "/forms-demo"
 @using SuperBlazorComponents.Components.Forms
+@using SuperBlazorComponents.Components.SuperTriStateCheckbox
 
 <PageTitle>Forms Demo</PageTitle>
 
 <h1>Forms Demo</h1>
 
 <p class="text-muted">
-    Démonstration des composants de formulaire — <code>SuperSwitch</code>.
+    Démonstration des composants de formulaire — <code>SuperSwitch</code> et <code>SuperTriStateCheckbox</code>.
 </p>
 
 @* ── SuperSwitch ──────────────────────────────────────────────────────────── *@
@@ -109,6 +110,68 @@
     </div>
 </div>
 
+@* ── SuperTriStateCheckbox ───────────────────────────────────────────────── *@
+
+<h2 class="mt-5">SuperTriStateCheckbox</h2>
+
+<div class="card mt-3">
+    <div class="card-header">Basique</div>
+    <div class="card-body">
+        <p class="text-muted mb-3">
+            Chaque clic fait tourner la valeur dans l'ordre <code>null</code>, <code>true</code>, <code>false</code>.
+        </p>
+
+        <SuperTriStateCheckbox Label="Filtre validé"
+                               HelpText="État indéterminé, oui ou non."
+                               @bind-Value="_triStateValue" />
+
+        <div class="alert alert-light border mt-3 mb-0">
+            Valeur : <strong>@FormatNullableBool(_triStateValue)</strong>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-3">
+    <div class="card-header">Styles Bootstrap</div>
+    <div class="card-body">
+        <p class="text-muted mb-3">
+            Le composant conserve les classes Bootstrap <code>form-check</code> et <code>form-check-input</code>,
+            avec des classes additionnelles configurables.
+        </p>
+
+        <SuperTriStateCheckbox Label="Décision revue"
+                               CssClass="border-primary"
+                               LabelCssClass="fw-semibold text-primary"
+                               HelpTextCssClass="text-primary"
+                               HelpText="Exemple avec classes CSS Bootstrap."
+                               @bind-Value="_styledTriStateValue" />
+
+        <div class="alert alert-light border mt-3 mb-0">
+            Valeur : <strong>@FormatNullableBool(_styledTriStateValue)</strong>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-3">
+    <div class="card-header">Callback explicite</div>
+    <div class="card-body">
+        <p class="text-muted mb-3">
+            Utilisation de <code>Value</code> + <code>ValueChanged</code> pour intercepter le changement.
+        </p>
+
+        <SuperTriStateCheckbox Label="Validation optionnelle"
+                               Value="@_triStateCallbackValue"
+                               ValueChanged="OnTriStateCallbackValueChangedAsync" />
+
+        <ul class="list-group mt-3">
+            @foreach (var entry in _triStateLog)
+            {
+                <li class="list-group-item py-1 small">@entry</li>
+            }
+        </ul>
+    </div>
+</div>
+
 <div class="card mt-3">
     <div class="card-header">Dans un formulaire avec validation</div>
     <div class="card-body">
@@ -145,6 +208,10 @@
     private bool _labelLeftValue;
     private bool _callbackValue;
     private readonly List<string> _log = [];
+    private bool? _triStateValue;
+    private bool? _styledTriStateValue = true;
+    private bool? _triStateCallbackValue;
+    private readonly List<string> _triStateLog = [];
     private bool _formSubmitted;
 
     private readonly FormModel _formModel = new();
@@ -162,10 +229,33 @@
         return Task.CompletedTask;
     }
 
+    private Task OnTriStateCallbackValueChangedAsync(bool? newValue)
+    {
+        _triStateCallbackValue = newValue;
+        _triStateLog.Insert(0, $"{DateTime.Now:HH:mm:ss} → {FormatNullableBool(newValue)}");
+
+        if (_triStateLog.Count > 5)
+        {
+            _triStateLog.RemoveAt(_triStateLog.Count - 1);
+        }
+
+        return Task.CompletedTask;
+    }
+
     private Task OnFormSubmitAsync()
     {
         _formSubmitted = true;
         return Task.CompletedTask;
+    }
+
+    private static string FormatNullableBool(bool? value)
+    {
+        return value switch
+        {
+            true => "true",
+            false => "false",
+            null => "null"
+        };
     }
 
     private sealed class FormModel

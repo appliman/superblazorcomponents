@@ -1,0 +1,186 @@
+@namespace SuperBlazorComponents.Components.SuperTriStateCheckbox
+@using System.Linq.Expressions
+@using Microsoft.AspNetCore.Components.Forms
+@implements IAsyncDisposable
+@inject IJSRuntime JSRuntime
+
+<div class="@WrapperClass">
+    <input @ref="_inputRef"
+           id="@EffectiveId"
+           name="@Name"
+           type="checkbox"
+           class="@InputClass"
+           checked="@(Value == true)"
+           disabled="@Disabled"
+           aria-checked="@AriaChecked"
+           @onclick="ToggleAsync"
+           @onclick:preventDefault
+           @attributes="CapturedAttributes" />
+    @if (!string.IsNullOrWhiteSpace(Label))
+    {
+        <label class="@LabelClass" for="@EffectiveId">@Label</label>
+    }
+    @if (!string.IsNullOrWhiteSpace(HelpText))
+    {
+        <small class="@HelpTextClass">@HelpText</small>
+    }
+    @if (ValueExpression is not null && CurrentEditContext is not null)
+    {
+        <ValidationMessage For="ValueExpression" />
+    }
+</div>
+
+@code {
+    private readonly string _generatedId = $"super-tristate-checkbox-{Guid.NewGuid():N}";
+    private ElementReference _inputRef;
+    private IJSObjectReference? _jsModule;
+    private bool? _lastRenderedValue;
+    private bool _indeterminateApplied;
+
+    [CascadingParameter]
+    public EditContext? CurrentEditContext { get; set; }
+
+    [Parameter]
+    public bool? Value { get; set; }
+
+    [Parameter]
+    public EventCallback<bool?> ValueChanged { get; set; }
+
+    [Parameter]
+    public Expression<Func<bool?>>? ValueExpression { get; set; }
+
+    [Parameter]
+    public string? Label { get; set; }
+
+    [Parameter]
+    public string? HelpText { get; set; }
+
+    [Parameter]
+    public string? Id { get; set; }
+
+    [Parameter]
+    public string? Name { get; set; }
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    [Parameter]
+    public string CssClass { get; set; } = string.Empty;
+
+    [Parameter]
+    public string WrapperCssClass { get; set; } = string.Empty;
+
+    [Parameter]
+    public string LabelCssClass { get; set; } = string.Empty;
+
+    [Parameter]
+    public string HelpTextCssClass { get; set; } = string.Empty;
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IReadOnlyDictionary<string, object>? CapturedAttributes { get; set; }
+
+    private FieldIdentifier? _fieldIdentifier;
+
+    private string EffectiveId => string.IsNullOrWhiteSpace(Id) ? _generatedId : Id;
+
+    private string WrapperClass => string.Join(" ", new[]
+    {
+        "form-check",
+        "super-tristate-checkbox",
+        WrapperCssClass
+    }.Where(i => !string.IsNullOrWhiteSpace(i)));
+
+    private string InputClass => string.Join(" ", new[]
+    {
+        "form-check-input",
+        "super-tristate-checkbox-input",
+        CssClass
+    }.Where(i => !string.IsNullOrWhiteSpace(i)));
+
+    private string LabelClass => string.Join(" ", new[]
+    {
+        "form-check-label",
+        LabelCssClass
+    }.Where(i => !string.IsNullOrWhiteSpace(i)));
+
+    private string HelpTextClass => string.Join(" ", new[]
+    {
+        "form-text",
+        "text-muted",
+        "d-block",
+        HelpTextCssClass
+    }.Where(i => !string.IsNullOrWhiteSpace(i)));
+
+    private string AriaChecked => Value switch
+    {
+        true => "true",
+        false => "false",
+        null => "mixed"
+    };
+
+    protected override void OnParametersSet()
+    {
+        if (ValueExpression is not null)
+        {
+            _fieldIdentifier = FieldIdentifier.Create(ValueExpression);
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                "import", "./_content/SuperBlazorComponents/Components/SuperTriStateCheckbox/SuperTriStateCheckbox.razor.js");
+        }
+
+        if (_jsModule is not null && (!_indeterminateApplied || _lastRenderedValue != Value))
+        {
+            await _jsModule.InvokeVoidAsync("setIndeterminate", _inputRef, Value is null);
+            _lastRenderedValue = Value;
+            _indeterminateApplied = true;
+        }
+    }
+
+    private async Task ToggleAsync()
+    {
+        if (Disabled)
+        {
+            return;
+        }
+
+        var newValue = Value switch
+        {
+            null => true,
+            true => false,
+            false => (bool?)null
+        };
+
+        Value = newValue;
+
+        if (ValueChanged.HasDelegate)
+        {
+            await ValueChanged.InvokeAsync(newValue);
+        }
+
+        if (CurrentEditContext is not null && _fieldIdentifier is not null)
+        {
+            CurrentEditContext.NotifyFieldChanged(_fieldIdentifier.Value);
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_jsModule is not null)
+        {
+            try
+            {
+                await _jsModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+                // Circuit is disconnected, ignore.
+            }
+        }
+    }
+}
