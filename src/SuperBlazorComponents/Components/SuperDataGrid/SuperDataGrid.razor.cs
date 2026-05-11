@@ -36,6 +36,8 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 	private bool _settingsLoaded;
 	private int _totalItemCount;
 	private List<TItem> _renderedItems = [];
+	private List<TItem> _hierarchicalRootItems = [];
+	private bool _hierarchicalRootItemsLoaded;
 	private Dictionary<object, int> _rowNumberLookup = [];
 	private readonly Dictionary<object, HierarchyRowState> _hierarchyState = [];
 	private object? _currentRowKey;
@@ -444,6 +446,13 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 	{
 		ResetHierarchyState();
 
+		if (IsHierarchicalRenderingEnabled())
+		{
+			await LoadHierarchicalRootItemsAsync(CancellationToken.None);
+			StateHasChanged();
+			return;
+		}
+
 		if (_virtualizeRef is not null)
 		{
 			await _virtualizeRef.RefreshDataAsync();
@@ -452,8 +461,8 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 	}
 
 	/// <summary>
-	/// Expands every currently rendered root row and recursively expands its descendants.
-	/// Root rows remain governed by virtualization, so only rows loaded in the current viewport/page are expanded.
+	/// Expands every loaded root row and recursively expands its descendants.
+	/// In hierarchical mode, root rows are rendered without virtualization to keep row heights stable.
 	/// </summary>
 	public async Task ExpandAllAsync(CancellationToken cancellationToken = default)
 	{
@@ -619,6 +628,14 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 			await _jsModule.InvokeVoidAsync("initialize", _containerRef, _dotNetRef);
 			await LoadSettingsAsync();
 			GridInstanceReady?.Invoke(this);
+		}
+	}
+
+	protected override async Task OnParametersSetAsync()
+	{
+		if (IsHierarchicalRenderingEnabled() && !_hierarchicalRootItemsLoaded && ItemsProvider is not null)
+		{
+			await LoadHierarchicalRootItemsAsync(CancellationToken.None);
 		}
 	}
 
@@ -1235,6 +1252,10 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 		{
 			await _virtualizeRef.RefreshDataAsync();
 		}
+		else if (IsHierarchicalRenderingEnabled())
+		{
+			await LoadHierarchicalRootItemsAsync(CancellationToken.None);
+		}
 
 		StateHasChanged();
 	}
@@ -1435,6 +1456,67 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 	private int GetRowNumberWidth()
 	{
 		return Hierarchical ? 78 : ROW_NUMBER_WIDTH;
+	}
+
+	private bool IsHierarchicalRenderingEnabled()
+	{
+		return Hierarchical && GridOrientation == SuperDataGridOrientation.Horizontal;
+	}
+
+	private async Task LoadHierarchicalRootItemsAsync(CancellationToken cancellationToken)
+	{
+		_isLoading = true;
+		_hierarchicalRootItemsLoaded = true;
+
+		try
+		{
+			var providerRequest = new GridItemsProviderRequest<TItem>(
+				StartIndex: 0,
+				Count: null,
+				SortColumn: _sortColumn,
+				SortDirection: _sortDirection,
+				Filters: _filterInfoList,
+				CancellationToken: cancellationToken);
+
+			var providerResult = await ItemsProvider(providerRequest);
+			_totalItemCount = providerResult.TotalItemCount;
+			ResetHierarchyState();
+
+			_hierarchicalRootItems = providerResult.Items.ToList();
+			_renderedItems = _hierarchicalRootItems;
+			for (var i = 0; i < _renderedItems.Count; i++)
+			{
+				var rowNumber = i + 1;
+				SetRowNumber(_renderedItems[i], rowNumber);
+				_rowNumberLookup[_renderedItems[i]!] = rowNumber;
+			}
+
+			if (DataLoaded.HasDelegate)
+			{
+				await DataLoaded.InvokeAsync(new SuperDataGridDataLoadedEventArgs<TItem>(
+					_renderedItems,
+					providerResult.TotalItemCount,
+					0,
+					_renderedItems.Count));
+			}
+
+			SyncRenderedItemsSelectionState();
+		}
+		catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+		{
+			throw;
+		}
+		catch (Exception ex)
+		{
+			Logger.LogError(ex, "Error loading hierarchical root items in SuperDataGrid");
+			throw;
+		}
+		finally
+		{
+			_isLoading = false;
+			DataReloaded?.Invoke();
+			_ = InvokeAsync(StateHasChanged);
+		}
 	}
 
 	private IReadOnlyList<HierarchyGridRow> GetHierarchyRows(TItem item)

@@ -155,7 +155,7 @@ The request object sent to your data provider:
 
 When `Hierarchical="true"`, SuperDataGrid reuses the same `ItemsProvider` for root rows and child rows:
 
-- Root requests keep the normal virtualized paging behavior.
+- In hierarchical mode, root rows are loaded without `Virtualize` because expanded rows create variable item heights.
 - Child requests are sent when a row is expanded.
 - Child requests use `StartIndex = 0`, `Count = null`, the current sort/filter state, and parent context through `ParentItem`, `ParentKey`, and `HierarchyLevel`.
 - Parent and child rows must be the same `TItem` type.
@@ -405,7 +405,7 @@ Each column supports four templates:
 | Method | Returns | Description |
 |---|---|---|
 | `ReloadAsync()` | `Task` | Refreshes the grid data from the `ItemsProvider` |
-| `ExpandAllAsync(CancellationToken)` | `Task` | Expands all currently rendered root rows and recursively loads descendants |
+| `ExpandAllAsync(CancellationToken)` | `Task` | Expands all loaded root rows and recursively loads descendants |
 | `CollapseAllAsync()` | `Task` | Collapses all expanded hierarchy rows and removes loaded descendants |
 | `ResetColumnSettingsAsync()` | `Task` | Resets all columns to their default width, visibility, and order |
 | `GetColumnSettings()` | `IEnumerable<SuperDataGridColumnSettings>` | Returns the current column settings |
@@ -1493,7 +1493,7 @@ Enable hierarchical mode when parent and child rows share the same `TItem` type 
 Notes:
 
 - The row-number column becomes the hierarchy column and displays `+`, `-`, or an empty placeholder.
-- Root rows remain virtualized; `ExpandAllAsync` expands only root rows currently rendered by virtualization.
+- Hierarchical mode disables root `Virtualize` and loads root rows with `Count = null` to avoid variable-height virtualization issues.
 - Child rows are requested with `Count = null` and are expected to be returned without paging.
 - Collapsing a row or calling `CollapseAllAsync` discards loaded descendants, so the next expansion performs a fresh provider call.
 

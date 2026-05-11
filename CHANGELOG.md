@@ -2,7 +2,7 @@
 
 All notable changes to SuperBlazorComponents are documented in this file.
 
-## 1.5.41.0
+## 1.5.42.0
 
 ### Added
 
@@ -21,5 +21,5 @@ All notable changes to SuperBlazorComponents are documented in this file.
 ### Notes
 
 - Parent and child rows must use the same `TItem` type.
-- Root rows remain virtualized; child rows are rendered inline under the currently rendered root rows.
+- Hierarchical mode renders root rows without `Virtualize` so expanded child rows do not break Blazor's fixed item-size virtualization assumptions.
 - Child rows are expected to be returned without paging.
