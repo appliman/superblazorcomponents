@@ -37,6 +37,7 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 	private int _totalItemCount;
 	private List<TItem> _renderedItems = [];
 	private Dictionary<object, int> _rowNumberLookup = [];
+	private readonly Dictionary<object, HierarchyRowState> _hierarchyState = [];
 	private object? _currentRowKey;
 	private readonly HashSet<object> _editingItemKeys = [];
 
@@ -227,6 +228,12 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 
 	[Parameter]
 	public bool DisplayRowNumberColumn { get; set; } = true;
+
+	[Parameter]
+	public bool Hierarchical { get; set; }
+
+	[Parameter]
+	public Func<TItem, object?>? HierarchyKeySelector { get; set; }
 
 	[Parameter]
 	public bool DisplayRefreshButton { get; set; } = false;
@@ -435,11 +442,42 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 	/// </summary>
 	public async Task ReloadAsync()
 	{
+		ResetHierarchyState();
+
 		if (_virtualizeRef is not null)
 		{
 			await _virtualizeRef.RefreshDataAsync();
 			StateHasChanged();
 		}
+	}
+
+	/// <summary>
+	/// Expands every currently rendered root row and recursively expands its descendants.
+	/// Root rows remain governed by virtualization, so only rows loaded in the current viewport/page are expanded.
+	/// </summary>
+	public async Task ExpandAllAsync(CancellationToken cancellationToken = default)
+	{
+		if (!Hierarchical || _renderedItems.Count == 0)
+		{
+			return;
+		}
+
+		var visitedKeys = new HashSet<object>();
+		foreach (var item in _renderedItems.ToList())
+		{
+			await ExpandHierarchyBranchAsync(item, 0, visitedKeys, cancellationToken);
+		}
+
+		await InvokeAsync(StateHasChanged);
+	}
+
+	/// <summary>
+	/// Collapses all expanded hierarchy rows and removes their loaded descendants from the grid state.
+	/// </summary>
+	public Task CollapseAllAsync()
+	{
+		ResetHierarchyState();
+		return InvokeAsync(StateHasChanged);
 	}
 
 	/// <summary>
@@ -681,6 +719,7 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 	{
 		if (filterInfo is null)
 		{
+			ResetHierarchyState();
 			await ReloadAsync();
 			return;
 		}
@@ -692,6 +731,7 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 		}
 
 		// On relance le chargement des données avec les nouveaux filtres
+		ResetHierarchyState();
 		await ReloadAsync();
 	}
 
@@ -732,6 +772,7 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 
 			var providerResult = await ItemsProvider(providerRequest);
 			_totalItemCount = providerResult.TotalItemCount;
+			ResetHierarchyState();
 
 			_renderedItems = providerResult.Items.ToList();
 			for (var i = 0; i < _renderedItems.Count; i++)
@@ -806,7 +847,7 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 	{
 		var styles = new List<string>();
 
-		styles.Add($"--sdg-row-number-width: {ROW_NUMBER_WIDTH}px");
+		styles.Add($"--sdg-row-number-width: {GetRowNumberWidth()}px");
 		styles.Add($"--sdg-selection-width: {SELECTION_WIDTH}px");
 		styles.Add($"--sdg-actions-width: {ActionsWidth}px");
 
@@ -878,7 +919,7 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 
 			if (DisplayRowNumberColumn)
 			{
-				leftOffsetParts.Add($"{ROW_NUMBER_WIDTH}px");
+				leftOffsetParts.Add($"{GetRowNumberWidth()}px");
 			}
 
 			if (DisplaySelectionColumn)
@@ -1187,6 +1228,7 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 
 		// Invalider le cache car l'ordre des items change
 		InvalidateItemsCache();
+		ResetHierarchyState();
 
 		// Refresh the data with new sort
 		if (_virtualizeRef is not null)
@@ -1389,6 +1431,256 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 
 		return 0;
 	}
+
+	private int GetRowNumberWidth()
+	{
+		return Hierarchical ? 78 : ROW_NUMBER_WIDTH;
+	}
+
+	private IReadOnlyList<HierarchyGridRow> GetHierarchyRows(TItem item)
+	{
+		var rows = new List<HierarchyGridRow>
+		{
+			new(item, 0, GetRowNumber(item))
+		};
+
+		if (Hierarchical)
+		{
+			AppendExpandedChildren(item, 1, rows);
+		}
+
+		return rows;
+	}
+
+	private void AppendExpandedChildren(TItem parent, int level, List<HierarchyGridRow> rows)
+	{
+		var state = GetHierarchyState(parent, create: false);
+		if (state?.IsExpanded != true || state.Children.Count == 0)
+		{
+			return;
+		}
+
+		for (var i = 0; i < state.Children.Count; i++)
+		{
+			var child = state.Children[i];
+			var rowNumber = i + 1;
+			SetRowNumber(child, rowNumber);
+			rows.Add(new HierarchyGridRow(child, level, rowNumber));
+			AppendExpandedChildren(child, level + 1, rows);
+		}
+	}
+
+	private bool ShouldDisplayHierarchyToggle(TItem item)
+	{
+		if (!Hierarchical)
+		{
+			return false;
+		}
+
+		var state = GetHierarchyState(item, create: false);
+		return state?.HasNoChildren != true;
+	}
+
+	private bool IsHierarchyExpanded(TItem item)
+	{
+		var state = GetHierarchyState(item, create: false);
+		return state?.IsExpanded == true;
+	}
+
+	private bool IsHierarchyLoading(TItem item)
+	{
+		var state = GetHierarchyState(item, create: false);
+		return state?.IsLoading == true;
+	}
+
+	private async Task ToggleHierarchyAsync(TItem item, int level)
+	{
+		var state = GetHierarchyState(item, create: true);
+		if (state is null || state.IsLoading)
+		{
+			return;
+		}
+
+		if (state.IsExpanded)
+		{
+			RemoveDescendantHierarchyState(state.Children);
+			state.Children.Clear();
+			state.IsExpanded = false;
+			await InvokeAsync(StateHasChanged);
+			return;
+		}
+
+		state.IsLoading = true;
+		await InvokeAsync(StateHasChanged);
+
+		try
+		{
+			await LoadHierarchyChildrenAsync(item, level, state, CancellationToken.None);
+		}
+		catch (Exception ex)
+		{
+			Logger.LogError(ex, "Error loading child items in SuperDataGrid");
+			throw;
+		}
+		finally
+		{
+			state.IsLoading = false;
+			await InvokeAsync(StateHasChanged);
+		}
+	}
+
+	private async Task ExpandHierarchyBranchAsync(
+		TItem item,
+		int level,
+		HashSet<object> visitedKeys,
+		CancellationToken cancellationToken)
+	{
+		cancellationToken.ThrowIfCancellationRequested();
+
+		var key = GetHierarchyKey(item);
+		if (key is not null && !visitedKeys.Add(key))
+		{
+			return;
+		}
+
+		var state = GetHierarchyState(item, create: true);
+		if (state is null || state.HasNoChildren)
+		{
+			return;
+		}
+
+		state.IsLoading = true;
+		await InvokeAsync(StateHasChanged);
+
+		try
+		{
+			await LoadHierarchyChildrenAsync(item, level, state, cancellationToken);
+		}
+		catch (Exception ex)
+		{
+			Logger.LogError(ex, "Error expanding hierarchy branch in SuperDataGrid");
+			throw;
+		}
+		finally
+		{
+			state.IsLoading = false;
+			await InvokeAsync(StateHasChanged);
+		}
+
+		foreach (var child in state.Children.ToList())
+		{
+			await ExpandHierarchyBranchAsync(child, level + 1, visitedKeys, cancellationToken);
+		}
+	}
+
+	private async Task LoadHierarchyChildrenAsync(
+		TItem item,
+		int level,
+		HierarchyRowState state,
+		CancellationToken cancellationToken)
+	{
+		RemoveDescendantHierarchyState(state.Children);
+		state.Children.Clear();
+		state.IsExpanded = false;
+
+		var parentKey = GetHierarchyKey(item);
+		var providerRequest = new GridItemsProviderRequest<TItem>(
+			StartIndex: 0,
+			Count: null,
+			SortColumn: _sortColumn,
+			SortDirection: _sortDirection,
+			Filters: _filterInfoList,
+			CancellationToken: cancellationToken,
+			ParentItem: item,
+			ParentKey: parentKey,
+			HierarchyLevel: level + 1);
+
+		var providerResult = await ItemsProvider(providerRequest);
+		state.Children = providerResult.Items.ToList();
+		state.HasNoChildren = state.Children.Count == 0;
+		state.IsExpanded = state.Children.Count > 0;
+
+		for (var i = 0; i < state.Children.Count; i++)
+		{
+			SetRowNumber(state.Children[i], i + 1);
+		}
+	}
+
+	private string GetHierarchyRowNumberStyle(int level)
+	{
+		var baseStyle = GetRowNumberCellStyle();
+		if (!Hierarchical || level <= 0)
+		{
+			return baseStyle;
+		}
+
+		return $"{baseStyle} --sdg-hierarchy-level: {level};";
+	}
+
+	private object? GetHierarchyKey(TItem item)
+	{
+		ArgumentNullException.ThrowIfNull(item);
+		return HierarchyKeySelector?.Invoke(item) ?? TryGetItemKey(item) ?? item;
+	}
+
+	private HierarchyRowState? GetHierarchyState(TItem item, bool create)
+	{
+		var key = GetHierarchyKey(item);
+		if (key is null)
+		{
+			return null;
+		}
+
+		if (_hierarchyState.TryGetValue(key, out var state))
+		{
+			return state;
+		}
+
+		if (!create)
+		{
+			return null;
+		}
+
+		state = new HierarchyRowState();
+		_hierarchyState[key] = state;
+		return state;
+	}
+
+	private void ResetHierarchyState()
+	{
+		_hierarchyState.Clear();
+	}
+
+	private void RemoveDescendantHierarchyState(IEnumerable<TItem> items)
+	{
+		foreach (var item in items)
+		{
+			var state = GetHierarchyState(item, create: false);
+			if (state is not null)
+			{
+				RemoveDescendantHierarchyState(state.Children);
+			}
+
+			var key = GetHierarchyKey(item);
+			if (key is not null)
+			{
+				_hierarchyState.Remove(key);
+			}
+		}
+	}
+
+	private sealed class HierarchyRowState
+	{
+		public bool IsExpanded { get; set; }
+
+		public bool IsLoading { get; set; }
+
+		public bool HasNoChildren { get; set; }
+
+		public List<TItem> Children { get; set; } = [];
+	}
+
+	private readonly record struct HierarchyGridRow(TItem Item, int Level, int RowNumber);
 
 	private static void SetRowNumber(TItem item, int rowNumber)
 	{

@@ -252,54 +252,93 @@
                                 OverscanCount="@OverscanCount"
                                 SpacerElement="tr">
                         <ItemContent Context="item">
-                            <tr class="@GetRowClass(item)"
-                                @onclick="@(() => OnRowClick(item))"
-                                @ondblclick="@(() => OnRowDoubleClick(item))">
-                                @if (DisplayRowNumberColumn)
-                                {
-                                    <td class="sdg-row-number-cell sdg-frozen-left" style="@GetRowNumberCellStyle()">@GetRowNumber(item)</td>
-                                }
-                                @if (DisplaySelectionColumn)
-                                {
-                                    <td class="sdg-selection-cell sdg-frozen-left" style="@GetSelectionColumnStyle()"
-                                        @onclick:stopPropagation>
-                                        <input type="checkbox"
-                                               class="form-check-input"
-                                               checked="@IsRowSelected(item)"
-                                               @onchange="@(e => OnSelectionCheckboxChangeAsync(item, e))"
-                                               @onclick:stopPropagation />
-                                    </td>
-                                }
-                                @if (ActionsTemplate is not null)
-                                {
-                                    <td class="sdg-actions-cell sdg-frozen-left" style="@GetActionsColumnStyle()"
-                                        @onclick:stopPropagation>
-                                        <div class="sdg-actions-content">
-                                            @ActionsTemplate(item)
-                                        </div>
-                                    </td>
-                                }
-                                @foreach (var column in visibleColumns)
-                                {
-                                    <td class="@GetCellClass(column, item)"
-                                        style="@GetCombinedCellStyle(column)"
-                                        @onclick="@(() => OnCellClick(item, column))"
-                                        @onclick:stopPropagation="@CellClicked.HasDelegate">
-                                        @if ((EditionMode == SuperDataGridEditionMode.Edit || IsRowInEditMode(item)) && column.EditTemplate is not null)
-                                        {
-                                            @column.EditTemplate(item)
-                                        }
-                                        else if (column.Template is not null)
-                                        {
-                                            @column.Template(item)
-                                        }
-                                        else
-                                        {
-                                            @GetCellValue(column, item)
-                                        }
-                                    </td>
-                                }
-                            </tr>
+                            @foreach (var hierarchyRow in GetHierarchyRows(item))
+                            {
+                                var rowItem = hierarchyRow.Item;
+                                <tr class="@GetRowClass(rowItem) @(hierarchyRow.Level > 0 ? "sdg-hierarchy-child-row" : "")"
+                                    @onclick="@(() => OnRowClick(rowItem))"
+                                    @ondblclick="@(() => OnRowDoubleClick(rowItem))">
+                                    @if (DisplayRowNumberColumn)
+                                    {
+                                        <td class="sdg-row-number-cell sdg-frozen-left @(Hierarchical ? "sdg-hierarchy-row-number-cell" : "")"
+                                            style="@GetHierarchyRowNumberStyle(hierarchyRow.Level)">
+                                            @if (Hierarchical)
+                                            {
+                                                <div class="sdg-hierarchy-row-number">
+                                                    @if (ShouldDisplayHierarchyToggle(rowItem))
+                                                    {
+                                                        <button type="button"
+                                                                class="sdg-hierarchy-toggle"
+                                                                disabled="@IsHierarchyLoading(rowItem)"
+                                                                aria-expanded="@IsHierarchyExpanded(rowItem)"
+                                                                title="@(IsHierarchyExpanded(rowItem) ? "Collapse" : "Expand")"
+                                                                @onclick="@(() => ToggleHierarchyAsync(rowItem, hierarchyRow.Level))"
+                                                                @onclick:stopPropagation>
+                                                            @if (IsHierarchyLoading(rowItem))
+                                                            {
+                                                                <span class="sdg-hierarchy-loading" aria-hidden="true"></span>
+                                                            }
+                                                            else
+                                                            {
+                                                                @(IsHierarchyExpanded(rowItem) ? "-" : "+")
+                                                            }
+                                                        </button>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="sdg-hierarchy-toggle-placeholder"></span>
+                                                    }
+                                                    <span class="sdg-hierarchy-number">@hierarchyRow.RowNumber</span>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                @GetRowNumber(rowItem)
+                                            }
+                                        </td>
+                                    }
+                                    @if (DisplaySelectionColumn)
+                                    {
+                                        <td class="sdg-selection-cell sdg-frozen-left" style="@GetSelectionColumnStyle()"
+                                            @onclick:stopPropagation>
+                                            <input type="checkbox"
+                                                   class="form-check-input"
+                                                   checked="@IsRowSelected(rowItem)"
+                                                   @onchange="@(e => OnSelectionCheckboxChangeAsync(rowItem, e))"
+                                                   @onclick:stopPropagation />
+                                        </td>
+                                    }
+                                    @if (ActionsTemplate is not null)
+                                    {
+                                        <td class="sdg-actions-cell sdg-frozen-left" style="@GetActionsColumnStyle()"
+                                            @onclick:stopPropagation>
+                                            <div class="sdg-actions-content">
+                                                @ActionsTemplate(rowItem)
+                                            </div>
+                                        </td>
+                                    }
+                                    @foreach (var column in visibleColumns)
+                                    {
+                                        <td class="@GetCellClass(column, rowItem)"
+                                            style="@GetCombinedCellStyle(column)"
+                                            @onclick="@(() => OnCellClick(rowItem, column))"
+                                            @onclick:stopPropagation="@CellClicked.HasDelegate">
+                                            @if ((EditionMode == SuperDataGridEditionMode.Edit || IsRowInEditMode(rowItem)) && column.EditTemplate is not null)
+                                            {
+                                                @column.EditTemplate(rowItem)
+                                            }
+                                            else if (column.Template is not null)
+                                            {
+                                                @column.Template(rowItem)
+                                            }
+                                            else
+                                            {
+                                                @GetCellValue(column, rowItem)
+                                            }
+                                        </td>
+                                    }
+                                </tr>
+                            }
                         </ItemContent>
                         <Placeholder Context="placeholderContext">
                             <tr class="sdg-placeholder-row">

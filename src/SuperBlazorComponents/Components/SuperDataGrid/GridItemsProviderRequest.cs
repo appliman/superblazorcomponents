@@ -10,5 +10,11 @@ public readonly record struct GridItemsProviderRequest<TItem>(
     string? SortColumn,
     SortDirection SortDirection,
     IEnumerable<SuperDataGridFilterInfo> Filters,
-    CancellationToken CancellationToken
-);
+    CancellationToken CancellationToken,
+    TItem? ParentItem = default,
+    object? ParentKey = null,
+    int HierarchyLevel = 0
+)
+{
+    public bool IsHierarchyRequest => ParentKey is not null;
+}
