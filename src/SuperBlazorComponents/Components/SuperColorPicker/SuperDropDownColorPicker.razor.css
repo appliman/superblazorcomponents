@@ -1,0 +1,128 @@
+/* ── Wrapper ───────────────────────────────────────────────────────── */
+
+.scpdd-wrapper {
+    display: inline-block;
+    font-size: 0.875rem;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.scpdd-wrapper.scpdd-disabled {
+    opacity: 0.55;
+    pointer-events: none;
+}
+
+.scpdd-label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.375rem;
+    cursor: pointer;
+}
+
+/* ── Anchor (position context for the popup) ───────────────────────── */
+
+.scpdd-anchor {
+    position: relative;
+    display: inline-block;
+}
+
+/* ── Trigger button ─────────────────────────────────────────────────── */
+
+.scpdd-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.3rem 0.55rem 0.3rem 0.4rem;
+    background: var(--bs-body-bg, #fff);
+    border: 1px solid var(--bs-border-color, #dee2e6);
+    border-radius: 0.375rem;
+    cursor: pointer;
+    color: var(--bs-body-color, #212529);
+    font-size: 0.875rem;
+    line-height: 1;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.scpdd-trigger:hover:not(:disabled) {
+    border-color: var(--bs-secondary-color, #6c757d);
+}
+
+.scpdd-trigger:focus-visible {
+    outline: none;
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.scpdd-trigger:disabled {
+    cursor: default;
+}
+
+/* ── Color swatch circle inside the button ─────────────────────────── */
+
+.scpdd-swatch {
+    position: relative;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 1.5px solid rgba(0, 0, 0, 0.18);
+}
+
+.scpdd-checker,
+.scpdd-color {
+    position: absolute;
+    inset: 0;
+}
+
+/* Checkerboard shown through transparent colors */
+.scpdd-checker {
+    background-image:
+        linear-gradient(45deg, #bbb 25%, transparent 25%),
+        linear-gradient(-45deg, #bbb 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #bbb 75%),
+        linear-gradient(-45deg, transparent 75%, #bbb 75%);
+    background-size: 6px 6px;
+    background-position: 0 0, 0 3px, 3px -3px, -3px 0px;
+    background-color: #fff;
+}
+
+/* ── Dropdown caret ─────────────────────────────────────────────────── */
+
+.scpdd-caret {
+    font-size: 0.7rem;
+    color: var(--bs-secondary-color, #6c757d);
+    line-height: 1;
+    margin-top: 1px;
+}
+
+/* ── Popup ──────────────────────────────────────────────────────────── */
+
+.scpdd-popup {
+    position: absolute;
+    top: calc(100% + 5px);
+    left: 0;
+    z-index: 1050;
+    animation: scpdd-fadein 0.12s ease-out;
+}
+
+@keyframes scpdd-fadein {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ── Backdrop ───────────────────────────────────────────────────────── */
+
+.scpdd-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1049;
+    background: transparent;
+}

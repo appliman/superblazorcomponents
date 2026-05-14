@@ -1,0 +1,435 @@
+@namespace SuperBlazorComponents.Components.SuperColorPicker
+@using System.Globalization
+@using System.Linq.Expressions
+@using Microsoft.AspNetCore.Components.Forms
+@implements IAsyncDisposable
+@inject IJSRuntime JSRuntime
+
+<div class="@WrapperClass">
+
+    @if (!string.IsNullOrWhiteSpace(Label))
+    {
+        <label class="form-label scp-label">@Label</label>
+    }
+
+    <div class="scp-picker">
+
+        <!-- ── Saturation / Value area ─────────────────────────────── -->
+        <div class="scp-sv-area" @ref="_svAreaRef" style="background-color: hsl(@HueStr, 100%, 50%)">
+            <div class="scp-sv-white"></div>
+            <div class="scp-sv-black"></div>
+            <div class="scp-sv-cursor" style="left:@SatStr%;top:@ValStr%">
+                <div class="scp-sv-ring"></div>
+            </div>
+        </div>
+
+        <!-- ── Hue + Alpha sliders ─────────────────────────────────── -->
+        <div class="scp-slider-row">
+            <div class="scp-swatch">
+                <div class="scp-swatch-color" style="background-color:@CurrentColor"></div>
+            </div>
+            <div class="scp-sliders">
+                <div class="scp-hue-track" @ref="_hueTrackRef">
+                    <div class="scp-hue-rail"></div>
+                    <div class="scp-thumb" style="left:@HuePercStr%"></div>
+                </div>
+                <div class="scp-alpha-track @(ShowAlpha ? "" : "scp-hidden")" @ref="_alphaTrackRef">
+                    <div class="scp-checker"></div>
+                    <div class="scp-alpha-rail"
+                         style="background:linear-gradient(to right,transparent,hsl(@HueStr,100%,50%))"></div>
+                    <div class="scp-thumb" style="left:@AlphaPercStr%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Input row ───────────────────────────────────────────── -->
+        <div class="scp-inputs-row">
+
+            @if (_mode == ColorInputMode.Hex)
+            {
+                <div class="scp-field scp-field-wide">
+                    <input type="text" class="form-control form-control-sm scp-input" value="@_hexInput"
+                           disabled="@Disabled" @onchange="OnHexChange" maxlength="9" spellcheck="false" autocomplete="off" />
+                    <span class="scp-input-label">HEX</span>
+                </div>
+            }
+            else
+            {
+                <div class="scp-field">
+                    <input type="number" class="form-control form-control-sm scp-input" min="0" max="255" value="@_r"
+                           disabled="@Disabled" @onchange="@(e => OnChannelChange(e, 0))" />
+                    <span class="scp-input-label">R</span>
+                </div>
+                <div class="scp-field">
+                    <input type="number" class="form-control form-control-sm scp-input" min="0" max="255" value="@_g"
+                           disabled="@Disabled" @onchange="@(e => OnChannelChange(e, 1))" />
+                    <span class="scp-input-label">G</span>
+                </div>
+                <div class="scp-field">
+                    <input type="number" class="form-control form-control-sm scp-input" min="0" max="255" value="@_b"
+                           disabled="@Disabled" @onchange="@(e => OnChannelChange(e, 2))" />
+                    <span class="scp-input-label">B</span>
+                </div>
+                @if (ShowAlpha)
+                {
+                    <div class="scp-field">
+                        <input type="number" class="form-control form-control-sm scp-input" min="0" max="255" value="@_a"
+                               disabled="@Disabled" @onchange="@(e => OnChannelChange(e, 3))" />
+                        <span class="scp-input-label">A</span>
+                    </div>
+                }
+            }
+
+            <button type="button" class="scp-toggle-btn btn btn-sm btn-outline-secondary" @onclick="ToggleMode"
+                    disabled="@Disabled" title="Basculer HEX / RGB(A)">⇄</button>
+
+        </div>
+    </div>
+</div>
+
+@code {
+    private readonly string _id = $"scp-{Guid.NewGuid():N}";
+
+    private ElementReference _svAreaRef;
+    private ElementReference _hueTrackRef;
+    private ElementReference _alphaTrackRef;
+
+    private IJSObjectReference? _js;
+    private DotNetObjectReference<SuperColorPicker>? _dotnet;
+    private int _jsId;
+
+    // ── Internal state (HSV + alpha) ─────────────────────────────────
+    private double _hue = 210; // 0–360
+    private double _sat = 0.70; // 0–1
+    private double _val = 0.85; // 0–1
+    private double _alpha = 1.0; // 0–1
+
+    // Derived RGB channels (0–255)
+    private int _r, _g, _b;
+    private int _a = 255;
+
+    private string _hexInput = string.Empty;
+    private ColorInputMode _mode = ColorInputMode.Hex;
+
+    private string? _prevValue;
+
+    // ── Parameters ────────────────────────────────────────────────────
+
+    /// <summary>Hex color value: #RRGGBB or #RRGGBBAA when ShowAlpha is true.</summary>
+    [Parameter] public string? Value { get; set; }
+
+    [Parameter] public EventCallback<string?> ValueChanged { get; set; }
+
+    [Parameter] public Expression<Func<string?>>? ValueExpression { get; set; }
+
+    /// <summary>Optional label displayed above the picker.</summary>
+    [Parameter] public string? Label { get; set; }
+
+    /// <summary>Show the alpha (opacity) slider and channel input.</summary>
+    [Parameter] public bool ShowAlpha { get; set; }
+
+    /// <summary>Disables all interactions.</summary>
+    [Parameter] public bool Disabled { get; set; }
+
+    /// <summary>Additional CSS class on the wrapper element.</summary>
+    [Parameter] public string? CssClass { get; set; }
+
+    [CascadingParameter] public EditContext? CurrentEditContext { get; set; }
+
+    // ── Computed helpers ─────────────────────────────────────────────
+
+    private string WrapperClass => string.Join(" ", new[]
+        { "scp-wrapper", Disabled ? "scp-disabled" : null, CssClass }
+        .Where(s => !string.IsNullOrWhiteSpace(s)));
+
+    private string HueStr => _hue.ToString("F0", CultureInfo.InvariantCulture);
+    private string SatStr => (_sat * 100).ToString("F2", CultureInfo.InvariantCulture);
+    private string ValStr => ((1 - _val) * 100).ToString("F2", CultureInfo.InvariantCulture);
+    private string HuePercStr => (_hue / 360.0 * 100).ToString("F2", CultureInfo.InvariantCulture);
+    private string AlphaPercStr => (_alpha * 100).ToString("F2", CultureInfo.InvariantCulture);
+
+    private string CurrentColor => ShowAlpha && _alpha < 1.0
+        ? $"rgba({_r},{_g},{_b},{_alpha.ToString("F2", CultureInfo.InvariantCulture)})"
+        : $"#{_r:X2}{_g:X2}{_b:X2}";
+
+    // ── Lifecycle ─────────────────────────────────────────────────────
+
+    protected override void OnInitialized()
+    {
+        if (!string.IsNullOrWhiteSpace(Value))
+        {
+            ParseColor(Value);
+        }
+        else
+        {
+            SyncRgbFromHsv();
+        }
+
+        RefreshHex();
+        _prevValue = Value;
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (Value != _prevValue)
+        {
+            _prevValue = Value;
+            if (!string.IsNullOrWhiteSpace(Value))
+            {
+                ParseColor(Value);
+                RefreshHex();
+            }
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        _js = await JSRuntime.InvokeAsync<IJSObjectReference>(
+            "import",
+            "./_content/SuperBlazorComponents/Components/SuperColorPicker/SuperColorPicker.razor.js");
+
+        _dotnet = DotNetObjectReference.Create(this);
+
+        _jsId = await _js.InvokeAsync<int>(
+            "initialize", _dotnet, _svAreaRef, _hueTrackRef, _alphaTrackRef, ShowAlpha);
+    }
+
+    // ── JS invokable ─────────────────────────────────────────────────
+
+    [JSInvokable]
+    public async Task OnDrag(string type, double x, double y)
+    {
+        if (Disabled)
+        {
+            return;
+        }
+
+        switch (type)
+        {
+            case "sv":
+                _sat = Math.Clamp(x, 0, 1);
+                _val = Math.Clamp(1 - y, 0, 1);
+                SyncRgbFromHsv();
+                break;
+
+            case "hue":
+                _hue = Math.Clamp(x, 0, 1) * 360;
+                SyncRgbFromHsv();
+                break;
+
+            case "alpha":
+                _alpha = Math.Clamp(x, 0, 1);
+                _a = (int)Math.Round(_alpha * 255);
+                break;
+        }
+
+        RefreshHex();
+        await NotifyChange();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    // ── UI event handlers ────────────────────────────────────────────
+
+    private async Task OnHexChange(ChangeEventArgs e)
+    {
+        var raw = e.Value?.ToString() ?? string.Empty;
+        _hexInput = raw;
+
+        if (TryParseHex(raw, out var r, out var g, out var b, out var a))
+        {
+            (_r, _g, _b) = (r, g, b);
+            if (ShowAlpha) { _a = a; _alpha = a / 255.0; }
+            SyncHsvFromRgb();
+            await NotifyChange();
+        }
+    }
+
+    private async Task OnChannelChange(ChangeEventArgs e, int channel)
+    {
+        if (!int.TryParse(e.Value?.ToString(), out var v))
+        {
+            return;
+        }
+        v = Math.Clamp(v, 0, 255);
+
+        switch (channel)
+        {
+            case 0: _r = v; break;
+            case 1: _g = v; break;
+            case 2: _b = v; break;
+            case 3: _a = v; _alpha = v / 255.0; break;
+        }
+
+        if (channel < 3)
+        {
+            SyncHsvFromRgb();
+        }
+        RefreshHex();
+        await NotifyChange();
+    }
+
+    private void ToggleMode() =>
+        _mode = _mode == ColorInputMode.Hex ? ColorInputMode.Rgba : ColorInputMode.Hex;
+
+    // ── Helpers ───────────────────────────────────────────────────────
+
+    private void ParseColor(string color)
+    {
+        if (TryParseHex(color.Trim(), out var r, out var g, out var b, out var a))
+        {
+            (_r, _g, _b) = (r, g, b);
+            _a = a;
+            _alpha = a / 255.0;
+            SyncHsvFromRgb();
+        }
+    }
+
+    private static bool TryParseHex(string raw, out int r, out int g, out int b, out int a)
+    {
+        r = g = b = 0; a = 255;
+
+        if (string.IsNullOrWhiteSpace(raw))
+        {
+            return false;
+        }
+
+        var hex = raw.TrimStart('#');
+
+        if (hex.Length == 3)
+        {
+            hex = $"{hex[0]}{hex[0]}{hex[1]}{hex[1]}{hex[2]}{hex[2]}";
+        }
+
+        if (hex.Length == 6)
+        {
+            if (!uint.TryParse(hex, NumberStyles.HexNumber, null, out var v)) return false;
+            r = (int)((v >> 16) & 0xFF);
+            g = (int)((v >> 8) & 0xFF);
+            b = (int)(v & 0xFF);
+            return true;
+        }
+
+        if (hex.Length == 8)
+        {
+            if (!uint.TryParse(hex[..6], NumberStyles.HexNumber, null, out var v)) return false;
+            if (!int.TryParse(hex[6..], NumberStyles.HexNumber, null, out a)) return false;
+            r = (int)((v >> 16) & 0xFF);
+            g = (int)((v >> 8) & 0xFF);
+            b = (int)(v & 0xFF);
+            return true;
+        }
+
+        return false;
+    }
+
+    private void SyncRgbFromHsv() => (_r, _g, _b) = HsvToRgb(_hue, _sat, _val);
+    private void SyncHsvFromRgb() => (_hue, _sat, _val) = RgbToHsv(_r, _g, _b);
+
+    private void RefreshHex() =>
+        _hexInput = ShowAlpha
+            ? $"#{_r:X2}{_g:X2}{_b:X2}{_a:X2}"
+            : $"#{_r:X2}{_g:X2}{_b:X2}";
+
+    private async Task NotifyChange()
+    {
+        var hex = ShowAlpha
+            ? $"#{_r:X2}{_g:X2}{_b:X2}{_a:X2}"
+            : $"#{_r:X2}{_g:X2}{_b:X2}";
+
+        _prevValue = hex;
+        await ValueChanged.InvokeAsync(hex);
+
+        if (ValueExpression is not null && CurrentEditContext is not null)
+        {
+            CurrentEditContext.NotifyFieldChanged(FieldIdentifier.Create(ValueExpression));
+        }
+    }
+
+    // ── Color math ────────────────────────────────────────────────────
+
+    private static (int r, int g, int b) HsvToRgb(double h, double s, double v)
+    {
+        if (s <= 0)
+        {
+            var c = (int)Math.Round(v * 255);
+            return (c, c, c);
+        }
+
+        var hh = h / 60.0;
+        var i = (int)Math.Floor(hh) % 6;
+        var f = hh - Math.Floor(hh);
+
+        var p = v * (1 - s);
+        var q = v * (1 - f * s);
+        var t = v * (1 - (1 - f) * s);
+
+        static int R(double x) => Math.Clamp((int)Math.Round(x * 255), 0, 255);
+
+        return i switch
+        {
+            0 => (R(v), R(t), R(p)),
+            1 => (R(q), R(v), R(p)),
+            2 => (R(p), R(v), R(t)),
+            3 => (R(p), R(q), R(v)),
+            4 => (R(t), R(p), R(v)),
+            _ => (R(v), R(p), R(q)),
+        };
+    }
+
+    private static (double h, double s, double v) RgbToHsv(int r, int g, int b)
+    {
+        var rd = r / 255.0;
+        var gd = g / 255.0;
+        var bd = b / 255.0;
+
+        var max = Math.Max(rd, Math.Max(gd, bd));
+        var min = Math.Min(rd, Math.Min(gd, bd));
+        var d = max - min;
+
+        double h = 0;
+        var s = max == 0 ? 0 : d / max;
+        var v = max;
+
+        if (d > 0)
+        {
+            if (max == rd)
+            {
+                h = 60 * (((gd - bd) / d) % 6);
+            }
+            else if (max == gd)
+            {
+                h = 60 * (((bd - rd) / d) + 2);
+            }
+            else
+            {
+                h = 60 * (((rd - gd) / d) + 4);
+            }
+
+            if (h < 0)
+            {
+                h += 360;
+            }
+        }
+
+        return (h, s, v);
+    }
+
+    // ── IAsyncDisposable ─────────────────────────────────────────────
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_js is not null)
+        {
+            try { await _js.InvokeVoidAsync("dispose", _jsId); } catch { }
+            await _js.DisposeAsync();
+        }
+        _dotnet?.Dispose();
+    }
+
+    private enum ColorInputMode { Hex, Rgba }
+}

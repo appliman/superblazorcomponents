@@ -1,0 +1,329 @@
+@page "/super-color-picker-demo"
+@using SuperBlazorComponents.Components.SuperColorPicker
+
+<PageTitle>SuperColorPicker Demo</PageTitle>
+
+<h1>SuperColorPicker</h1>
+
+<p class="text-muted">
+    Sélecteur de couleur interactif avec modes HSV, HEX et RGB(A).
+    Inspiré de <a href="https://blazor.radzen.com/colorpicker" target="_blank">Radzen ColorPicker</a>.
+</p>
+
+@* ── Basic ─────────────────────────────────────────────────────────── *@
+
+<h2 class="mt-4">Basique</h2>
+
+<div class="card mt-3">
+    <div class="card-header">Utilisation minimale</div>
+    <div class="card-body">
+        <p class="text-muted mb-3">
+            Lier la valeur via <code>@("@bind-Value")</code>. Le composant émet un code HEX <code>#RRGGBB</code>.
+        </p>
+
+        <SuperColorPicker @bind-Value="_basicColor" />
+
+        <div class="alert alert-light border mt-3 mb-0 d-flex align-items-center gap-3">
+            <div
+                style="width:2rem;height:2rem;border-radius:.375rem;border:1px solid #dee2e6;background-color:@_basicColor">
+            </div>
+            <span>Valeur : <strong>@_basicColor</strong></span>
+        </div>
+    </div>
+</div>
+
+@* ── With label ────────────────────────────────────────────────────── *@
+
+<h2 class="mt-4">Avec label</h2>
+
+<div class="card mt-3">
+    <div class="card-header">Paramètre Label</div>
+    <div class="card-body">
+        <p class="text-muted mb-3">
+            Le paramètre <code>Label</code> affiche un libellé au-dessus du picker.
+        </p>
+
+        <SuperColorPicker Label="Couleur de fond" @bind-Value="_labelColor" />
+
+        <div class="alert alert-light border mt-3 mb-0 d-flex align-items-center gap-3">
+            <div
+                style="width:2rem;height:2rem;border-radius:.375rem;border:1px solid #dee2e6;background-color:@_labelColor">
+            </div>
+            <span>Valeur : <strong>@_labelColor</strong></span>
+        </div>
+    </div>
+</div>
+
+@* ── Alpha ─────────────────────────────────────────────────────────── *@
+
+<h2 class="mt-4">Avec canal Alpha</h2>
+
+<div class="card mt-3">
+    <div class="card-header">ShowAlpha = true</div>
+    <div class="card-body">
+        <p class="text-muted mb-3">
+            Activez <code>ShowAlpha</code> pour afficher le curseur d'opacité.
+            La valeur émise devient <code>#RRGGBBAA</code>.
+        </p>
+
+        <SuperColorPicker Label="Couleur avec opacité" ShowAlpha="true" @bind-Value="_alphaColor" />
+
+        <div class="alert alert-light border mt-3 mb-0 d-flex align-items-center gap-3">
+            <div
+                style="width:2rem;height:2rem;border-radius:.375rem;border:1px solid #dee2e6;background-color:@AlphaCssColor">
+            </div>
+            <span>Valeur : <strong>@_alphaColor</strong></span>
+        </div>
+    </div>
+</div>
+
+@* ── Preset value ──────────────────────────────────────────────────── *@
+
+<h2 class="mt-4">Valeur initiale</h2>
+
+<div class="card mt-3">
+    <div class="card-header">Value = "#E74C3C"</div>
+    <div class="card-body">
+        <p class="text-muted mb-3">
+            Passer une valeur initiale via le paramètre <code>Value</code>.
+        </p>
+
+        <SuperColorPicker Label="Couleur de danger" @bind-Value="_presetColor" />
+
+        <div class="alert alert-light border mt-3 mb-0 d-flex align-items-center gap-3">
+            <div
+                style="width:2rem;height:2rem;border-radius:.375rem;border:1px solid #dee2e6;background-color:@_presetColor">
+            </div>
+            <span>Valeur : <strong>@_presetColor</strong></span>
+        </div>
+    </div>
+</div>
+
+@* ── Disabled ──────────────────────────────────────────────────────── *@
+
+<h2 class="mt-4">Désactivé</h2>
+
+<div class="card mt-3">
+    <div class="card-header">Disabled = true</div>
+    <div class="card-body">
+        <p class="text-muted mb-3">
+            Le paramètre <code>Disabled</code> désactive toutes les interactions.
+        </p>
+
+        <SuperColorPicker Label="Lecture seule" Value="#2ECC71" Disabled="true" />
+    </div>
+</div>
+
+@* ── Side by side ──────────────────────────────────────────────────── *@
+
+<h2 class="mt-4">Plusieurs pickers côte à côte</h2>
+
+<div class="card mt-3">
+    <div class="card-header">Palette de couleurs</div>
+    <div class="card-body">
+        <p class="text-muted mb-3">
+            Exemple d'utilisation de plusieurs pickers pour composer une palette.
+        </p>
+
+        <div class="d-flex flex-wrap gap-4">
+            <SuperColorPicker Label="Primaire" @bind-Value="_palette0" />
+            <SuperColorPicker Label="Secondaire" @bind-Value="_palette1" />
+            <SuperColorPicker Label="Accentuation" @bind-Value="_palette2" />
+        </div>
+
+        <div class="d-flex gap-2 mt-3">
+            @foreach (var color in new[] { _palette0, _palette1, _palette2 })
+            {
+                <div style="flex:1;height:3rem;border-radius:.5rem;background-color:@color;
+                    border:1px solid rgba(0,0,0,.1);display:flex;align-items:center;
+                    justify-content:center;font-size:.75rem;font-weight:600;
+                    color:@ContrastColor(color)">
+                    @color
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@* ══════════════════════════════════════════════════════════════════════
+    SuperDropDownColorPicker
+   ══════════════════════════════════════════════════════════════════════ *@
+
+<h1 class="mt-5">SuperDropDownColorPicker</h1>
+
+<p class="text-muted">
+    Version compacte en mode dropdown — un bouton affiche la couleur courante,
+    un clic ouvre le <code>SuperColorPicker</code> dans un panneau flottant.
+</p>
+
+@* ── Basic dropdown ────────────────────────────────────────────────── *@
+
+<h2 class="mt-4">Basique</h2>
+
+<div class="card mt-3">
+    <div class="card-header">Dropdown sans label</div>
+    <div class="card-body">
+        <p class="text-muted mb-3">
+            Cliquez sur le bouton pour ouvrir le picker. Cliquez en dehors pour fermer.
+        </p>
+
+        <SuperDropDownColorPicker @bind-Value="_ddBasic" />
+
+        <div class="alert alert-light border mt-3 mb-0 d-flex align-items-center gap-3">
+            <div
+                style="width:2rem;height:2rem;border-radius:.375rem;border:1px solid #dee2e6;background-color:@_ddBasic">
+            </div>
+            <span>Valeur : <strong>@_ddBasic</strong></span>
+        </div>
+    </div>
+</div>
+
+@* ── With label ────────────────────────────────────────────────────── *@
+
+<h2 class="mt-4">Avec label</h2>
+
+<div class="card mt-3">
+    <div class="card-header">Paramètre Label</div>
+    <div class="card-body">
+        <p class="text-muted mb-3">
+            Le label est cliquable et ouvre également le dropdown.
+        </p>
+
+        <SuperDropDownColorPicker Label="Couleur du texte" @bind-Value="_ddLabel" />
+
+        <div class="alert alert-light border mt-3 mb-0 d-flex align-items-center gap-3">
+            <div
+                style="width:2rem;height:2rem;border-radius:.375rem;border:1px solid #dee2e6;background-color:@_ddLabel">
+            </div>
+            <span>Valeur : <strong>@_ddLabel</strong></span>
+        </div>
+    </div>
+</div>
+
+@* ── Alpha dropdown ────────────────────────────────────────────────── *@
+
+<h2 class="mt-4">Avec canal Alpha</h2>
+
+<div class="card mt-3">
+    <div class="card-header">ShowAlpha = true</div>
+    <div class="card-body">
+        <p class="text-muted mb-3">
+            La pastille du bouton reflète l'opacité via le damier en arrière-plan.
+        </p>
+
+        <SuperDropDownColorPicker Label="Couleur avec opacité" ShowAlpha="true" @bind-Value="_ddAlpha" />
+
+        <div class="alert alert-light border mt-3 mb-0 d-flex align-items-center gap-3">
+            <div
+                style="width:2rem;height:2rem;border-radius:.375rem;border:1px solid #dee2e6;background-color:@DdAlphaCssColor">
+            </div>
+            <span>Valeur : <strong>@_ddAlpha</strong></span>
+        </div>
+    </div>
+</div>
+
+@* ── Disabled dropdown ─────────────────────────────────────────────── *@
+
+<h2 class="mt-4">Désactivé</h2>
+
+<div class="card mt-3">
+    <div class="card-header">Disabled = true</div>
+    <div class="card-body">
+        <p class="text-muted mb-3">
+            Le bouton est désactivé, aucune interaction possible.
+        </p>
+
+        <SuperDropDownColorPicker Label="Lecture seule" Value="#27AE60" Disabled="true" />
+    </div>
+</div>
+
+@* ── Inline usage ──────────────────────────────────────────────────── *@
+
+<h2 class="mt-4">Usage inline dans un formulaire</h2>
+
+<div class="card mt-3">
+    <div class="card-header">Intégration dans une ligne d'UI</div>
+    <div class="card-body">
+        <p class="text-muted mb-3">
+            Le composant est <code>inline-block</code> et s'intègre naturellement
+            dans une ligne avec d'autres éléments.
+        </p>
+
+        <div class="d-flex align-items-center gap-3 flex-wrap">
+            <SuperDropDownColorPicker Label="Primaire" @bind-Value="_ddPalette0" />
+            <SuperDropDownColorPicker Label="Secondaire" @bind-Value="_ddPalette1" />
+            <SuperDropDownColorPicker Label="Bordure" @bind-Value="_ddPalette2" />
+        </div>
+
+        <div class="d-flex gap-2 mt-3">
+            @foreach (var color in new[] { _ddPalette0, _ddPalette1, _ddPalette2 })
+            {
+                <div style="flex:1;height:3rem;border-radius:.5rem;background-color:@color;
+                    border:1px solid rgba(0,0,0,.1);display:flex;align-items:center;
+                    justify-content:center;font-size:.75rem;font-weight:600;
+                    color:@ContrastColor(color)">
+                    @color
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private string? _basicColor = "#3498DB";
+    private string? _labelColor = "#9B59B6";
+    private string? _alphaColor = "#E67E22BF";
+    private string? _presetColor = "#E74C3C";
+
+    // SuperDropDownColorPicker state
+    private string? _ddBasic = "#3498DB";
+    private string? _ddLabel = "#8E44AD";
+    private string? _ddAlpha = "#E67E22BF";
+    private string? _ddPalette0 = "#2C3E50";
+    private string? _ddPalette1 = "#E74C3C";
+    private string? _ddPalette2 = "#F39C12";
+
+    private string? _palette0 = "#2C3E50";
+    private string? _palette1 = "#E74C3C";
+    private string? _palette2 = "#F39C12";
+
+    // Convert #RRGGBBAA to CSS rgba() for the alpha demo swatch
+    private string AlphaCssColor => HexToCss(_alphaColor);
+    private string DdAlphaCssColor => HexToCss(_ddAlpha);
+
+    private static string HexToCss(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return "transparent";
+        }
+
+        var hex = value.TrimStart('#');
+
+        if (hex.Length == 8
+            && uint.TryParse(hex[..6], System.Globalization.NumberStyles.HexNumber, null, out var rgb)
+            && int.TryParse(hex[6..], System.Globalization.NumberStyles.HexNumber, null, out var aa))
+        {
+            var r = (rgb >> 16) & 0xFF;
+            var g = (rgb >> 8) & 0xFF;
+            var b = rgb & 0xFF;
+            return $"rgba({r},{g},{b},{aa / 255.0:F2})";
+        }
+
+        return value;
+    }
+
+    // Very rough luminance check to pick white or black text on a swatch
+    private static string ContrastColor(string? hex)
+    {
+        if (string.IsNullOrWhiteSpace(hex)) return "#000";
+        var h = hex.TrimStart('#');
+        if (h.Length < 6) return "#000";
+        if (!uint.TryParse(h[..6], System.Globalization.NumberStyles.HexNumber, null, out var v)) return "#000";
+        var r = (v >> 16) & 0xFF;
+        var g = (v >> 8) & 0xFF;
+        var b = v & 0xFF;
+        var lum = 0.299 * r + 0.587 * g + 0.114 * b;
+        return lum > 140 ? "#000" : "#fff";
+    }
+}
