@@ -23,6 +23,8 @@
 | **SuperTabs** | Dynamic tabbed interface — badges, closable tabs, lazy loading, persistence (URL + localStorage), keyboard navigation, service-driven management | [📖 SUPERTABS.md](SUPERTABS.md) |
 | **SuperSplitter** | Resizable split panels — horizontal/vertical, collapsible, state persistence | [📖 SuperSplitter.md](src/SuperBlazorComponents/Components/SuperSplitter/SuperSplitter.md) |
 | **SuperDateRangePicker** | Calendar-based date range picker with presets | [📖 SUPERDATERANGEPICKER.md](SUPERDATERANGEPICKER.md) |
+| **SuperColorPicker** | Inline HSV color picker — hue/saturation/value canvas, alpha slider, HEX & RGB input modes | [📖 SUPERCOLORPICKER.md](SUPERCOLORPICKER.md) |
+| **SuperDropDownColorPicker** | Compact dropdown variant of SuperColorPicker — colored swatch trigger button with floating popup | [📖 SUPERCOLORPICKER.md](SUPERCOLORPICKER.md) |
 | **SuperButtons** | Buttons, split buttons, toggle buttons, link buttons, confirmation buttons | [📖 SUPERBUTTONS.md](SUPERBUTTONS.md) |
 | **SuperTriStateCheckbox** | Bootstrap-friendly checkbox for nullable boolean values (`true`, `false`, `null`) | [📖 SuperTriStateCheckbox.md](src/SuperBlazorComponents/Components/SuperTriStateCheckbox/SuperTriStateCheckbox.md) |
 | **SuperTooltip** | Tooltips for Blazor or HTML elements — text, HTML, Markdown, positions, delay, duration, click closing and manual control | [📖 SuperTooltip.md](src/SuperBlazorComponents/Components/Tooltips/SuperTooltip.md) |
