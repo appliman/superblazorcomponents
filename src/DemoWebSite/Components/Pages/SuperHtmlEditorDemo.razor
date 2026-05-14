@@ -1,0 +1,133 @@
+@page "/super-html-editor-demo"
+@using SuperBlazorComponents.Components.SuperHtmlEditor
+
+<PageTitle>SuperHtmlEditor Demo</PageTitle>
+
+<h1>SuperHtmlEditor</h1>
+
+<p class="text-muted">
+    Éditeur HTML WYSIWYG avec barre d'outils complète (police, taille, gras, couleurs, listes, alignement)
+    et basculement vers l'édition HTML source via <strong>Monaco Editor</strong> chargé à la volée.
+</p>
+
+@* ── Basique ────────────────────────────────────────────────────────── *@
+
+<h2 class="mt-4">Basique</h2>
+
+<div class="card mt-3">
+    <div class="card-header">Utilisation minimale</div>
+    <div class="card-body">
+        <p class="text-muted mb-3">
+            Lier la valeur via <code>@("@bind-Value")</code>. Le composant retourne du HTML.
+        </p>
+
+        <SuperHtmlEditor @bind-Value="_basicHtml" />
+
+        <div class="mt-3">
+            <button class="btn btn-sm btn-outline-secondary" @onclick="() => _showBasicSource = !_showBasicSource">
+                @(_showBasicSource ? "Masquer" : "Afficher") le HTML produit
+            </button>
+        </div>
+
+        @if (_showBasicSource)
+        {
+            <pre class="bg-body-secondary border rounded p-3 mt-2"
+                 style="white-space:pre-wrap;word-break:break-all;font-size:12px;">@_basicHtml</pre>
+        }
+    </div>
+</div>
+
+@* ── Avec label ─────────────────────────────────────────────────────── *@
+
+<h2 class="mt-4">Avec label</h2>
+
+<div class="card mt-3">
+    <div class="card-header">Paramètre <code>Label</code></div>
+    <div class="card-body">
+        <SuperHtmlEditor Label="Corps du message" @bind-Value="_labelHtml" MinHeight="180" />
+    </div>
+</div>
+
+@* ── Contenu initial ─────────────────────────────────────────────────── *@
+
+<h2 class="mt-4">Contenu initial</h2>
+
+<div class="card mt-3">
+    <div class="card-header">Valeur pré-remplie</div>
+    <div class="card-body">
+        <p class="text-muted mb-3">
+            Fournir du HTML initial via <code>Value</code> / <code>@("@bind-Value")</code>.
+        </p>
+
+        <SuperHtmlEditor Label="Description" @bind-Value="_prefilledHtml" MinHeight="160" />
+    </div>
+</div>
+
+@* ── Taille personnalisée ────────────────────────────────────────────── *@
+
+<h2 class="mt-4">Taille personnalisée</h2>
+
+<div class="card mt-3">
+    <div class="card-header">Paramètres <code>MinHeight</code>, <code>MaxHeight</code>, <code>MonacoHeight</code></div>
+    <div class="card-body">
+        <p class="text-muted mb-3">
+            <code>MinHeight</code> fixe la hauteur minimale de la zone de saisie.
+            <code>MaxHeight</code> limite la hauteur (scroll au-delà).
+            <code>MonacoHeight</code> contrôle la hauteur du panneau Monaco.
+        </p>
+
+        <SuperHtmlEditor Label="Note compacte" @bind-Value="_compactHtml" MinHeight="80" MaxHeight="200"
+                         MonacoHeight="250" />
+    </div>
+</div>
+
+@* ── Désactivé ───────────────────────────────────────────────────────── *@
+
+<h2 class="mt-4">Désactivé</h2>
+
+<div class="card mt-3">
+    <div class="card-header">Paramètre <code>Disabled</code></div>
+    <div class="card-body">
+        <SuperHtmlEditor Label="Lecture seule (désactivé)"
+                         Value="<p>Ce contenu <strong>ne peut pas</strong> être modifié.</p>" Disabled="true" />
+    </div>
+</div>
+
+@* ── Rendu HTML ──────────────────────────────────────────────────────── *@
+
+<h2 class="mt-4">Aperçu du rendu</h2>
+
+<div class="card mt-3">
+    <div class="card-header">Éditeur + aperçu côte à côte</div>
+    <div class="card-body">
+        <p class="text-muted mb-3">
+            Le HTML produit peut être affiché directement avec <code>@@((MarkupString)html)</code>.
+        </p>
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <SuperHtmlEditor Label="Éditeur" @bind-Value="_previewHtml" MinHeight="200" />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Rendu</label>
+                <div class="border rounded p-3 bg-body-secondary" style="min-height:200px;">
+                    @((MarkupString)(_previewHtml ?? ""))
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string? _basicHtml;
+    private bool _showBasicSource;
+
+    private string? _labelHtml;
+    private string? _compactHtml;
+
+    private string? _prefilledHtml = "<p>Bienvenue dans <strong>SuperHtmlEditor</strong> !</p>"
+        + "<p>Essayez la mise en forme : <em>italique</em>, <u>souligné</u>, "
+        + "<span style=\"color:#e03\">couleur</span>.</p>";
+
+    private string? _previewHtml = "<h3>Titre</h3><p>Saisissez du texte ici pour voir le rendu en direct.</p>";
+}
