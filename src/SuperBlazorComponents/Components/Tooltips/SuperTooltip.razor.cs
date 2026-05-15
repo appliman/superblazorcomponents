@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -54,8 +54,30 @@ public partial class SuperTooltip : IAsyncDisposable
 	[Parameter]
 	public string? TooltipStyle { get; set; }
 
+	/// <summary>Gets or sets the opacity level of the tooltip (0 = fully transparent, 100 = fully opaque). Defaults to null (no transparency).</summary>
+	[Parameter]
+	public int? Opacity { get; set; }
+
 	[Parameter]
 	public bool Disabled { get; set; }
+
+	private string? EffectiveTooltipStyle
+	{
+		get
+		{
+			if (Opacity is null)
+			{
+				return TooltipStyle;
+			}
+
+			var clamped = Math.Clamp(Opacity.Value, 0, 100);
+			var opacityPart = $"opacity: {clamped / 100.0:0.##};";
+
+			return string.IsNullOrWhiteSpace(TooltipStyle)
+				? opacityPart
+				: $"{TooltipStyle.TrimEnd(';', ' ')};{opacityPart}";
+		}
+	}
 
 	[Parameter(CaptureUnmatchedValues = true)]
 	public Dictionary<string, object> AdditionalAttributes { get; set; } = new();
@@ -124,8 +146,8 @@ public partial class SuperTooltip : IAsyncDisposable
 			duration = Math.Max(0, Duration),
 			closeOnDocumentClick = CloseOnDocumentClick,
 			cssClass = TooltipCssClass,
-			style = TooltipStyle,
-			disabled = Disabled || string.IsNullOrWhiteSpace(ContentHtml)
+			style = EffectiveTooltipStyle,
+			disabled = Disabled
 		});
 		_initialized = true;
 	}

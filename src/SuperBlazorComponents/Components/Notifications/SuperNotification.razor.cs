@@ -11,6 +11,24 @@ public partial class SuperNotification
 	[Parameter]
 	public NotificationPosition Position { get; set; } = NotificationPosition.BottomRight;
 
+	/// <summary>Gets or sets the opacity level of the notifications (0 = fully transparent, 100 = fully opaque). Defaults to null (no transparency).</summary>
+	[Parameter]
+	public int? Opacity { get; set; }
+
+	private string? OpacityStyle
+	{
+		get
+		{
+			if (Opacity is null)
+			{
+				return null;
+			}
+
+			var clamped = Math.Clamp(Opacity.Value, 0, 100);
+			return $"opacity: {clamped / 100.0:0.##};";
+		}
+	}
+
 	private string PositionCssClass => Position switch
 	{
 		NotificationPosition.TopLeft => "top-0 start-0",

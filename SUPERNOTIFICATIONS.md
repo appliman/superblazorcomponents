@@ -1,4 +1,4 @@
-# 🔔 SuperNotifications
+﻿# 🔔 SuperNotifications
 
 > Bootstrap-styled toast notification system for Blazor with severity levels, auto-dismiss progress bar, click handlers and configurable position.
 
@@ -139,6 +139,7 @@ classDiagram
 | Parameter | Type | Default | Description |
 |---|---|---|---|
 | `Position` | `NotificationPosition` | `BottomRight` | Stack position of toasts |
+| `Opacity` | `int?` | `null` | Opacity level of every toast (0 = fully transparent, 100 = fully opaque). `null` renders toasts at full opacity. |
 
 ### NotificationMessage
 
@@ -220,7 +221,17 @@ await NotificationService.Notify(
 <SuperNotification Position="NotificationPosition.TopRight" />
 ```
 
-### 7. Manual remove
+### 7. Semi-transparent notifications
+
+```razor
+<SuperNotification Position="NotificationPosition.TopRight" Opacity="80" />
+```
+
+Set any value from `0` (invisible) to `100` (fully opaque). Omit the parameter to keep the default full-opacity rendering.
+
+---
+
+### 8. Manual remove
 
 ```csharp
 var msg = new NotificationMessage
@@ -235,7 +246,7 @@ NotificationService.Notifications.ToList().Add(msg);  // (use Notify in real cod
 await NotificationService.Remove(msg);
 ```
 
-### 8. Severity matrix
+### 9. Severity matrix
 
 ```csharp
 foreach (NotificationSeverity s in Enum.GetValues<NotificationSeverity>())
@@ -244,11 +255,11 @@ foreach (NotificationSeverity s in Enum.GetValues<NotificationSeverity>())
 }
 ```
 
-### 9. Progress bar (built-in)
+### 10. Progress bar (built-in)
 
 When `Duration > 0`, the host automatically renders a 2px progress bar at the bottom of the toast that drains over the lifetime. No code required.
 
-### 10. Helper extension (recommended pattern)
+### 11. Helper extension (recommended pattern)
 
 ```csharp
 public static class NotificationsExtensions
