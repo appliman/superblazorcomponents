@@ -1,4 +1,4 @@
-# SuperTooltip
+﻿# SuperTooltip
 
 ## Description
 `SuperTooltip` affiche une infobulle Bootstrap autour de n'importe quel contenu Blazor. Message texte, positions, contenu HTML, delai d'ouverture, duree d'affichage, fermeture au clic dans la page et utilisation sur un element HTML. Il ajoute aussi un rendu Markdown integre, sans dependance externe.
@@ -25,6 +25,7 @@ builder.Services.AddSuperComponents();
 | `CloseOnDocumentClick` | `bool` | `false` | Ferme le tooltip lorsqu'un clic intervient ailleurs dans la page. |
 | `TooltipCssClass` | `string?` | - | Classe CSS ajoutee au tooltip Bootstrap. |
 | `TooltipStyle` | `string?` | - | Style inline applique au tooltip affiche. |
+| `Opacity` | `int?` | `null` | Niveau d'opacite du tooltip (0 = totalement transparent, 100 = totalement opaque). `null` correspond a une opacite complete. Fusionne avec `TooltipStyle` si les deux sont definis. |
 | `Disabled` | `bool` | `false` | Desactive le tooltip. |
 | `AdditionalAttributes` | `Dictionary<string, object>` | - | Attributs HTML supplementaires appliques au wrapper. |
 
@@ -131,6 +132,21 @@ Le Markdown est encode avant la transformation inline afin de limiter les inject
 @code {
     private SuperTooltip _tooltip = default!;
 }
+```
+
+### Opacite
+```razor
+<SuperTooltip Text="Tooltip semi-transparent" Opacity="70">
+    <button class="btn btn-secondary">Survoler</button>
+</SuperTooltip>
+```
+
+Compatible avec `TooltipStyle` : les deux styles sont fusionnes.
+
+```razor
+<SuperTooltip Text="Style combine" Opacity="80" TooltipStyle="background:red;">
+    <button class="btn btn-danger">Survoler</button>
+</SuperTooltip>
 ```
 
 ## Bonnes pratiques
