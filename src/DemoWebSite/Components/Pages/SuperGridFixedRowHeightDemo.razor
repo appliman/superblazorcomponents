@@ -1,0 +1,168 @@
+@page "/supergrid-fixed-row-height-demo"
+@using SuperBlazorComponents.Components.SuperDataGrid
+
+<PageTitle>SuperGrid - Fixed Row Height</PageTitle>
+
+<h1>SuperGrid - Fixed Row Height</h1>
+<p class="text-muted">
+    Rows are fixed at <code>44px</code>. Cells with taller content keep the row height stable and scroll vertically inside the cell.
+</p>
+
+<div style="height: 520px;">
+    <SuperDataGrid TItem="InventoryAlert"
+                   ItemsProvider="LoadAlertsAsync"
+                   RowHeight="44"
+                   FixedRowHeight="true"
+                   DisplaySelectionColumn="false"
+                   DisplayRefreshButton="true"
+                   FreezeLeftColumns="1">
+        <ChildContent>
+            <DataGridColumn For="@(alert => alert.Reference)" Title="Reference" Width="130px" AlwaysVisible="true" />
+            <DataGridColumn For="@(alert => alert.Designation)" Title="Designation" Width="220px">
+                <Template>
+                    <div class="fw-semibold">@context.Designation</div>
+                    <div class="text-muted small">@context.Category</div>
+                </Template>
+            </DataGridColumn>
+            <DataGridColumn For="@(alert => alert.SupplierNotes)" Title="Supplier notes" Width="260px">
+                <Template>
+                    @foreach (var line in context.SupplierNotes)
+                    {
+                        <div>@line</div>
+                    }
+                </Template>
+            </DataGridColumn>
+            <DataGridColumn For="@(alert => alert.Tags)" Title="Tags" Width="190px">
+                <Template>
+                    @foreach (var tag in context.Tags)
+                    {
+                        <span class="badge text-bg-secondary me-1 mb-1">@tag</span>
+                    }
+                </Template>
+            </DataGridColumn>
+            <DataGridColumn For="@(alert => alert.Comment)" Title="Long comment" Width="360px">
+                <Template>
+                    <div>@context.Comment</div>
+                </Template>
+            </DataGridColumn>
+            <DataGridColumn For="@(alert => alert.Stock)" Title="Stock" Width="90px" TextAlign="SuperTextAlignment.Right" />
+            <DataGridColumn For="@(alert => alert.Risk)" Title="Risk" Width="90px" TextAlign="SuperTextAlignment.Center">
+                <Template>
+                    <span class="badge text-bg-danger">@context.Risk %</span>
+                </Template>
+            </DataGridColumn>
+        </ChildContent>
+    </SuperDataGrid>
+</div>
+
+@code {
+    private static readonly List<InventoryAlert> _alerts =
+    [
+        new(
+            "0011000",
+            "DIVERS LAMINES",
+            "Steel profiles",
+            [
+                "MOREL DISTRIBUTION",
+                "SOMEFI SAS - PRODUITS METALLURGIQUES",
+                "ARCELORMITTAL DISTRIBUTION",
+                "VOSS INOX FRANCE",
+                "ROZIER",
+                "FIC ACIER",
+                "PLATTARD",
+                "FOURNISSEURS DIVERS"
+            ],
+            ["tag urgent", "multi supplier", "stock watch", "steel"],
+            "This row intentionally contains a long operational note. The configured row height remains fixed while this cell can be scrolled vertically to read the full content without expanding the row.",
+            72,
+            100),
+        new(
+            "0011002",
+            "PLAT LAMINE 14 X 5",
+            "Flat bar",
+            [
+                "ROZIER",
+                "Backup supplier pending validation",
+                "Annual framework agreement available"
+            ],
+            ["standard", "warehouse A"],
+            "Shorter content still uses the same fixed row height.",
+            24,
+            82),
+        new(
+            "0011003",
+            "PLAT LAMINE 14 X 6",
+            "Flat bar",
+            [
+                "MOREL DISTRIBUTION",
+                "SOMEFI SAS - PRODUITS METALLURGIQUES",
+                "Supplier has a minimum order quantity",
+                "Delayed shipping windows during end-of-month inventory"
+            ],
+            ["delay risk", "MOQ", "review", "procurement", "quality"],
+            "The tags column deliberately wraps on several lines. With FixedRowHeight enabled, the row does not grow; the cell itself owns the vertical scroll.",
+            11,
+            96),
+        new(
+            "0011044",
+            "CORNIERE A AILES EGALES",
+            "Angles",
+            [
+                "Primary supplier: ALR",
+                "Secondary supplier: FIC ACIER",
+                "Tertiary supplier: local sourcing pool"
+            ],
+            ["angles", "regional", "price check"],
+            "Large custom templates behave the same way as plain text values. This verifies that template output is constrained by the grid cell content wrapper.",
+            38,
+            74),
+        new(
+            "0012077",
+            "TUBE RECTANGULAIRE",
+            "Tubes",
+            [
+                "VOSS INOX FRANCE",
+                "ARCELORMITTAL DISTRIBUTION",
+                "Contract renewal expected next quarter"
+            ],
+            ["inox", "contract", "forecast", "production", "reorder"],
+            "A fixed row height is useful for virtualization because every item keeps the same visual size even when business data contains verbose comments.",
+            5,
+            100)
+    ];
+
+    private static ValueTask<GridItemsProviderResult<InventoryAlert>> LoadAlertsAsync(GridItemsProviderRequest<InventoryAlert> request)
+    {
+        var query = _alerts.AsEnumerable();
+
+        query = (request.SortColumn, request.SortDirection) switch
+        {
+            (nameof(InventoryAlert.Reference), SortDirection.Ascending) => query.OrderBy(alert => alert.Reference),
+            (nameof(InventoryAlert.Reference), SortDirection.Descending) => query.OrderByDescending(alert => alert.Reference),
+            (nameof(InventoryAlert.Stock), SortDirection.Ascending) => query.OrderBy(alert => alert.Stock),
+            (nameof(InventoryAlert.Stock), SortDirection.Descending) => query.OrderByDescending(alert => alert.Stock),
+            (nameof(InventoryAlert.Risk), SortDirection.Ascending) => query.OrderBy(alert => alert.Risk),
+            (nameof(InventoryAlert.Risk), SortDirection.Descending) => query.OrderByDescending(alert => alert.Risk),
+            _ => query
+        };
+
+        var totalCount = query.Count();
+        var count = request.Count is > 0 ? request.Count.Value : totalCount;
+        var page = query
+            .Skip(request.StartIndex)
+            .Take(count)
+            .ToList();
+
+        return ValueTask.FromResult(new GridItemsProviderResult<InventoryAlert>(page, totalCount));
+    }
+
+    private sealed record InventoryAlert(
+        string Reference,
+        string Designation,
+        string Category,
+        IReadOnlyList<string> SupplierNotes,
+        IReadOnlyList<string> Tags,
+        string Comment,
+        int Stock,
+        int Risk);
+}

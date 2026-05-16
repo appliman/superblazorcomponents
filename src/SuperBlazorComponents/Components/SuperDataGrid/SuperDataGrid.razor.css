@@ -484,13 +484,75 @@
     font-size: 0.8rem;
 }
 
-/* IMPORTANT: Forcer l'isolation du contenu des cellules */
-.sdg-cell > * {
+.sdg-cell-content {
+    display: block;
     max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     font-size: inherit;
+}
+
+/* IMPORTANT: Forcer l'isolation du contenu des cellules */
+.sdg-cell > :not(.sdg-cell-content),
+.sdg-cell-content > * {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: inherit;
+}
+
+.sdg-fixed-row-height .sdg-row,
+.sdg-fixed-row-height .sdg-vertical-row {
+    height: var(--sdg-row-height, 40px);
+    max-height: var(--sdg-row-height, 40px);
+}
+
+.sdg-fixed-row-height .sdg-cell,
+.sdg-fixed-row-height .sdg-row-number-cell,
+.sdg-fixed-row-height .sdg-selection-cell,
+.sdg-fixed-row-height .sdg-actions-cell,
+.sdg-fixed-row-height .sdg-vertical-key,
+.sdg-fixed-row-height .sdg-vertical-value {
+    height: var(--sdg-row-height, 40px);
+    max-height: var(--sdg-row-height, 40px);
+    overflow: hidden;
+}
+
+.sdg-fixed-row-height .sdg-cell-content,
+.sdg-fixed-row-height .sdg-vertical-value .sdg-cell-content {
+    max-height: calc(var(--sdg-row-height, 40px) - 0.2rem - 2px);
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+    scrollbar-width: auto;
+    scrollbar-color: var(--bs-secondary, #6c757d) var(--bs-tertiary-bg, #f8f9fa);
+    white-space: normal;
+}
+
+.sdg-fixed-row-height .sdg-cell-content::-webkit-scrollbar,
+.sdg-fixed-row-height .sdg-vertical-value .sdg-cell-content::-webkit-scrollbar {
+    width: 12px;
+}
+
+.sdg-fixed-row-height .sdg-cell-content::-webkit-scrollbar-track,
+.sdg-fixed-row-height .sdg-vertical-value .sdg-cell-content::-webkit-scrollbar-track {
+    background: var(--bs-tertiary-bg, #f8f9fa);
+    border-left: 1px solid var(--bs-border-color, #dee2e6);
+}
+
+.sdg-fixed-row-height .sdg-cell-content::-webkit-scrollbar-thumb,
+.sdg-fixed-row-height .sdg-vertical-value .sdg-cell-content::-webkit-scrollbar-thumb {
+    background-color: var(--bs-secondary, #6c757d);
+    border: 2px solid var(--bs-tertiary-bg, #f8f9fa);
+    border-radius: 999px;
+}
+
+.sdg-fixed-row-height .sdg-cell-content > * {
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
 }
 
 /* Selected Row - uniquement la bordure, pas de fond */

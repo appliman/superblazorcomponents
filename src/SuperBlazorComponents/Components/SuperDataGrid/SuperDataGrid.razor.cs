@@ -151,6 +151,12 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 	public float RowHeight { get; set; } = 40f;
 
 	/// <summary>
+	/// Keeps body rows at <see cref="RowHeight"/> and makes overflowing cell content vertically scrollable.
+	/// </summary>
+	[Parameter]
+	public bool FixedRowHeight { get; set; } = true;
+
+	/// <summary>
 	/// Number of items to render outside the visible area.
 	/// </summary>
 	[Parameter]
@@ -642,6 +648,7 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 	private void ApplyPresetDefaults(ParameterView parameters, SuperDataGridSettings preset)
 	{
 		if (!parameters.TryGetValue<float>(nameof(RowHeight), out _)) { RowHeight = preset.RowHeight; }
+		if (!parameters.TryGetValue<bool>(nameof(FixedRowHeight), out _)) { FixedRowHeight = preset.FixedRowHeight; }
 		if (!parameters.TryGetValue<int>(nameof(OverscanCount), out _)) { OverscanCount = preset.OverscanCount; }
 		if (!parameters.TryGetValue<bool>(nameof(FreezeHeader), out _)) { FreezeHeader = preset.FreezeHeader; }
 		if (!parameters.TryGetValue<bool>(nameof(FreezeFooter), out _)) { FreezeFooter = preset.FreezeFooter; }
@@ -877,6 +884,23 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 		styles.Add($"--sdg-row-height: {rowHeight}px");
 
 		return styles.Count == 0 ? null : string.Join("; ", styles) + ";";
+	}
+
+	private string GetContainerClass()
+	{
+		var classes = new List<string> { "sdg-container" };
+
+		if (FixedRowHeight)
+		{
+			classes.Add("sdg-fixed-row-height");
+		}
+
+		if (!string.IsNullOrWhiteSpace(ContainerCssClass))
+		{
+			classes.Add(ContainerCssClass);
+		}
+
+		return string.Join(" ", classes);
 	}
 
 	private string GetTableWrapperStyle()

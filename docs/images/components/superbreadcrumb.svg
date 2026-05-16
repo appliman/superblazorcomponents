@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="88" height="52" viewBox="0 0 88 52" role="img" aria-label="SuperBreadCrumb thumbnail">
+  <rect width="88" height="52" rx="6" fill="#f8fafc"/>
+  <rect x="9" y="19" width="18" height="12" rx="4" fill="#e7f1ff" stroke="#0d6efd"/>
+  <path d="M31 25h6M35 21l5 4-5 4" fill="none" stroke="#64748b" stroke-width="1.5"/>
+  <rect x="43" y="19" width="18" height="12" rx="4" fill="#e2e8f0"/>
+  <path d="M65 25h4M68 21l5 4-5 4" fill="none" stroke="#64748b" stroke-width="1.5"/>
+  <rect x="73" y="19" width="8" height="12" rx="4" fill="#0d6efd"/>
+</svg>

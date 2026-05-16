@@ -7,6 +7,12 @@ public class SuperNotificationService
 	private readonly List<NotificationMessage> _notifications = new();
 
 	/// <summary>
+	/// Détermine si le détail des notifications est rendu en HTML par défaut.
+	/// Valeur par défaut : <c>true</c> (rendu HTML). Définir à <c>false</c> pour un rendu en texte brut.
+	/// </summary>
+	public bool DefaultIsHtml { get; set; } = true;
+
+	/// <summary>
 	/// Événement déclenché lorsqu'une notification doit être affichée.
 	/// </summary>
 	public event Func<Task>? OnChange;
@@ -27,6 +33,7 @@ public class SuperNotificationService
 	/// <param name="closeOnClick">Indique si la notification se ferme au clic.</param>
 	/// <param name="payload">Données personnalisées associées à la notification.</param>
 	/// <param name="close">Action à exécuter lors de la fermeture de la notification.</param>
+	/// <param name="isHtml">Indique si le détail est rendu en HTML. Hérite de <see cref="DefaultIsHtml"/> si non spécifié.</param>
 	public async Task Notify(
 		NotificationSeverity notificationSeverity,
 		string summary = "",
@@ -35,7 +42,8 @@ public class SuperNotificationService
 		Action<NotificationMessage>? click = null,
 		bool closeOnClick = false,
 		object? payload = null,
-		Action<NotificationMessage>? close = null)
+		Action<NotificationMessage>? close = null,
+		bool? isHtml = null)
 	{
 		var notification = new NotificationMessage
 		{
@@ -47,7 +55,8 @@ public class SuperNotificationService
 			Click = click,
 			CloseOnClick = closeOnClick,
 			Payload = payload,
-			Close = close
+			Close = close,
+			IsHtml = isHtml ?? DefaultIsHtml
 		};
 
 		_notifications.Add(notification);

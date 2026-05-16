@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="88" height="52" viewBox="0 0 88 52" role="img" aria-label="SuperTabs thumbnail">
+  <rect width="88" height="52" rx="6" fill="#f8fafc"/>
+  <rect x="8" y="14" width="72" height="30" rx="3" fill="#fff" stroke="#cbd5e1"/>
+  <rect x="8" y="8" width="22" height="12" rx="3" fill="#0d6efd"/>
+  <rect x="32" y="10" width="20" height="10" rx="3" fill="#e2e8f0"/>
+  <rect x="54" y="10" width="20" height="10" rx="3" fill="#e2e8f0"/>
+  <rect x="16" y="27" width="42" height="4" rx="2" fill="#94a3b8"/>
+  <rect x="16" y="35" width="28" height="4" rx="2" fill="#cbd5e1"/>
+</svg>

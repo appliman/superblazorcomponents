@@ -8,7 +8,7 @@
     @{
         var visibleColumns = GetVisibleColumns();
     }
-    <div class="sdg-container @ContainerCssClass"
+    <div class="@GetContainerClass()"
          style="@GetContainerStyle()"
          @ref="_containerRef">
         @if (DisplaySelectionColumn
@@ -125,18 +125,20 @@
                                         <td class="sdg-vertical-value sdg-text-left"
                                             @onclick="@(() => OnCellClick(item, column))"
                                             @onclick:stopPropagation="@CellClicked.HasDelegate">
-                                            @if ((EditionMode == SuperDataGridEditionMode.Edit || IsRowInEditMode(item)) && column.EditTemplate is not null)
-                                            {
-                                                @column.EditTemplate(item)
-                                            }
-                                            else if (column.Template is not null)
-                                            {
-                                                @column.Template(item)
-                                            }
-                                            else
-                                            {
-                                                @GetCellValue(column, item)
-                                            }
+                                            <div class="sdg-cell-content">
+                                                @if ((EditionMode == SuperDataGridEditionMode.Edit || IsRowInEditMode(item)) && column.EditTemplate is not null)
+                                                {
+                                                    @column.EditTemplate(item)
+                                                }
+                                                else if (column.Template is not null)
+                                                {
+                                                    @column.Template(item)
+                                                }
+                                                else
+                                                {
+                                                    @GetCellValue(column, item)
+                                                }
+                                            </div>
                                         </td>
                                     </tr>
                                 }
@@ -321,18 +323,20 @@
                                             style="@GetCombinedCellStyle(column)"
                                             @onclick="@(() => OnCellClick(rowItem, column))"
                                             @onclick:stopPropagation="@CellClicked.HasDelegate">
-                                            @if ((EditionMode == SuperDataGridEditionMode.Edit || IsRowInEditMode(rowItem)) && column.EditTemplate is not null)
-                                            {
-                                                @column.EditTemplate(rowItem)
-                                            }
-                                            else if (column.Template is not null)
-                                            {
-                                                @column.Template(rowItem)
-                                            }
-                                            else
-                                            {
-                                                @GetCellValue(column, rowItem)
-                                            }
+                                            <div class="sdg-cell-content">
+                                                @if ((EditionMode == SuperDataGridEditionMode.Edit || IsRowInEditMode(rowItem)) && column.EditTemplate is not null)
+                                                {
+                                                    @column.EditTemplate(rowItem)
+                                                }
+                                                else if (column.Template is not null)
+                                                {
+                                                    @column.Template(rowItem)
+                                                }
+                                                else
+                                                {
+                                                    @GetCellValue(column, rowItem)
+                                                }
+                                            </div>
                                         </td>
                                     }
                                 </tr>
@@ -418,18 +422,20 @@
                                                 style="@GetCombinedCellStyle(column)"
                                                 @onclick="@(() => OnCellClick(rowItem, column))"
                                                 @onclick:stopPropagation="@CellClicked.HasDelegate">
-                                                @if ((EditionMode == SuperDataGridEditionMode.Edit || IsRowInEditMode(rowItem)) && column.EditTemplate is not null)
-                                                {
-                                                    @column.EditTemplate(rowItem)
-                                                }
-                                                else if (column.Template is not null)
-                                                {
-                                                    @column.Template(rowItem)
-                                                }
-                                                else
-                                                {
-                                                    @GetCellValue(column, rowItem)
-                                                }
+                                                <div class="sdg-cell-content">
+                                                    @if ((EditionMode == SuperDataGridEditionMode.Edit || IsRowInEditMode(rowItem)) && column.EditTemplate is not null)
+                                                    {
+                                                        @column.EditTemplate(rowItem)
+                                                    }
+                                                    else if (column.Template is not null)
+                                                    {
+                                                        @column.Template(rowItem)
+                                                    }
+                                                    else
+                                                    {
+                                                        @GetCellValue(column, rowItem)
+                                                    }
+                                                </div>
                                             </td>
                                         }
                                     </tr>
