@@ -56,6 +56,9 @@ public partial class SuperButton : IAsyncDisposable
 	public SuperButtonStyle Style { get; set; } = SuperButtonStyle.Primary;
 
 	[Parameter]
+	public SuperButtonType ButtonType { get; set; } = SuperButtonType.Button;
+
+	[Parameter]
 	public string? PopoverTitle { get; set; }
 
 	[Parameter]
@@ -75,6 +78,12 @@ public partial class SuperButton : IAsyncDisposable
 	private bool HasLeadingVisual => !string.IsNullOrWhiteSpace(Image) || !string.IsNullOrWhiteSpace(Icon);
 
 	private bool UseIconOnly => IsCollapsedOrHidden && HasLeadingVisual;
+
+	private string ButtonTypeAttributeValue => ButtonType switch
+	{
+		SuperButtonType.Submit => "submit",
+		_ => "button"
+	};
 
 	private string IconCssClass
 	{
@@ -154,24 +163,14 @@ public partial class SuperButton : IAsyncDisposable
 			{
 				CapturedAttributes["data-bs-placement"] = PopoverPlacement;
 			}
-
-			if (!CapturedAttributes.ContainsKey("type"))
-			{
-				CapturedAttributes["type"] = "button";
-			}
 		}
 
-		if (!UseIconOnly)
-		{
-			return;
-		}
-
-		if (!CapturedAttributes.ContainsKey("title"))
+		if (UseIconOnly && !CapturedAttributes.ContainsKey("title"))
 		{
 			CapturedAttributes["title"] = Text;
 		}
 
-		if (!CapturedAttributes.ContainsKey("aria-label"))
+		if (UseIconOnly && !CapturedAttributes.ContainsKey("aria-label"))
 		{
 			CapturedAttributes["aria-label"] = Text;
 		}
@@ -180,6 +179,11 @@ public partial class SuperButton : IAsyncDisposable
 		foreach (var (key, value) in CapturedAttributes)
 		{
 			if (string.Equals(key, "class", StringComparison.OrdinalIgnoreCase))
+			{
+				continue;
+			}
+
+			if (string.Equals(key, "type", StringComparison.OrdinalIgnoreCase))
 			{
 				continue;
 			}

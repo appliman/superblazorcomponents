@@ -34,6 +34,7 @@
 
 - 🎨 9 Bootstrap variants (`Primary`, `Secondary`, `Success`, `Danger`, `Warning`, `Info`, `Light`, `Dark`, `Link`)
 - 📏 4 sizes (`Default`, `SuperSmall`, `Small`, `Large`)
+- 🧾 Native `button` / `submit` rendering via `ButtonType`
 - ⏳ Built-in **busy state** with spinner and `BusyText`
 - 🖼️ Icons (Font Awesome) or images (URL)
 - 🏷️ Optional **badges** with custom CSS class
@@ -84,6 +85,9 @@ classDiagram
         +bool IsBusy
         +bool Disabled
         #OnClick(MouseEventArgs)
+    }
+    class SuperButton {
+        +SuperButtonType ButtonType
     }
     SuperButtonBase <|-- SuperButton
     SuperButtonBase <|-- SuperToggleButton
@@ -145,9 +149,10 @@ sequenceDiagram
 | `Outline` | `bool` | `false` | Use `btn-outline-*` variant |
 | `Size` | `SuperButtonSize` | `Default` | Button size |
 | `Style` | `SuperButtonStyle` | `Primary` | Bootstrap variant |
+| `ButtonType` | `SuperButtonType` | `Button` | Native button type. `Button` renders `type="button"`; `Submit` renders `type="submit"` for forms |
 | `Disabled` | `bool` | `false` | Disables the button |
 | `IsBusy` | `bool` | `false` | Force the busy state externally |
-| `BusyText` | `string?` | `null` | Text shown next to the spinner during async click |
+| `BusyText` | `string?` | `null` | Text shown next to the spinner while the component `Click` callback is running |
 | `PopoverTitle` | `string?` | `null` | Bootstrap popover title |
 | `PopoverContent` | `string?` | `null` | Bootstrap popover content |
 | `PopoverPlacement` | `string?` | `null` | `top`, `bottom`, `start`, `end` |
@@ -227,6 +232,11 @@ public enum SuperButtonSize
     Default, SuperSmall, Small, Large
 }
 
+public enum SuperButtonType
+{
+    Button, Submit
+}
+
 public enum SuperDropdownMenuAlignment
 {
     Start, End
@@ -243,7 +253,51 @@ public enum SuperDropdownMenuAlignment
 <SuperButton Text="Save" Icon="fa-floppy-disk" Click="OnSaveAsync" />
 ```
 
-### 2. Outline + size + style
+### 2. Submit button
+
+```razor
+<EditForm Model="@model" OnValidSubmit="OnSubmitAsync">
+    <SuperButton Text="Save"
+                 Icon="fa-floppy-disk"
+                 ButtonType="SuperButtonType.Submit" />
+</EditForm>
+```
+
+`SuperButton` renders `type="button"` by default, so it does not submit a form accidentally. Use `ButtonType="SuperButtonType.Submit"` only for the button that should trigger form submission.
+
+### 3. Submit button with form-controlled loader
+
+```razor
+<EditForm Model="@model" OnValidSubmit="SaveAsync">
+    <SuperButton Text="Save"
+                 Icon="fa-floppy-disk"
+                 ButtonType="SuperButtonType.Submit"
+                 IsBusy="@_isSaving"
+                 BusyText="Saving..." />
+</EditForm>
+
+@code {
+    private bool _isSaving;
+
+    private async Task SaveAsync()
+    {
+        _isSaving = true;
+
+        try
+        {
+            await Api.SaveAsync(model);
+        }
+        finally
+        {
+            _isSaving = false;
+        }
+    }
+}
+```
+
+`BusyText` is automatic when the async work is executed by the `Click` callback on `SuperButton`. For `EditForm.OnValidSubmit`, bind `IsBusy` to the form handler state as shown above.
+
+### 4. Outline + size + style
 
 ```razor
 <SuperButton Text="Delete"
@@ -254,7 +308,7 @@ public enum SuperDropdownMenuAlignment
              Click="OnDeleteAsync" />
 ```
 
-### 3. Async button with busy state
+### 5. Async button with busy state
 
 ```razor
 <SuperButton Text="Send invoice"
@@ -269,7 +323,7 @@ public enum SuperDropdownMenuAlignment
 }
 ```
 
-### 4. Image instead of icon
+### 6. Image instead of icon
 
 ```razor
 <SuperButton Text="Sign in with Google"
@@ -277,7 +331,7 @@ public enum SuperDropdownMenuAlignment
              Style="SuperButtonStyle.Light" />
 ```
 
-### 5. Button with badge
+### 7. Button with badge
 
 ```razor
 <SuperButton Text="Inbox"
@@ -286,7 +340,7 @@ public enum SuperDropdownMenuAlignment
              BadgeCssClass="badge text-bg-danger" />
 ```
 
-### 6. Bootstrap popover
+### 8. Bootstrap popover
 
 ```razor
 <SuperButton Text="Help"
@@ -298,7 +352,7 @@ public enum SuperDropdownMenuAlignment
              PopoverPlacement="top" />
 ```
 
-### 7. Link button opening in a new tab
+### 9. Link button opening in a new tab
 
 ```razor
 <SuperLinkButton Text="Documentation"
@@ -308,7 +362,7 @@ public enum SuperDropdownMenuAlignment
                  Style="SuperButtonStyle.Link" />
 ```
 
-### 8. Toggle button (pressed state)
+### 10. Toggle button (pressed state)
 
 ```razor
 <SuperToggleButton Text="Show archived"
@@ -317,7 +371,7 @@ public enum SuperDropdownMenuAlignment
                    Click="OnFilterChanged" />
 ```
 
-### 9. Split button with multiple actions
+### 11. Split button with multiple actions
 
 ```razor
 <SuperSplitButton Text="Export"
@@ -345,7 +399,7 @@ public enum SuperDropdownMenuAlignment
 }
 ```
 
-### 10. Split button with link items
+### 12. Split button with link items
 
 ```razor
 <SuperSplitButton Text="New" Icon="fa-plus" Style="SuperButtonStyle.Success">
@@ -356,7 +410,7 @@ public enum SuperDropdownMenuAlignment
 </SuperSplitButton>
 ```
 
-### 11. Confirmation button (deletion)
+### 13. Confirmation button (deletion)
 
 ```razor
 <SuperConfirmationButton Text="Delete"
@@ -367,7 +421,7 @@ public enum SuperDropdownMenuAlignment
                          Click="DeleteCustomerAsync" />
 ```
 
-### 12. Confirmation button with `ApplyCondition`
+### 14. Confirmation button with `ApplyCondition`
 
 ```razor
 <SuperConfirmationButton Text="Apply"
@@ -377,7 +431,7 @@ public enum SuperDropdownMenuAlignment
                          Click="OnApplyAsync" />
 ```
 
-### 13. Button group (toolbar)
+### 15. Button group (toolbar)
 
 ```razor
 <SuperButtonGroup AriaLabel="Text alignment">
@@ -389,7 +443,7 @@ public enum SuperDropdownMenuAlignment
 </SuperButtonGroup>
 ```
 
-### 14. Vertical button group
+### 16. Vertical button group
 
 ```razor
 <SuperButtonGroup Vertical="true">
@@ -401,7 +455,7 @@ public enum SuperDropdownMenuAlignment
 </SuperButtonGroup>
 ```
 
-### 15. Auto icon-only inside collapsed sidebar
+### 17. Auto icon-only inside collapsed sidebar
 
 ```razor
 <SuperLayout>
@@ -414,7 +468,7 @@ public enum SuperDropdownMenuAlignment
 
 Set `AllowCollapse="false"` to disable that behavior.
 
-### 16. All variants overview
+### 18. All variants overview
 
 ```razor
 @foreach (var style in Enum.GetValues<SuperButtonStyle>())
@@ -429,6 +483,7 @@ Set `AllowCollapse="false"` to disable that behavior.
 ## Tips & Best Practices
 
 - ✅ Prefer **`BusyText`** over manually toggling `Disabled` for async clicks — it gives free spinner + click protection.
+- ✅ Keep the default `ButtonType="SuperButtonType.Button"` for normal actions inside forms, and opt in to `Submit` only when the button must submit the form.
 - ✅ Use **`SuperConfirmationButton`** for any destructive operation; do not roll your own modal.
 - ✅ For toolbars, wrap related buttons in **`SuperButtonGroup`** to get correct Bootstrap spacing/borders.
 - ✅ Provide **`Icon` + `Text`** so the button degrades gracefully when the sidebar collapses to icon-only.
@@ -442,6 +497,8 @@ Set `AllowCollapse="false"` to disable that behavior.
 | Symptom | Cause | Fix |
 |---|---|---|
 | Click handler runs twice | `Click` callback also calls `StateHasChanged` while `BusyText` already triggers it | Remove the manual `StateHasChanged` |
+| Button inside a form does not submit | `SuperButton` defaults to `type="button"` | Set `ButtonType="SuperButtonType.Submit"` |
+| Loader does not show during `OnValidSubmit` | `BusyText` follows the `SuperButton.Click` callback, not the form event | Bind `IsBusy` to a field that is toggled in the form submit handler |
 | Confirmation dialog never shows | `<SuperDialog />` or `<SuperConfirmDialog />` host not placed in layout | Add both to `MainLayout.razor` |
 | Split button menu cut off | Parent has `overflow: hidden` | Add `overflow-visible` or move the dropdown to a higher container |
 | Icon-only mode never triggers | Component is not inside a `SuperLayout` | Either add it, or set `AllowCollapse="false"` to silence the feature |
