@@ -5,7 +5,7 @@
 @inherits SuperButtonBase
 @implements IAsyncDisposable
 
-<button @ref="_buttonRef" class="@CssClass" @onclick="@OnClick" disabled="@IsDisabled" @attributes="@_additionalAttributes">
+<button @ref="_buttonRef" type="@ButtonTypeAttributeValue" class="@CssClass" @onclick="@OnClick" disabled="@IsDisabled" @attributes="@_additionalAttributes">
     @if (IsBusy)
     {
         <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
