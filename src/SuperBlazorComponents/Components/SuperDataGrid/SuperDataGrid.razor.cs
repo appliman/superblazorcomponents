@@ -890,7 +890,7 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 	{
 		var classes = new List<string> { "sdg-container" };
 
-		if (FixedRowHeight)
+		if (IsFixedRowHeightEnabled())
 		{
 			classes.Add("sdg-fixed-row-height");
 		}
@@ -901,6 +901,11 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 		}
 
 		return string.Join(" ", classes);
+	}
+
+	private bool IsFixedRowHeightEnabled()
+	{
+		return FixedRowHeight && GridOrientation == SuperDataGridOrientation.Horizontal;
 	}
 
 	private string GetTableWrapperStyle()
