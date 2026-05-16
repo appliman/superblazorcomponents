@@ -16,26 +16,26 @@
 
 ## ✨ Components
 
-| Component | Description | Docs |
-|---|---|---|
-| **SuperDataGrid** | Virtualized data grid — frozen columns/rows, hierarchical lazy-loading rows, reordering, resizing, filtering, sorting, inline editing, row selection, settings persistence | [📖 SUPERDATAGRID.md](SUPERDATAGRID.md) |
-| **SuperLayout** | Responsive app layout — header, sidebar, body, footer, chat panel with collapsible sidebar | [📖 SUPERLAYOUT.md](SUPERLAYOUT.md) |
-| **SuperTabs** | Dynamic tabbed interface — badges, closable tabs, lazy loading, persistence (URL + localStorage), keyboard navigation, service-driven management | [📖 SUPERTABS.md](SUPERTABS.md) |
-| **SuperSplitter** | Resizable split panels — horizontal/vertical, collapsible, state persistence | [📖 SuperSplitter.md](src/SuperBlazorComponents/Components/SuperSplitter/SuperSplitter.md) |
-| **SuperDateRangePicker** | Calendar-based date range picker with presets | [📖 SUPERDATERANGEPICKER.md](SUPERDATERANGEPICKER.md) |
-| **SuperColorPicker** | Inline HSV color picker — hue/saturation/value canvas, alpha slider, HEX & RGB input modes | [📖 SUPERCOLORPICKER.md](SUPERCOLORPICKER.md) |
-| **SuperDropDownColorPicker** | Compact dropdown variant of SuperColorPicker — colored swatch trigger button with floating popup | [📖 SUPERCOLORPICKER.md](SUPERCOLORPICKER.md) |
-| **SuperHtmlEditor** | WYSIWYG HTML editor — toolbar (font, size, bold/italic/underline, colors, alignment, lists), lazy-loaded Monaco Editor for HTML source view | [📖 SUPERHTMLEDITOR.md](SUPERHTMLEDITOR.md) |
-| **SuperButtons** | Buttons, split buttons, toggle buttons, link buttons, confirmation buttons | [📖 SUPERBUTTONS.md](SUPERBUTTONS.md) |
-| **SuperTriStateCheckbox** | Bootstrap-friendly checkbox for nullable boolean values (`true`, `false`, `null`) | [📖 SuperTriStateCheckbox.md](src/SuperBlazorComponents/Components/SuperTriStateCheckbox/SuperTriStateCheckbox.md) |
-| **SuperTooltip** | Tooltips for Blazor or HTML elements — text, HTML, Markdown, positions, delay, duration, click closing and manual control | [📖 SuperTooltip.md](src/SuperBlazorComponents/Components/Tooltips/SuperTooltip.md) |
-| **SuperDialog** | Modal dialog system with dynamic component rendering | [📖 SUPERDIALOGS.md](SUPERDIALOGS.md) |
-| **SuperConfirmDialog** | Confirmation dialog with customizable buttons | [📖 SUPERDIALOGS.md](SUPERDIALOGS.md) |
-| **SuperNotifications** | Toast notifications with auto-dismiss and severity levels | [📖 SUPERNOTIFICATIONS.md](SUPERNOTIFICATIONS.md) |
-| **SuperBreadCrumb** | Breadcrumb navigation with back-navigation support | [📖 SUPERBREADCRUMB.md](SUPERBREADCRUMB.md) |
-| **SuperMenuItem** | Sidebar menu items with icons, badges, and nested submenus | [📖 SUPERMENUITEM.md](SUPERMENUITEM.md) |
-| **ThemeToggle** | Dark/light theme toggle with system preference detection and localStorage persistence | [📖 THEMETOGGLE.md](THEMETOGGLE.md) |
-| **Google Charts** | Combo charts, pie charts, and pure SVG time series charts | [📖 GOOGLECHARTS.md](GOOGLECHARTS.md) |
+| Preview | Component | Description | Docs |
+|---|---|---|---|
+| <img src="docs/images/components/superdatagrid.svg" width="88" alt="SuperDataGrid preview"> | **SuperDataGrid** | Virtualized data grid — frozen columns/rows, hierarchical lazy-loading rows, reordering, resizing, filtering, sorting, inline editing, row selection, settings persistence | [📖 SUPERDATAGRID.md](SUPERDATAGRID.md) |
+| <img src="docs/images/components/superlayout.svg" width="88" alt="SuperLayout preview"> | **SuperLayout** | Responsive app layout — header, sidebar, body, footer, chat panel with collapsible sidebar | [📖 SUPERLAYOUT.md](SUPERLAYOUT.md) |
+| <img src="docs/images/components/supertabs.svg" width="88" alt="SuperTabs preview"> | **SuperTabs** | Dynamic tabbed interface — badges, closable tabs, lazy loading, persistence (URL + localStorage), keyboard navigation, service-driven management | [📖 SUPERTABS.md](SUPERTABS.md) |
+| <img src="docs/images/components/supersplitter.svg" width="88" alt="SuperSplitter preview"> | **SuperSplitter** | Resizable split panels — horizontal/vertical, collapsible, state persistence | [📖 SuperSplitter.md](src/SuperBlazorComponents/Components/SuperSplitter/SuperSplitter.md) |
+| <img src="docs/images/components/superdaterangepicker.svg" width="88" alt="SuperDateRangePicker preview"> | **SuperDateRangePicker** | Calendar-based date range picker with presets | [📖 SUPERDATERANGEPICKER.md](SUPERDATERANGEPICKER.md) |
+| <img src="docs/images/components/supercolorpicker.svg" width="88" alt="SuperColorPicker preview"> | **SuperColorPicker** | Inline HSV color picker — hue/saturation/value canvas, alpha slider, HEX & RGB input modes | [📖 SUPERCOLORPICKER.md](SUPERCOLORPICKER.md) |
+| <img src="docs/images/components/superdropdowncolorpicker.svg" width="88" alt="SuperDropDownColorPicker preview"> | **SuperDropDownColorPicker** | Compact dropdown variant of SuperColorPicker — colored swatch trigger button with floating popup | [📖 SUPERCOLORPICKER.md](SUPERCOLORPICKER.md) |
+| <img src="docs/images/components/superhtmleditor.svg" width="88" alt="SuperHtmlEditor preview"> | **SuperHtmlEditor** | WYSIWYG HTML editor — toolbar (font, size, bold/italic/underline, colors, alignment, lists), lazy-loaded Monaco Editor for HTML source view | [📖 SUPERHTMLEDITOR.md](SUPERHTMLEDITOR.md) |
+| <img src="docs/images/components/superbuttons.svg" width="88" alt="SuperButtons preview"> | **SuperButtons** | Buttons, split buttons, toggle buttons, link buttons, confirmation buttons | [📖 SUPERBUTTONS.md](SUPERBUTTONS.md) |
+| <img src="docs/images/components/supertristatecheckbox.svg" width="88" alt="SuperTriStateCheckbox preview"> | **SuperTriStateCheckbox** | Bootstrap-friendly checkbox for nullable boolean values (`true`, `false`, `null`) | [📖 SuperTriStateCheckbox.md](src/SuperBlazorComponents/Components/SuperTriStateCheckbox/SuperTriStateCheckbox.md) |
+| <img src="docs/images/components/supertooltip.svg" width="88" alt="SuperTooltip preview"> | **SuperTooltip** | Tooltips for Blazor or HTML elements — text, HTML, Markdown, positions, delay, duration, click closing and manual control | [📖 SuperTooltip.md](src/SuperBlazorComponents/Components/Tooltips/SuperTooltip.md) |
+| <img src="docs/images/components/superdialog.svg" width="88" alt="SuperDialog preview"> | **SuperDialog** | Modal dialog system with dynamic component rendering | [📖 SUPERDIALOGS.md](SUPERDIALOGS.md) |
+| <img src="docs/images/components/superconfirmdialog.svg" width="88" alt="SuperConfirmDialog preview"> | **SuperConfirmDialog** | Confirmation dialog with customizable buttons | [📖 SUPERDIALOGS.md](SUPERDIALOGS.md) |
+| <img src="docs/images/components/supernotifications.svg" width="88" alt="SuperNotifications preview"> | **SuperNotifications** | Toast notifications with auto-dismiss and severity levels | [📖 SUPERNOTIFICATIONS.md](SUPERNOTIFICATIONS.md) |
+| <img src="docs/images/components/superbreadcrumb.svg" width="88" alt="SuperBreadCrumb preview"> | **SuperBreadCrumb** | Breadcrumb navigation with back-navigation support | [📖 SUPERBREADCRUMB.md](SUPERBREADCRUMB.md) |
+| <img src="docs/images/components/supermenuitem.svg" width="88" alt="SuperMenuItem preview"> | **SuperMenuItem** | Sidebar menu items with icons, badges, and nested submenus | [📖 SUPERMENUITEM.md](SUPERMENUITEM.md) |
+| <img src="docs/images/components/themetoggle.svg" width="88" alt="ThemeToggle preview"> | **ThemeToggle** | Dark/light theme toggle with system preference detection and localStorage persistence | [📖 THEMETOGGLE.md](THEMETOGGLE.md) |
+| <img src="docs/images/components/googlecharts.svg" width="88" alt="Google Charts preview"> | **Google Charts** | Combo charts, pie charts, and pure SVG time series charts | [📖 GOOGLECHARTS.md](GOOGLECHARTS.md) |
 
 ---
 
@@ -118,6 +118,7 @@ The server exposes tools such as:
 - `list_super_components`
 - `get_super_component_guide`
 - `get_super_data_grid_guide`
+- `get_super_datagrid_guide`
 - `get_super_buttons_guide`
 - `get_super_tabs_guide`
 - `get_super_layout_guide`

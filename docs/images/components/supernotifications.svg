@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="88" height="52" viewBox="0 0 88 52" role="img" aria-label="SuperNotifications thumbnail">
+  <rect width="88" height="52" rx="6" fill="#f8fafc"/>
+  <rect x="21" y="10" width="48" height="10" rx="4" fill="#198754"/>
+  <rect x="27" y="23" width="42" height="10" rx="4" fill="#0d6efd"/>
+  <rect x="17" y="36" width="52" height="10" rx="4" fill="#ffc107"/>
+  <circle cx="27" cy="15" r="2" fill="#fff"/>
+  <circle cx="33" cy="28" r="2" fill="#fff"/>
+  <circle cx="23" cy="41" r="2" fill="#fff"/>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="88" height="52" viewBox="0 0 88 52" role="img" aria-label="SuperButtons thumbnail">
+  <rect width="88" height="52" rx="6" fill="#f8fafc"/>
+  <rect x="10" y="13" width="28" height="12" rx="4" fill="#0d6efd"/>
+  <rect x="43" y="13" width="35" height="12" rx="4" fill="#198754"/>
+  <rect x="10" y="31" width="42" height="12" rx="4" fill="#fff" stroke="#0d6efd"/>
+  <rect x="58" y="31" width="20" height="12" rx="4" fill="#dc3545"/>
+  <path d="M69 17l4 4 4-4" fill="none" stroke="#fff" stroke-width="1.5"/>
+</svg>

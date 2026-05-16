@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="88" height="52" viewBox="0 0 88 52" role="img" aria-label="SuperDropDownColorPicker thumbnail">
+  <rect width="88" height="52" rx="6" fill="#f8fafc"/>
+  <rect x="13" y="9" width="62" height="12" rx="3" fill="#fff" stroke="#cbd5e1"/>
+  <rect x="17" y="12" width="16" height="6" rx="2" fill="#20c997"/>
+  <path d="M66 14l4 4 4-4" fill="none" stroke="#64748b" stroke-width="1.5"/>
+  <rect x="24" y="25" width="40" height="18" rx="4" fill="#fff" stroke="#cbd5e1"/>
+  <circle cx="34" cy="34" r="5" fill="#dc3545"/>
+  <circle cx="45" cy="34" r="5" fill="#0d6efd"/>
+  <circle cx="56" cy="34" r="5" fill="#ffc107"/>
+</svg>

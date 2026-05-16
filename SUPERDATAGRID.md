@@ -246,6 +246,7 @@ When your model implements `IDataItem`:
 | `GridId` | `string?` | `null` | Unique identifier for settings persistence |
 | `Height` | `string` | `"400px"` | CSS height of the grid container (e.g. `"400px"`, `"100%"`) |
 | `RowHeight` | `float` | `40f` | Estimated row height in pixels for virtualization |
+| `FixedRowHeight` | `bool` | `true` | Keep body rows at `RowHeight`; overflowing cell content scrolls vertically inside the cell and can expand into a hover preview |
 | `OverscanCount` | `int` | `5` | Number of extra items rendered outside the visible area |
 | `GridOrientation` | `SuperDataGridOrientation` | `Horizontal` | `Horizontal` (table) or `Vertical` (property grid) |
 | `DefaultSettingsName` | `string?` | `null` | Name of a preset from `SuperComponentsConfiguration.SuperDataGridSettingsList` |
@@ -1279,6 +1280,14 @@ The grid uses virtualization to handle large datasets efficiently:
 }
 ```
 
+With `FixedRowHeight="true"` (the default), body rows remain at the configured `RowHeight`.
+When a cell contains taller content, the content scrolls vertically inside the cell instead of increasing the row height.
+If the user hovers an overflowing cell, the grid shows a floating preview over the cell with the full content; the preview opens downward when there is enough viewport space and upward when the row is near the bottom of the screen.
+
+![SuperDataGrid fixed row height with overflowing cells](docs/images/superdatagrid-fixed-row-height.png)
+
+![SuperDataGrid fixed row height hover preview](docs/images/superdatagrid-fixed-row-height-hover-preview.png)
+
 ---
 
 ### 17 — Cell Click Events
@@ -1651,6 +1660,7 @@ public interface ISuperDataGridSettingsStorage
 - **Always set `Height`** — The grid needs a fixed or relative height for virtualization to work efficiently.
 - **Use server-side paging** — For large datasets (1000+ rows), implement paging in your `ItemsProvider` instead of loading all data in memory.
 - **Set `RowHeight` accurately** — The closer this matches your actual row height, the smoother virtualization scrolling will be.
+- **Keep `FixedRowHeight` enabled for virtualized grids** — Overflowing cells scroll internally and show a hover preview, while virtualization keeps stable row measurements.
 - **Use `OverscanCount`** wisely — Default is 5. Increase for smoother scrolling, decrease for better memory usage.
 - **Respect `CancellationToken`** — The grid cancels superseded requests when the user scrolls fast. Always pass the token to your data operations.
 

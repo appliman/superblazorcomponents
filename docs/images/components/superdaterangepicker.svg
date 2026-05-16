@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="88" height="52" viewBox="0 0 88 52" role="img" aria-label="SuperDateRangePicker thumbnail">
+  <rect width="88" height="52" rx="6" fill="#f8fafc"/>
+  <rect x="17" y="8" width="54" height="36" rx="4" fill="#fff" stroke="#cbd5e1"/>
+  <rect x="17" y="8" width="54" height="9" rx="4" fill="#0d6efd"/>
+  <path d="M25 23h38M25 30h38M25 37h38M34 18v22M44 18v22M54 18v22" stroke="#cbd5e1"/>
+  <rect x="35" y="24" width="18" height="10" rx="2" fill="#198754"/>
+</svg>

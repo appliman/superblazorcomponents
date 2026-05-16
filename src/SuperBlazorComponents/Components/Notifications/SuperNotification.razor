@@ -17,7 +17,14 @@
             </div>
             <div class="toast-body" style="cursor: @(n.Click is null ? "default" : "pointer")"
                  @onclick="() => OnToastClickAsync(n)">
-                @n.Detail
+                @if (n.IsHtml)
+                {
+                    @((MarkupString)(n.Detail ?? string.Empty))
+                }
+                else
+                {
+                    @n.Detail
+                }
             </div>
 
             @if (ShouldShowProgress(n))

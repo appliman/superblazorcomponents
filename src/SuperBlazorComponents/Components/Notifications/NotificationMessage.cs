@@ -61,6 +61,13 @@ public sealed class NotificationMessage
 	public string? Detail { get; set; }
 	//
 	// Summary:
+	//     Gets or sets whether the detail is rendered as HTML.
+	//
+	// Value:
+	//     True to render detail as raw HTML; false to render as plain text. Defaults to true.
+	public bool IsHtml { get; set; } = true;
+	//
+	// Summary:
 	//     Gets or sets the summary content.
 	//
 	// Value:

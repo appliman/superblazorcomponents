@@ -11,6 +11,7 @@ public sealed record SuperDataGridSettings
 
 	// --- Dimensions ---
 	public float RowHeight { get; set; } = 40f;
+	public bool FixedRowHeight { get; set; } = true;
 	public int OverscanCount { get; set; } = 5;
 
 	// --- Freeze ---

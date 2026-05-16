@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="88" height="52" viewBox="0 0 88 52" role="img" aria-label="SuperDataGrid thumbnail">
+  <rect width="88" height="52" rx="6" fill="#f8fafc"/>
+  <rect x="6" y="8" width="76" height="36" rx="3" fill="#fff" stroke="#cbd5e1"/>
+  <rect x="6" y="8" width="76" height="9" rx="3" fill="#e2e8f0"/>
+  <path d="M6 26h76M6 35h76M24 8v36M48 8v36M66 8v36" stroke="#cbd5e1"/>
+  <rect x="10" y="20" width="10" height="3" rx="1.5" fill="#0d6efd"/>
+  <rect x="29" y="29" width="14" height="3" rx="1.5" fill="#64748b"/>
+  <rect x="52" y="38" width="10" height="3" rx="1.5" fill="#dc3545"/>
+</svg>

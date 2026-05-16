@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="88" height="52" viewBox="0 0 88 52" role="img" aria-label="ThemeToggle thumbnail">
+  <rect width="88" height="52" rx="6" fill="#f8fafc"/>
+  <rect x="16" y="18" width="56" height="18" rx="9" fill="#0f172a"/>
+  <circle cx="55" cy="27" r="7" fill="#fff"/>
+  <path d="M52 20a8 8 0 1 0 9 11 9 9 0 0 1-9-11z" fill="#94a3b8"/>
+  <circle cx="28" cy="27" r="5" fill="#ffc107"/>
+</svg>

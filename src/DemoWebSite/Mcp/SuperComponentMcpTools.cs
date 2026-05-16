@@ -28,6 +28,10 @@ public sealed class SuperComponentMcpTools(SuperComponentGuideCatalog catalog)
 	public string get_super_data_grid_guide() => catalog.RenderGuide("super-data-grid");
 
 	[McpServerTool]
+	[Description("Gets setup guidance for SuperDataGrid, including virtualization, ItemsProvider, DataGridColumn, fixed row height, and overflow hover preview behavior.")]
+	public string get_super_datagrid_guide() => catalog.RenderGuide("super-data-grid");
+
+	[McpServerTool]
 	[Description("Gets setup guidance for the SuperButtons family: SuperButton, SuperLinkButton, SuperSplitButton, SuperConfirmationButton, and SuperToggleButton.")]
 	public string get_super_buttons_guide() => catalog.RenderGuide("super-buttons");
 

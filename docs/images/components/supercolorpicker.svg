@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="88" height="52" viewBox="0 0 88 52" role="img" aria-label="SuperColorPicker thumbnail">
+  <defs>
+    <linearGradient id="scp-a" x1="0" x2="1" y1="0" y2="1">
+      <stop stop-color="#f00"/><stop offset=".5" stop-color="#0f0"/><stop offset="1" stop-color="#00f"/>
+    </linearGradient>
+  </defs>
+  <rect width="88" height="52" rx="6" fill="#f8fafc"/>
+  <rect x="11" y="10" width="42" height="32" rx="4" fill="url(#scp-a)" stroke="#cbd5e1"/>
+  <rect x="60" y="10" width="7" height="32" rx="3.5" fill="#0d6efd"/>
+  <circle cx="34" cy="27" r="5" fill="none" stroke="#fff" stroke-width="2"/>
+  <rect x="70" y="25" width="8" height="17" rx="2" fill="#dc3545"/>
+</svg>

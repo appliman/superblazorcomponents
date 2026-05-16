@@ -56,13 +56,13 @@ public sealed class SuperComponentGuideCatalog
 		yield return new(
 			"super-data-grid",
 			"SuperDataGrid",
-			"Virtualized data grid with sorting, filtering, frozen columns, row actions, selection, settings persistence, and row editing.",
+			"Virtualized data grid with sorting, filtering, frozen columns, fixed row height with overflow preview, row actions, selection, settings persistence, and row editing.",
 			["SuperDataGrid", "DataGrid", "Grid"],
 			["SuperBlazorComponents.Components.SuperDataGrid"],
-			["/supergrid-demo", "/supergrid-simple-demo", "/todo-supergrid-demo"],
-			"Call builder.Services.AddSuperComponents(...) in Program.cs. Use <SuperDataGrid TItem=\"MyItem\" ItemsProvider=\"LoadItemsAsync\"> with one <DataGridColumn> per property. Implement GridItemsProviderResult<TItem> and give rows a stable KeyValue when they implement IDataItem.",
+			["/supergrid-demo", "/supergrid-simple-demo", "/supergrid-fixed-row-height-demo", "/todo-supergrid-demo"],
+			"Call builder.Services.AddSuperComponents(...) in Program.cs. Use <SuperDataGrid TItem=\"MyItem\" ItemsProvider=\"LoadItemsAsync\"> with one <DataGridColumn> per property. Implement GridItemsProviderResult<TItem> and give rows a stable KeyValue when they implement IDataItem. Keep FixedRowHeight enabled for virtualized grids when row content may be taller than RowHeight; overflowing cells scroll internally and show a hover preview.",
 			"""
-			<SuperDataGrid TItem="Customer" ItemsProvider="LoadCustomersAsync" Height="520px" AllowFiltering="true" AllowSorting="true">
+			<SuperDataGrid TItem="Customer" ItemsProvider="LoadCustomersAsync" Height="520px" RowHeight="44" FixedRowHeight="true" AllowFiltering="true" AllowSorting="true">
 			    <ChildContent>
 			        <DataGridColumn For="@(item => item.Name)" Title="Name" Width="220px" />
 			        <DataGridColumn For="@(item => item.City)" Title="City" Width="180px" />
