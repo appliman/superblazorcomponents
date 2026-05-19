@@ -64,11 +64,11 @@
     ];
 
     private readonly Type _externalInjectorType = typeof(ProductDynamicColumnsInjector);
-    private Dictionary<string, object> _externalInjectorParameters = default!;
+    private Dictionary<string, object?> _externalInjectorParameters = default!;
 
     protected override void OnInitialized()
     {
-        _externalInjectorParameters = new Dictionary<string, object>
+        _externalInjectorParameters = new Dictionary<string, object?>
         {
             [nameof(ProductDynamicColumnsInjector.PricePosition)] = 1,
             [nameof(ProductDynamicColumnsInjector.StatusPosition)] = 3
