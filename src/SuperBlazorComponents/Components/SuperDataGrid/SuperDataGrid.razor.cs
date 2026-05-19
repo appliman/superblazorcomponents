@@ -611,8 +611,10 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 		{
 			if (existingIndex == targetIndex)
 			{
+				column.MarkRegistrationState(true);
 				ApplyLoadedColumnSettingsIfAvailable();
 				InvalidateColumnStyleCache();
+				NotifyColumnStateChanged();
 				StateHasChanged();
 				return;
 			}
