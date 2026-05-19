@@ -15,18 +15,19 @@
 
 .stcf-clear {
     position: absolute;
-    right: 0.25rem;
+    right: 0.3rem;
     top: 50%;
     transform: translateY(-50%);
-    border: 0;
-    background: none;
+    border: 1px solid transparent;
+    background: transparent;
     box-shadow: none;
     color: var(--bs-secondary-color, #6c757d);
     padding: 0;
-    width: auto;
-    height: auto;
+    width: 1.1rem;
+    height: 1.1rem;
+    border-radius: 3px;
     line-height: 1;
-    font-size: 0.75rem;
+    font-size: 0.85rem;
     cursor: pointer;
     appearance: none;
     display: flex;
@@ -36,7 +37,8 @@
 
 .stcf-clear:hover {
     color: var(--bs-body-color, #212529);
-    background: none;
+    background: transparent;
+    border-color: var(--bs-border-color, #dee2e6);
     box-shadow: none;
 }
 

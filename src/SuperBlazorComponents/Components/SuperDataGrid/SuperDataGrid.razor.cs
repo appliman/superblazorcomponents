@@ -469,9 +469,9 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 	/// <summary>
 	/// Forces a re-render of the UI.
 	/// </summary>
-	public void Refresh()
+	public Task RefreshAsync()
 	{
-		StateHasChanged();
+		return InvokeAsync(StateHasChanged);
 	}
 
 	/// <summary>
@@ -1177,7 +1177,7 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 		return item;
 	}
 
-	private string GetCellClass(DataGridColumn<TItem> column, TItem item)
+	private string GetCellClass(DataGridColumn<TItem> column, TItem item, string? cellTitle = null)
 	{
 		var classes = new List<string> { "sdg-cell" };
 
@@ -1198,7 +1198,7 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 		}
 
 		// Mark cells that render multiline plain text so the CSS hover rule can expand them
-		if (GetCellTitle(column, item) is not null)
+		if ((cellTitle ?? GetCellTitle(column, item)) is not null)
 		{
 			classes.Add("sdg-cell-multiline");
 		}
