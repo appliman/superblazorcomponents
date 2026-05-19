@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.Web.Virtualization;
 using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
+using System.Runtime.CompilerServices;
 
 namespace SuperBlazorComponents.Components.SuperDataGrid;
 
@@ -998,7 +999,7 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 
 	private string GetColumnStyle(DataGridColumn<TItem> column)
 	{
-		var cacheKey = $"{column.Property}_style_{_cacheVersion}";
+		var cacheKey = $"{RuntimeHelpers.GetHashCode(column)}_style_{_cacheVersion}";
 		if (_columnStyleCache.TryGetValue(cacheKey, out var cachedStyle))
 		{
 			return cachedStyle;
