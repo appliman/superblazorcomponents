@@ -1,0 +1,140 @@
+@page "/supergrid-dynamic-component-demo"
+@using SuperBlazorComponents
+@using SuperBlazorComponents.Components.SuperDataGrid
+
+<PageTitle>SuperGrid - Dynamic Component Injection</PageTitle>
+
+<h1>SuperGrid - Dynamic Component Injection</h1>
+<p>
+    This demo injects external columns through a <code>DynamicComponent</code> placed inside the grid
+    <code>ChildContent</code>. The injected component receives the grid through a cascading parameter and
+    calls <code>AddColumn(position, column)</code> after its <code>@@ref</code> columns are available.
+</p>
+
+<div class="alert alert-info">
+    <strong>Injected columns:</strong> Price is inserted at position 1 and Status at position 3.
+</div>
+
+<div class="mb-3">
+    <span class="badge bg-primary me-2">Rows: @_products.Count</span>
+    <span class="badge bg-success me-2">Injected component: @_externalInjectorType.Name</span>
+    <span class="badge bg-secondary">GridId: dynamic-component-demo</span>
+</div>
+
+<div style="height: 520px; width: 1100px;">
+    <SuperDataGrid TItem="DemoProduct"
+                   ItemsProvider="LoadProductsAsync"
+                   Height="100%"
+                   RowHeight="48"
+                   GridId="dynamic-component-demo"
+                   FreezeHeader="true"
+                   FreezeFooter="true"
+                   AllowColumnReorder="true"
+                   AllowColumnResize="true"
+                   AllowSorting="true"
+                   DisplayRefreshButton="true">
+        <HeaderTemplate>
+            <div class="d-flex align-items-center gap-2">
+                <span>External columns injected with <code>DynamicComponent</code></span>
+            </div>
+        </HeaderTemplate>
+
+        <ChildContent>
+            <DataGridColumn TItem="DemoProduct" For="@(p => p.Id)" Title="ID" Width="80px" AlwaysVisible="true" />
+            <DataGridColumn TItem="DemoProduct" For="@(p => p.Name)" Title="Name" Width="240px" />
+
+            <DynamicComponent Type="@_externalInjectorType" Parameters="@_externalInjectorParameters" />
+
+            <DataGridColumn TItem="DemoProduct" For="@(p => p.Category)" Title="Category" Width="180px" />
+            <DataGridColumn TItem="DemoProduct" For="@(p => p.Stock)" Title="Stock" Width="110px" TextAlign="SuperTextAlignment.Right" />
+            <DataGridColumn TItem="DemoProduct" For="@(p => p.UpdatedAt)" Title="Updated" Width="160px" FormatString="{0:yyyy-MM-dd}" />
+        </ChildContent>
+    </SuperDataGrid>
+</div>
+
+@code {
+    private readonly List<DemoProduct> _products =
+    [
+        new() { Id = 1, Name = "Mechanical Keyboard", Category = "Peripherals", Price = 129.90m, IsActive = true, Stock = 42, UpdatedAt = new DateTimeOffset(2026, 5, 10, 0, 0, 0, TimeSpan.Zero) },
+        new() { Id = 2, Name = "Wireless Mouse", Category = "Peripherals", Price = 69.50m, IsActive = true, Stock = 125, UpdatedAt = new DateTimeOffset(2026, 5, 12, 0, 0, 0, TimeSpan.Zero) },
+        new() { Id = 3, Name = "4K Monitor", Category = "Displays", Price = 499.00m, IsActive = true, Stock = 18, UpdatedAt = new DateTimeOffset(2026, 5, 13, 0, 0, 0, TimeSpan.Zero) },
+        new() { Id = 4, Name = "USB-C Dock", Category = "Accessories", Price = 189.00m, IsActive = false, Stock = 0, UpdatedAt = new DateTimeOffset(2026, 5, 8, 0, 0, 0, TimeSpan.Zero) },
+        new() { Id = 5, Name = "Noise Cancelling Headset", Category = "Audio", Price = 249.00m, IsActive = true, Stock = 9, UpdatedAt = new DateTimeOffset(2026, 5, 15, 0, 0, 0, TimeSpan.Zero) },
+        new() { Id = 6, Name = "Webcam Pro", Category = "Video", Price = 159.00m, IsActive = true, Stock = 31, UpdatedAt = new DateTimeOffset(2026, 5, 18, 0, 0, 0, TimeSpan.Zero) }
+    ];
+
+    private readonly Type _externalInjectorType = typeof(ProductDynamicColumnsInjector);
+    private Dictionary<string, object?> _externalInjectorParameters = default!;
+
+    protected override void OnInitialized()
+    {
+        _externalInjectorParameters = new Dictionary<string, object?>
+        {
+            [nameof(ProductDynamicColumnsInjector.PricePosition)] = 1,
+            [nameof(ProductDynamicColumnsInjector.StatusPosition)] = 3
+        };
+    }
+
+    private ValueTask<GridItemsProviderResult<DemoProduct>> LoadProductsAsync(GridItemsProviderRequest<DemoProduct> request)
+    {
+        IEnumerable<DemoProduct> query = _products;
+
+        if (!string.IsNullOrWhiteSpace(request.SortColumn))
+        {
+            query = request.SortDirection switch
+            {
+                SortDirection.Ascending => request.SortColumn switch
+                {
+                    nameof(DemoProduct.Id) => query.OrderBy(x => x.Id),
+                    nameof(DemoProduct.Name) => query.OrderBy(x => x.Name),
+                    nameof(DemoProduct.Category) => query.OrderBy(x => x.Category),
+                    nameof(DemoProduct.Price) => query.OrderBy(x => x.Price),
+                    nameof(DemoProduct.IsActive) => query.OrderBy(x => x.IsActive),
+                    nameof(DemoProduct.Stock) => query.OrderBy(x => x.Stock),
+                    nameof(DemoProduct.UpdatedAt) => query.OrderBy(x => x.UpdatedAt),
+                    _ => query
+                },
+                SortDirection.Descending => request.SortColumn switch
+                {
+                    nameof(DemoProduct.Id) => query.OrderByDescending(x => x.Id),
+                    nameof(DemoProduct.Name) => query.OrderByDescending(x => x.Name),
+                    nameof(DemoProduct.Category) => query.OrderByDescending(x => x.Category),
+                    nameof(DemoProduct.Price) => query.OrderByDescending(x => x.Price),
+                    nameof(DemoProduct.IsActive) => query.OrderByDescending(x => x.IsActive),
+                    nameof(DemoProduct.Stock) => query.OrderByDescending(x => x.Stock),
+                    nameof(DemoProduct.UpdatedAt) => query.OrderByDescending(x => x.UpdatedAt),
+                    _ => query
+                },
+                _ => query
+            };
+        }
+
+        var ordered = query.ToList();
+        var items = ordered
+            .Skip(request.StartIndex)
+            .Take(request.Count ?? ordered.Count)
+            .ToList();
+
+        for (var i = 0; i < items.Count; i++)
+        {
+            items[i].RowNumber = request.StartIndex + i + 1;
+        }
+
+        return ValueTask.FromResult(GridItemsProviderResult<DemoProduct>.From(items, ordered.Count));
+    }
+
+    public sealed class DemoProduct : IDataItem
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Category { get; set; } = string.Empty;
+        public decimal Price { get; set; }
+        public bool IsActive { get; set; }
+        public int Stock { get; set; }
+        public DateTimeOffset UpdatedAt { get; set; }
+
+        public object KeyValue => Id;
+        public bool IsSelected { get; set; }
+        public int RowNumber { get; set; }
+    }
+}

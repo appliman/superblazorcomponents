@@ -361,6 +361,7 @@ Define columns inside `<ChildContent>` of `SuperDataGrid`:
 | `HeaderCssClass` | `string?` | `null` | CSS class for header cells |
 | `CssClass` | `string?` | `null` | CSS class for data cells |
 | `CellClass` | `Func<TItem, string?>?` | `null` | Function returning per-cell CSS class |
+| `DeferredRegistration` | `bool` | `false` | Skips auto-registration so a parent component can insert the column later with `grid.AddColumn(...)` |
 
 ### Column Templates
 
@@ -412,6 +413,7 @@ Each column supports four templates:
 | `GetColumnSettings()` | `IEnumerable<SuperDataGridColumnSettings>` | Returns the current column settings |
 | `GetColumnVisibilityInfo()` | `IReadOnlyList<SuperDataGridColumnVisibilityInfo>` | Returns visibility metadata for all columns |
 | `SetColumnVisibilityAsync(int, bool)` | `Task` | Sets visibility of a column by its index |
+| `AddColumn(int, DataGridColumn<TItem>)` | `void` | Inserts or repositions a column at a specific logical index |
 | `BeginEditAsync(TItem)` | `Task` | Puts a row into edit mode |
 | `EndEditAsync(TItem)` | `Task` | Confirms and exits edit mode for a row |
 | `CancelEditAsync(TItem)` | `Task` | Cancels edit mode for a row (no `RowEditEnded` event) |
@@ -1359,6 +1361,62 @@ Use `@ref` to interact with the grid from code:
     private async Task SelectAll() => await _grid!.SelectAllAsync();
 }
 ```
+
+---
+
+### 18.1 — Injecting Columns From ChildContent
+
+When a child component lives inside the grid `ChildContent`, it can receive the grid through `[CascadingParameter]`, keep a `DataGridColumn<TItem>` reference, and inject it at a specific position after the first render.
+
+Use `DeferredRegistration="true"` to prevent the column from auto-registering at the end before you place it.
+
+```razor
+<SuperDataGrid TItem="Product"
+               ItemsProvider="LoadProducts"
+               GridId="products-grid">
+    <ChildContent>
+        <DataGridColumn For="@(p => p.Name)" Title="Name" Width="220px" />
+        <PluginInjectedPriceColumn />
+        <DataGridColumn For="@(p => p.Category)" Title="Category" Width="180px" />
+    </ChildContent>
+</SuperDataGrid>
+```
+
+```razor
+@using SuperBlazorComponents.Components.SuperDataGrid
+
+<DataGridColumn @ref="_priceColumn"
+                TItem="Product"
+                For="@(p => p.Price)"
+                Title="Price"
+                Width="120px"
+                DeferredRegistration="true">
+    <Template>
+        <strong>@context.Price.ToString("C")</strong>
+    </Template>
+</DataGridColumn>
+
+@code {
+    [CascadingParameter]
+    private SuperDataGrid<Product>? Grid { get; set; }
+
+    private DataGridColumn<Product>? _priceColumn;
+    private bool _injected;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (_injected || Grid is null || _priceColumn is null)
+        {
+            return;
+        }
+
+        Grid.AddColumn(1, _priceColumn);
+        _injected = true;
+    }
+}
+```
+
+If the same column is already attached to the grid, `AddColumn(...)` repositions it instead of duplicating it.
 
 ---
 
