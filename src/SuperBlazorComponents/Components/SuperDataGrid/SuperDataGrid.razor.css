@@ -493,6 +493,27 @@
     font-size: inherit;
 }
 
+/* Cells with line breaks: show content wrapped on hover */
+.sdg-cell.sdg-cell-multiline:hover {
+    overflow: visible;
+    z-index: 100;
+    position: relative;
+}
+
+.sdg-cell.sdg-cell-multiline:hover .sdg-cell-content {
+    white-space: pre-line;
+    overflow: visible;
+    text-overflow: clip;
+    position: absolute;
+    background-color: var(--bs-body-bg, #fff);
+    border: 1px solid var(--bs-border-color, #dee2e6);
+    border-radius: 0.25rem;
+    padding: 0.25rem 0.4rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    min-width: 100%;
+    z-index: 100;
+}
+
 /* IMPORTANT: Forcer l'isolation du contenu des cellules */
 .sdg-cell > :not(.sdg-cell-content),
 .sdg-cell-content > * {

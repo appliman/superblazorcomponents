@@ -321,6 +321,7 @@
                                     {
                                         <td class="@GetCellClass(column, rowItem)"
                                             style="@GetCombinedCellStyle(column)"
+                                            title="@GetCellTitle(column, rowItem)"
                                             @onclick="@(() => OnCellClick(rowItem, column))"
                                             @onclick:stopPropagation="@CellClicked.HasDelegate">
                                             <div class="sdg-cell-content">
@@ -416,31 +417,32 @@
                                                 </div>
                                             </td>
                                         }
-                                        @foreach (var column in visibleColumns)
-                                        {
-                                            <td class="@GetCellClass(column, rowItem)"
-                                                style="@GetCombinedCellStyle(column)"
-                                                @onclick="@(() => OnCellClick(rowItem, column))"
-                                                @onclick:stopPropagation="@CellClicked.HasDelegate">
-                                                <div class="sdg-cell-content">
-                                                    @if ((EditionMode == SuperDataGridEditionMode.Edit || IsRowInEditMode(rowItem)) && column.EditTemplate is not null)
+                                                    @foreach (var column in visibleColumns)
                                                     {
-                                                        @column.EditTemplate(rowItem)
+                                                        <td class="@GetCellClass(column, rowItem)"
+                                                            style="@GetCombinedCellStyle(column)"
+                                                            title="@GetCellTitle(column, rowItem)"
+                                                            @onclick="@(() => OnCellClick(rowItem, column))"
+                                                            @onclick:stopPropagation="@CellClicked.HasDelegate">
+                                                            <div class="sdg-cell-content">
+                                                                @if ((EditionMode == SuperDataGridEditionMode.Edit || IsRowInEditMode(rowItem)) && column.EditTemplate is not null)
+                                                                {
+                                                                    @column.EditTemplate(rowItem)
+                                                                }
+                                                                else if (column.Template is not null)
+                                                                {
+                                                                    @column.Template(rowItem)
+                                                                }
+                                                                else
+                                                                {
+                                                                    @GetCellValue(column, rowItem)
+                                                                }
+                                                            </div>
+                                                        </td>
                                                     }
-                                                    else if (column.Template is not null)
-                                                    {
-                                                        @column.Template(rowItem)
-                                                    }
-                                                    else
-                                                    {
-                                                        @GetCellValue(column, rowItem)
-                                                    }
-                                                </div>
-                                            </td>
-                                        }
-                                    </tr>
-                                }
-                            </ItemContent>
+                                                </tr>
+                                            }
+                                        </ItemContent>
                             <Placeholder Context="placeholderContext">
                                 <tr class="sdg-placeholder-row">
                                     @if (DisplayRowNumberColumn)
