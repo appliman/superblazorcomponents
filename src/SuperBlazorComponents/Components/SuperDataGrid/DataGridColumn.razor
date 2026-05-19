@@ -143,11 +143,18 @@
     [Parameter]
     public RenderFragment? FilterTemplate { get; set; }
 
+    /// <summary>
+    /// When true, the column does not auto-register itself and must be attached by the parent component.
+    /// </summary>
+    [Parameter]
+    public bool DeferredRegistration { get; set; }
+
     // Internal state for runtime modifications
     internal string? _currentWidth;
     internal bool _currentVisible;
     internal string? _defaultWidth;
     internal bool _defaultVisible;
+    private bool _isRegisteredWithGrid;
 
     /// <summary>
     /// Gets the current width (considers runtime modifications)
@@ -166,7 +173,10 @@
         _currentWidth = Width;
         _currentVisible = _defaultVisible;
 
-        Grid?.AddColumn(this);
+        if (!DeferredRegistration)
+        {
+            RegisterWithGrid();
+        }
     }
 
     protected override void OnParametersSet()
@@ -204,6 +214,35 @@
         _currentVisible = AlwaysVisible || visible;
     }
 
+    internal void AttachToGrid(SuperDataGrid<TItem> grid)
+    {
+        ArgumentNullException.ThrowIfNull(grid);
+
+        if (Grid is not null && !ReferenceEquals(Grid, grid))
+        {
+            throw new InvalidOperationException("The column is already attached to another SuperDataGrid instance.");
+        }
+
+        Grid = grid;
+        RegisterWithGrid();
+    }
+
+    internal void MarkRegistrationState(bool isRegistered)
+    {
+        _isRegisteredWithGrid = isRegistered;
+    }
+
+    private void RegisterWithGrid()
+    {
+        if (_isRegisteredWithGrid || Grid is null)
+        {
+            return;
+        }
+
+        Grid.AddColumnCore(this);
+        _isRegisteredWithGrid = true;
+    }
+
     private static string GetPropertyName(Expression<Func<TItem, object?>> expression)
     {
         var body = expression.Body;
@@ -220,6 +259,10 @@
 
     public void Dispose()
     {
-        Grid?.RemoveColumn(this);
+        if (_isRegisteredWithGrid)
+        {
+            Grid?.RemoveColumn(this);
+            _isRegisteredWithGrid = false;
+        }
     }
 }

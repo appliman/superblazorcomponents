@@ -1,0 +1,59 @@
+@using SuperBlazorComponents.Components.SuperDataGrid
+
+<DataGridColumn @ref="_priceColumn"
+                TItem="SuperGridDynamicComponentDemo.DemoProduct"
+                For="@(p => p.Price)"
+                Title="Price"
+                Width="130px"
+                FormatString="{0:C}"
+                TextAlign="SuperTextAlignment.Right"
+                DeferredRegistration="true">
+    <Template>
+        <strong class="text-success">@context.Price.ToString("C")</strong>
+    </Template>
+</DataGridColumn>
+
+<DataGridColumn @ref="_statusColumn"
+                TItem="SuperGridDynamicComponentDemo.DemoProduct"
+                For="@(p => p.IsActive)"
+                Title="Status"
+                Width="120px"
+                DeferredRegistration="true">
+    <Template>
+        @if (context.IsActive)
+        {
+            <span class="badge bg-success">Active</span>
+        }
+        else
+        {
+            <span class="badge bg-secondary">Inactive</span>
+        }
+    </Template>
+</DataGridColumn>
+
+@code {
+    [CascadingParameter]
+    private SuperDataGrid<SuperGridDynamicComponentDemo.DemoProduct>? Grid { get; set; }
+
+    [Parameter]
+    public int PricePosition { get; set; } = 1;
+
+    [Parameter]
+    public int StatusPosition { get; set; } = 3;
+
+    private DataGridColumn<SuperGridDynamicComponentDemo.DemoProduct>? _priceColumn;
+    private DataGridColumn<SuperGridDynamicComponentDemo.DemoProduct>? _statusColumn;
+    private bool _columnsInjected;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (_columnsInjected || Grid is null || _priceColumn is null || _statusColumn is null)
+        {
+            return;
+        }
+
+        Grid.AddColumn(PricePosition, _priceColumn);
+        Grid.AddColumn(StatusPosition, _statusColumn);
+        _columnsInjected = true;
+    }
+}

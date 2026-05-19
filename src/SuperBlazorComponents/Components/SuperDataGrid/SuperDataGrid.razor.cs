@@ -34,6 +34,7 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 	private string? _sortColumn;
 	private SortDirection _sortDirection = SortDirection.None;
 	private bool _settingsLoaded;
+	private List<SuperDataGridColumnSettings>? _loadedColumnSettings;
 	private int _totalItemCount;
 	private List<TItem> _renderedItems = [];
 	private List<TItem> _hierarchicalRootItems = [];
@@ -528,7 +529,7 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 	/// </summary>
 	public IEnumerable<SuperDataGridColumnSettings> GetColumnSettings()
 	{
-      var result = _columns.Select((c, i) => new SuperDataGridColumnSettings
+		var result = _columns.Select((c, i) => new SuperDataGridColumnSettings
 		{
 			PropertyName = c.Property,
 			Width = c.CurrentWidth,
@@ -536,7 +537,7 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 			IsVisible = c.CurrentVisible
 		});
 
-      return NormalizeColumnSettings(result);
+		return NormalizeColumnSettings(result);
 	}
 
 	/// <summary>
@@ -567,7 +568,7 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 		}
 
 		var column = _columns[columnIndex];
-     if (column.AlwaysVisible && !isVisible)
+		if (column.AlwaysVisible && !isVisible)
 		{
 			return;
 		}
@@ -591,19 +592,68 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 	}
 
 
+	/// <summary>
+	/// Inserts a column at the requested position or moves it there if it is already attached to the grid.
+	/// </summary>
+	/// <param name="position">Zero-based target index in the logical column collection.</param>
+	/// <param name="column">The column instance to insert.</param>
+	public void AddColumn(int position, DataGridColumn<TItem> column)
+	{
+		ArgumentNullException.ThrowIfNull(column);
+
+		column.AttachToGrid(this);
+
+		var existingIndex = _columns.IndexOf(column);
+		var targetIndex = Math.Clamp(position, 0, _columns.Count);
+
+		if (existingIndex >= 0)
+		{
+			if (existingIndex == targetIndex)
+			{
+				ApplyLoadedColumnSettingsIfAvailable();
+				InvalidateColumnStyleCache();
+				StateHasChanged();
+				return;
+			}
+
+			_columns.RemoveAt(existingIndex);
+			targetIndex = Math.Clamp(position, 0, _columns.Count);
+		}
+
+		_columns.Insert(targetIndex, column);
+		column.MarkRegistrationState(true);
+		ApplyLoadedColumnSettingsIfAvailable();
+		InvalidateColumnStyleCache();
+		NotifyColumnStateChanged();
+		StateHasChanged();
+	}
+
 	internal void AddColumn(DataGridColumn<TItem> column)
 	{
-		if (!_columns.Contains(column))
+		ArgumentNullException.ThrowIfNull(column);
+		column.AttachToGrid(this);
+	}
+
+	internal void AddColumnCore(DataGridColumn<TItem> column)
+	{
+		if (_columns.Contains(column))
 		{
-			_columns.Add(column);
-			InvalidateColumnStyleCache();
-			StateHasChanged();
+			return;
 		}
+
+		_columns.Add(column);
+		column.MarkRegistrationState(true);
+		ApplyLoadedColumnSettingsIfAvailable();
+		InvalidateColumnStyleCache();
+		StateHasChanged();
 	}
 
 	internal void RemoveColumn(DataGridColumn<TItem> column)
 	{
-		_columns.Remove(column);
+		if (_columns.Remove(column))
+		{
+			column.MarkRegistrationState(false);
+		}
 		InvalidateColumnStyleCache();
 		StateHasChanged();
 	}
@@ -689,7 +739,8 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 		var settings = await SettingsStorage.GetSettingsAsync(GridId);
 		if (settings is not null && settings.Any())
 		{
-			ApplyColumnSettings(settings);
+			_loadedColumnSettings = NormalizeColumnSettings(settings);
+			ApplyColumnSettings(_loadedColumnSettings);
 			await InvokeAsync(StateHasChanged);
 		}
 
@@ -698,7 +749,7 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 
 	private void ApplyColumnSettings(IEnumerable<SuperDataGridColumnSettings> settings)
 	{
-       var settingsList = NormalizeColumnSettings(settings);
+		var settingsList = NormalizeColumnSettings(settings);
 		var reorderedColumns = new List<DataGridColumn<TItem>>();
 
 		foreach (var setting in settingsList.OrderBy(s => s.Order))
@@ -710,7 +761,7 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 				{
 					column.SetWidth(setting.Width);
 				}
-               column.SetVisible(column.AlwaysVisible || setting.IsVisible);
+				column.SetVisible(column.AlwaysVisible || setting.IsVisible);
 				reorderedColumns.Add(column);
 			}
 		}
@@ -727,6 +778,14 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 		_columns = reorderedColumns;
 		InvalidateColumnStyleCache();
 		NotifyColumnStateChanged();
+	}
+
+	private void ApplyLoadedColumnSettingsIfAvailable()
+	{
+		if (_loadedColumnSettings is { Count: > 0 })
+		{
+			ApplyColumnSettings(_loadedColumnSettings);
+		}
 	}
 
 	public async ValueTask DisposeAsync()
