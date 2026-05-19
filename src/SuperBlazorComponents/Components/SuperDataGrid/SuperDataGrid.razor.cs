@@ -467,6 +467,14 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 	}
 
 	/// <summary>
+	/// Forces a re-render of the UI.
+	/// </summary>
+	public void Refresh()
+	{
+		StateHasChanged();
+	}
+
+	/// <summary>
 	/// Expands every loaded root row and recursively expands its descendants.
 	/// In hierarchical mode, root rows are rendered without virtualization to keep row heights stable.
 	/// </summary>
@@ -1189,6 +1197,12 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 			classes.Add(customClass);
 		}
 
+		// Mark cells that render multiline plain text so the CSS hover rule can expand them
+		if (GetCellTitle(column, item) is not null)
+		{
+			classes.Add("sdg-cell-multiline");
+		}
+
 		var visibleColumns = GetVisibleColumns();
 		var index = visibleColumns.IndexOf(column);
 
@@ -1241,6 +1255,34 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 		{
 			return null;
 		}
+	}
+
+	/// <summary>Returns true when the cell renders plain text (no custom template active for this item).</summary>
+	private bool IsTextCell(DataGridColumn<TItem> column, TItem item)
+	{
+		if ((EditionMode == SuperDataGridEditionMode.Edit || IsRowInEditMode(item)) && column.EditTemplate is not null)
+		{
+			return false;
+		}
+
+		return column.Template is null;
+	}
+
+	/// <summary>Returns the cell value as a string for use as a native title tooltip, only when the value contains line breaks.</summary>
+	private string? GetCellTitle(DataGridColumn<TItem> column, TItem item)
+	{
+		if (!IsTextCell(column, item))
+		{
+			return null;
+		}
+
+		var value = GetCellValue(column, item)?.ToString();
+		if (string.IsNullOrEmpty(value) || (!value.Contains('\n') && !value.Contains('\r')))
+		{
+			return null;
+		}
+
+		return value;
 	}
 
 	private async Task OnHeaderClick(DataGridColumn<TItem> column)
