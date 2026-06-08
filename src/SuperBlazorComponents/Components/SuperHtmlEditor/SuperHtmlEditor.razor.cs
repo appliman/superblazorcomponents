@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
 namespace SuperBlazorComponents.Components.SuperHtmlEditor;
@@ -23,6 +23,8 @@ public partial class SuperHtmlEditor : ComponentBase, IAsyncDisposable
     private bool _underlineActive;
     private string _textColor = "#000000";
     private string _bgColor = "#ffff00";
+    private string _lastSyncedValue = string.Empty;
+    private bool _valueSyncPending;
 
     // ── Parameters ───────────────────────────────────────────────────────────
 
@@ -55,21 +57,49 @@ public partial class SuperHtmlEditor : ComponentBase, IAsyncDisposable
     [Parameter]
     public int MonacoHeight { get; set; } = 300;
 
+    protected override void OnParametersSet()
+    {
+        var value = Value ?? string.Empty;
+        if (!string.Equals(value, _lastSyncedValue, StringComparison.Ordinal))
+        {
+            _valueSyncPending = true;
+        }
+    }
+
     // ── Lifecycle ────────────────────────────────────────────────────────────
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (!firstRender)
+        if (firstRender)
+        {
+            _module = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                "import", "./_content/SuperBlazorComponents/Components/SuperHtmlEditor/SuperHtmlEditor.razor.js");
+
+            _dotnet = DotNetObjectReference.Create(this);
+
+            var value = Value ?? string.Empty;
+            await _module.InvokeVoidAsync("initialize", _editorRef, _toolbarRef, _dotnet, value);
+
+            _lastSyncedValue = value;
+            _valueSyncPending = false;
+            return;
+        }
+
+        if (!_valueSyncPending || _module is null)
         {
             return;
         }
 
-        _module = await JSRuntime.InvokeAsync<IJSObjectReference>(
-            "import", "./_content/SuperBlazorComponents/Components/SuperHtmlEditor/SuperHtmlEditor.razor.js");
+        var currentValue = Value ?? string.Empty;
+        await _module.InvokeVoidAsync("setHtml", _editorRef, currentValue, false);
 
-        _dotnet = DotNetObjectReference.Create(this);
+        if (_isHtmlMode)
+        {
+            await _module.InvokeVoidAsync("setMonacoValue", currentValue);
+        }
 
-        await _module.InvokeVoidAsync("initialize", _editorRef, _toolbarRef, _dotnet, Value ?? "");
+        _lastSyncedValue = currentValue;
+        _valueSyncPending = false;
     }
 
     // ── JS → .NET callbacks ──────────────────────────────────────────────────
@@ -77,6 +107,9 @@ public partial class SuperHtmlEditor : ComponentBase, IAsyncDisposable
     [JSInvokable]
     public async Task OnContentChanged(string html)
     {
+        _lastSyncedValue = html;
+        _valueSyncPending = false;
+
         if (Value != html)
         {
             Value = html;

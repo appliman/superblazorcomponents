@@ -1,4 +1,4 @@
-/**
+﻿/**
  * SuperHtmlEditor.razor.js
  * WYSIWYG HTML editor with lazy Monaco code-editor for HTML source view.
  */
@@ -111,11 +111,12 @@ export function getHtml(el) {
  * Set the inner HTML of the editable element.
  * @param {HTMLElement} el
  * @param {string}      html
+ * @param {boolean}     notifyDotNet
  */
-export function setHtml(el, html) {
+export function setHtml(el, html, notifyDotNet = true) {
     el.innerHTML = html ?? '';
     const state = _editorMap.get(el);
-    if (state) {
+    if (notifyDotNet && state) {
         state.dotnetRef.invokeMethodAsync('OnContentChanged', el.innerHTML);
     }
 }

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="88" height="52" viewBox="0 0 88 52" role="img" aria-label="SuperMarkdownEditor thumbnail">
+  <rect width="88" height="52" rx="6" fill="#f8f9fa"/>
+  <rect x="7" y="7" width="74" height="38" rx="4" fill="#ffffff" stroke="#ced4da"/>
+  <rect x="7" y="7" width="74" height="9" rx="4" fill="#e9ecef"/>
+  <rect x="52" y="10" width="13" height="3" rx="1.5" fill="#6c757d"/>
+  <rect x="68" y="10" width="9" height="3" rx="1.5" fill="#0d6efd"/>
+  <path d="M16 22h10l3 7 3-7h10v16h-7v-8l-4 8h-4l-4-8v8h-7z" fill="#212529"/>
+  <path d="M48 25h8v-3l8 7-8 7v-3h-8z" fill="#0d6efd"/>
+  <rect x="15" y="39" width="55" height="2" rx="1" fill="#adb5bd"/>
+</svg>

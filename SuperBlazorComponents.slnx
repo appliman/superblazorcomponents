@@ -9,4 +9,5 @@
   </Project>
   <Project Path="src/DemoWebSite/DemoWebSite.csproj" />
   <Project Path="src/SuperBlazorComponents/SuperBlazorComponents.csproj" />
+  <Project Path="tests/SuperBlazorComponents.Tests/SuperBlazorComponents.Tests.csproj" />
 </Solution>

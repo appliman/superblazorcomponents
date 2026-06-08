@@ -1,0 +1,30 @@
+@namespace SuperBlazorComponents.Components.SuperMarkdownEditor
+@implements IAsyncDisposable
+@inject IJSRuntime JSRuntime
+
+<div class="sme-wrapper @(_disabled ? "sme-disabled" : "")">
+    @if (!string.IsNullOrWhiteSpace(Label))
+    {
+        <label class="form-label sme-label">@Label</label>
+    }
+
+    <div class="sme-editor-box @(_isFocused ? "sme-focused" : "")">
+        @if (ShowToolbar)
+        {
+            <SuperMarkdownEditorToolbar Disabled="@_disabled" RenderedView="@_renderedView"
+                                        RenderedViewChanged="OnRenderedViewChanged" />
+        }
+
+        <div id="@_renderedEditorId" class="sme-preview @(_renderedView ? string.Empty : "sme-hidden")"
+             @ref="_renderedEditorRef" contenteditable="@(_disabled ? "false" : "true")" spellcheck="false">
+            @((MarkupString)_renderedHtml)
+        </div>
+
+        <textarea class="sme-content @(_renderedView ? "sme-hidden" : string.Empty)" id="@_sourceEditorId"
+                  @ref="_sourceEditorRef" disabled="@(_disabled || _renderedView)" spellcheck="false"
+                  value="@_lastSyncedValue"
+                  style="height:@(MinHeight)px; max-height:@(MaxHeight > 0 ? MaxHeight + "px" : "none");"
+                  @attributes="AdditionalAttributes">
+        </textarea>
+    </div>
+</div>

@@ -1,0 +1,63 @@
+@namespace SuperBlazorComponents.Components.SuperMarkdownEditor
+@using SuperBlazorComponents.Components.Buttons
+@inject SuperDialogService DialogService
+
+<div class="sme-help">
+    <section class="sme-help-section">
+        <h2><span aria-hidden="true">📌</span> Text</h2>
+        <div class="sme-help-box">
+            <div><strong>Bold</strong> : <code>**text**</code> → <strong>text</strong></div>
+            <div><em>Italic</em> : <code>*text*</code> → <em>text</em></div>
+            <div><span class="sme-help-strike">Strikethrough</span> : <code>~~text~~</code> → <span class="sme-help-strike">text</span></div>
+        </div>
+    </section>
+
+    <section class="sme-help-section">
+        <h2><span aria-hidden="true">📌</span> Headings</h2>
+        <pre><code># Heading 1
+## Heading 2
+### Heading 3</code></pre>
+    </section>
+
+    <section class="sme-help-section">
+        <h2><span aria-hidden="true">📌</span> Lists</h2>
+        <h3>Bullet list:</h3>
+        <pre><code>- Item 1
+- Item 2</code></pre>
+        <h3>Numbered list:</h3>
+        <pre><code>1. First
+2. Second</code></pre>
+    </section>
+
+    <section class="sme-help-section">
+        <h2><span aria-hidden="true">📌</span> Links and Images</h2>
+        <div class="sme-help-box">
+            <div>Link: <code>[text](https://example.com)</code></div>
+            <div>Image: <code>![alt](https://example.com/image.png)</code></div>
+        </div>
+    </section>
+
+    <section class="sme-help-section">
+        <h2><span aria-hidden="true">📌</span> Tables</h2>
+        <pre><code>| Column 1 | Column 2 |
+| --- | --- |
+| Value 1 | Value 2 |
+| Value 3 | Value 4 |</code></pre>
+        <div class="sme-help-box">
+            <div>Left aligned: <code>| :--- |</code></div>
+            <div>Center aligned: <code>| :---: |</code></div>
+            <div>Right aligned: <code>| ---: |</code></div>
+        </div>
+    </section>
+
+    <div class="sme-help-actions">
+        <SuperButton Text="Close" Style="SuperButtonStyle.Primary" Click="@CloseAsync" />
+    </div>
+</div>
+
+@code {
+    private Task CloseAsync()
+    {
+        return DialogService.Close();
+    }
+}
