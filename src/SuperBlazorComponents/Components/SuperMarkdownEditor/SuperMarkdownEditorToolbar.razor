@@ -1,0 +1,16 @@
+@namespace SuperBlazorComponents.Components.SuperMarkdownEditor
+
+<div class="sme-toolbar">
+    <span class="sme-spacer"></span>
+
+    <button type="button" class="sme-btn sme-help-btn" title="Markdown help" disabled="@Disabled"
+            @onclick="OpenHelpDialog">
+        Help
+    </button>
+
+    <button type="button" class="sme-btn sme-toggle-btn" title="Toggle Markdown / rendered" disabled="@Disabled"
+            @onmousedown:preventDefault="true"
+            @onclick="ToggleRenderedView">
+        <span class="sme-toggle-pill">@(RenderedView ? "Markdown" : "Rendered")</span>
+    </button>
+</div>
