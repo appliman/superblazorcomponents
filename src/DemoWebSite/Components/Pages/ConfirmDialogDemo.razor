@@ -10,28 +10,49 @@
 
 <h1>Confirm dialog</h1>
 
-<div class="card mt-3">
-    <div class="card-header">
-        Demo
+<DemoExample Title="Demo"
+             Description="Ouverture d'une boite de confirmation via SuperDialogService."
+             Code="@ConfirmDialogCode"
+             CodeHeight="620">
+    <div class="d-flex flex-wrap gap-2">
+        <SuperButton Text="Confirm (default)" Style="SuperButtonStyle.Primary" Click="@ConfirmDefaultAsync" />
+        <SuperButton Text="Confirm (custom)" Style="SuperButtonStyle.Secondary" Click="@ConfirmCustomAsync" />
     </div>
-    <div class="card-body">
-        <div class="d-flex flex-wrap gap-2">
-            <SuperButton Text="Confirm (default)" Style="SuperButtonStyle.Primary" Click="@ConfirmDefaultAsync" />
-            <SuperButton Text="Confirm (custom)" Style="SuperButtonStyle.Secondary" Click="@ConfirmCustomAsync" />
-        </div>
 
-        @if (_lastResult is not null)
-        {
-            <div class="alert alert-info mt-3 mb-0">
-                Result: <strong>@(_lastResult.Value ? "OK" : "Cancelled")</strong>
-            </div>
-        }
-    </div>
-</div>
+    @if (_lastResult is not null)
+    {
+        <div class="alert alert-info mt-3 mb-0">
+            Result: <strong>@(_lastResult.Value ? "OK" : "Cancelled")</strong>
+        </div>
+    }
+</DemoExample>
 
 @code
 {
     private bool? _lastResult;
+
+    private const string ConfirmDialogCode = """
+    @inject SuperDialogService DialogService
+
+    <SuperButton Text="Confirm (default)" Style="SuperButtonStyle.Primary" Click="@ConfirmDefaultAsync" />
+    <SuperButton Text="Confirm (custom)" Style="SuperButtonStyle.Secondary" Click="@ConfirmCustomAsync" />
+
+    @code {
+        private bool? _lastResult;
+
+        private async Task ConfirmCustomAsync()
+        {
+            _lastResult = await DialogService.Confirm(
+                "Deletion",
+                "Do you confirm the deletion?",
+                new ConfirmOptions
+                {
+                    OkButtonText = "Yes",
+                    CancelButtonText = "No"
+                });
+        }
+    }
+    """;
 
     private async Task ConfirmDefaultAsync()
     {

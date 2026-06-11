@@ -9,142 +9,226 @@
     Tooltips texte, HTML, Markdown, positions, delais et fermeture au clic de page.
 </p>
 
-<div class="card mt-3">
-    <div class="card-header">
-        Message texte
-    </div>
-    <div class="card-body">
-        <SuperTooltip Text="Message texte simple au survol">
-            <button class="btn btn-primary">Show tooltip</button>
+<DemoExample Title="Message texte"
+             Description="Tooltip simple au survol d'un bouton."
+             Code="@TextTooltipCode">
+    <SuperTooltip Text="Message texte simple au survol">
+        <button class="btn btn-primary">Show tooltip</button>
+    </SuperTooltip>
+</DemoExample>
+
+<DemoExample Title="Positions"
+             Description="Positionnement autour de la cible."
+             Code="@PositionsTooltipCode">
+    <div class="d-flex flex-wrap gap-2">
+        <SuperTooltip Text="Tooltip a gauche" Position="SuperTooltipPosition.Left">
+            <button class="btn btn-outline-secondary">Left</button>
+        </SuperTooltip>
+
+        <SuperTooltip Text="Tooltip en haut" Position="SuperTooltipPosition.Top">
+            <button class="btn btn-outline-secondary">Top</button>
+        </SuperTooltip>
+
+        <SuperTooltip Text="Tooltip en bas" Position="SuperTooltipPosition.Bottom">
+            <button class="btn btn-outline-secondary">Bottom</button>
+        </SuperTooltip>
+
+        <SuperTooltip Text="Tooltip a droite" Position="SuperTooltipPosition.Right">
+            <button class="btn btn-outline-secondary">Right</button>
         </SuperTooltip>
     </div>
-</div>
+</DemoExample>
 
-<div class="card mt-3">
-    <div class="card-header">
-        Positions
-    </div>
-    <div class="card-body">
-        <div class="d-flex flex-wrap gap-2">
-            <SuperTooltip Text="Tooltip a gauche" Position="SuperTooltipPosition.Left">
-                <button class="btn btn-outline-secondary">Left</button>
-            </SuperTooltip>
+<DemoExample Title="Contenu HTML"
+             Description="Affichage d'un contenu HTML court."
+             Code="@HtmlTooltipCode">
+    <SuperTooltip HtmlContent="<strong>HTML content</strong><br><span class='text-warning'>Avec mise en forme Bootstrap</span>"
+                  Position="SuperTooltipPosition.Right">
+        <button class="btn btn-warning">Show HTML tooltip</button>
+    </SuperTooltip>
+</DemoExample>
 
-            <SuperTooltip Text="Tooltip en haut" Position="SuperTooltipPosition.Top">
-                <button class="btn btn-outline-secondary">Top</button>
-            </SuperTooltip>
+<DemoExample Title="Markdown"
+             Description="Rendu Markdown dans le tooltip."
+             Code="@MarkdownTooltipCode"
+             CodeHeight="420">
+    <SuperTooltip Markdown="@MarkdownContent"
+                  Position="SuperTooltipPosition.Right"
+                  TooltipCssClass="super-tooltip-demo-markdown">
+        <button class="btn btn-info">Show Markdown tooltip</button>
+    </SuperTooltip>
+</DemoExample>
 
-            <SuperTooltip Text="Tooltip en bas" Position="SuperTooltipPosition.Bottom">
-                <button class="btn btn-outline-secondary">Bottom</button>
-            </SuperTooltip>
+<DemoExample Title="Tableau Markdown"
+             Description="Exemple avec tableau Markdown."
+             Code="@MarkdownTableTooltipCode"
+             CodeHeight="420">
+    <SuperTooltip Markdown="@MarkdownTableContent"
+                  Position="SuperTooltipPosition.Bottom"
+                  TooltipCssClass="super-tooltip-demo-table">
+        <button class="btn btn-outline-info">Show Markdown table tooltip</button>
+    </SuperTooltip>
+</DemoExample>
 
-            <SuperTooltip Text="Tooltip a droite" Position="SuperTooltipPosition.Right">
-                <button class="btn btn-outline-secondary">Right</button>
-            </SuperTooltip>
-        </div>
-    </div>
-</div>
+<DemoExample Title="Delai et duree"
+             Description="Ouverture differee et fermeture automatique."
+             Code="@DelayTooltipCode">
+    <SuperTooltip Text="Ouverture apres 600 ms, fermeture automatique apres 5 secondes"
+                  Delay="600"
+                  Duration="5000">
+        <button class="btn btn-secondary">Show delayed tooltip</button>
+    </SuperTooltip>
+</DemoExample>
 
-<div class="card mt-3">
-    <div class="card-header">
-        Contenu HTML
-    </div>
-    <div class="card-body">
-        <SuperTooltip HtmlContent="<strong>HTML content</strong><br><span class='text-warning'>Avec mise en forme Bootstrap</span>"
+<DemoExample Title="Clic et fermeture sur la page"
+             Description="Ouverture au clic et fermeture en cliquant ailleurs."
+             Code="@ClickTooltipCode">
+    <SuperTooltip Text="Cliquez ailleurs dans la page pour fermer ce tooltip"
+                  Trigger="SuperTooltipTrigger.Click"
+                  CloseOnDocumentClick="true"
+                  Position="SuperTooltipPosition.Bottom"
+                  TooltipStyle="--bs-tooltip-bg: var(--bs-primary); --bs-tooltip-color: #fff;">
+        <button class="btn btn-dark">Click to show tooltip</button>
+    </SuperTooltip>
+</DemoExample>
+
+<DemoExample Title="Element HTML"
+             Description="Tooltip sur une cible HTML native."
+             Code="@HtmlElementTooltipCode">
+    <SuperTooltip Text="Tooltip sur un element HTML natif">
+        <span class="text-decoration-underline text-primary" role="button" tabindex="0">Show tooltip</span>
+    </SuperTooltip>
+</DemoExample>
+
+<DemoExample Title="Controle manuel"
+             Description="Pilotage via ShowAsync, HideAsync et ToggleAsync."
+             Code="@ManualTooltipCode"
+             CodeHeight="500">
+    <div class="d-flex flex-wrap align-items-center gap-2">
+        <SuperTooltip @ref="_manualTooltip"
+                      Text="Tooltip affiche via ShowAsync, HideAsync ou ToggleAsync"
+                      Trigger="SuperTooltipTrigger.Manual"
                       Position="SuperTooltipPosition.Right">
-            <button class="btn btn-warning">Show HTML tooltip</button>
+            <button class="btn btn-outline-primary">Target</button>
         </SuperTooltip>
-    </div>
-</div>
 
-<div class="card mt-3">
-    <div class="card-header">
-        Markdown
+        <button class="btn btn-sm btn-primary" @onclick="ShowManualTooltipAsync">Show</button>
+        <button class="btn btn-sm btn-outline-secondary" @onclick="HideManualTooltipAsync">Hide</button>
+        <button class="btn btn-sm btn-outline-primary" @onclick="ToggleManualTooltipAsync">Toggle</button>
     </div>
-    <div class="card-body">
-        <SuperTooltip Markdown="@MarkdownContent"
-                      Position="SuperTooltipPosition.Right"
-                      TooltipCssClass="super-tooltip-demo-markdown">
-            <button class="btn btn-info">Show Markdown tooltip</button>
-        </SuperTooltip>
-    </div>
-</div>
-
-<div class="card mt-3">
-    <div class="card-header">
-        Tableau Markdown
-    </div>
-    <div class="card-body">
-        <SuperTooltip Markdown="@MarkdownTableContent"
-                      Position="SuperTooltipPosition.Bottom"
-                      TooltipCssClass="super-tooltip-demo-table">
-            <button class="btn btn-outline-info">Show Markdown table tooltip</button>
-        </SuperTooltip>
-    </div>
-</div>
-
-<div class="card mt-3">
-    <div class="card-header">
-        Delai et duree
-    </div>
-    <div class="card-body">
-        <SuperTooltip Text="Ouverture apres 600 ms, fermeture automatique apres 5 secondes"
-                      Delay="600"
-                      Duration="5000">
-            <button class="btn btn-secondary">Show delayed tooltip</button>
-        </SuperTooltip>
-    </div>
-</div>
-
-<div class="card mt-3">
-    <div class="card-header">
-        Clic et fermeture sur la page
-    </div>
-    <div class="card-body">
-        <SuperTooltip Text="Cliquez ailleurs dans la page pour fermer ce tooltip"
-                      Trigger="SuperTooltipTrigger.Click"
-                      CloseOnDocumentClick="true"
-                      Position="SuperTooltipPosition.Bottom"
-                      TooltipStyle="--bs-tooltip-bg: var(--bs-primary); --bs-tooltip-color: #fff;">
-            <button class="btn btn-dark">Click to show tooltip</button>
-        </SuperTooltip>
-    </div>
-</div>
-
-<div class="card mt-3">
-    <div class="card-header">
-        Element HTML
-    </div>
-    <div class="card-body">
-        <SuperTooltip Text="Tooltip sur un element HTML natif">
-            <span class="text-decoration-underline text-primary" role="button" tabindex="0">Show tooltip</span>
-        </SuperTooltip>
-    </div>
-</div>
-
-<div class="card mt-3">
-    <div class="card-header">
-        Controle manuel
-    </div>
-    <div class="card-body">
-        <div class="d-flex flex-wrap align-items-center gap-2">
-            <SuperTooltip @ref="_manualTooltip"
-                          Text="Tooltip affiche via ShowAsync, HideAsync ou ToggleAsync"
-                          Trigger="SuperTooltipTrigger.Manual"
-                          Position="SuperTooltipPosition.Right">
-                <button class="btn btn-outline-primary">Target</button>
-            </SuperTooltip>
-
-            <button class="btn btn-sm btn-primary" @onclick="ShowManualTooltipAsync">Show</button>
-            <button class="btn btn-sm btn-outline-secondary" @onclick="HideManualTooltipAsync">Hide</button>
-            <button class="btn btn-sm btn-outline-primary" @onclick="ToggleManualTooltipAsync">Toggle</button>
-        </div>
-    </div>
-</div>
+</DemoExample>
 
 @code
 {
     private SuperTooltip? _manualTooltip;
+
+    private const string TextTooltipCode = """
+    <SuperTooltip Text="Message texte simple au survol">
+        <button class="btn btn-primary">Show tooltip</button>
+    </SuperTooltip>
+    """;
+
+    private const string PositionsTooltipCode = """
+    <div class="d-flex flex-wrap gap-2">
+        <SuperTooltip Text="Tooltip a gauche" Position="SuperTooltipPosition.Left">
+            <button class="btn btn-outline-secondary">Left</button>
+        </SuperTooltip>
+
+        <SuperTooltip Text="Tooltip en haut" Position="SuperTooltipPosition.Top">
+            <button class="btn btn-outline-secondary">Top</button>
+        </SuperTooltip>
+
+        <SuperTooltip Text="Tooltip en bas" Position="SuperTooltipPosition.Bottom">
+            <button class="btn btn-outline-secondary">Bottom</button>
+        </SuperTooltip>
+
+        <SuperTooltip Text="Tooltip a droite" Position="SuperTooltipPosition.Right">
+            <button class="btn btn-outline-secondary">Right</button>
+        </SuperTooltip>
+    </div>
+    """;
+
+    private const string HtmlTooltipCode = """
+    <SuperTooltip HtmlContent="<strong>HTML content</strong><br><span class='text-warning'>Avec mise en forme Bootstrap</span>"
+                  Position="SuperTooltipPosition.Right">
+        <button class="btn btn-warning">Show HTML tooltip</button>
+    </SuperTooltip>
+    """;
+
+    private const string MarkdownTooltipCode = """
+    <SuperTooltip Markdown="@MarkdownContent"
+                  Position="SuperTooltipPosition.Right"
+                  TooltipCssClass="super-tooltip-demo-markdown">
+        <button class="btn btn-info">Show Markdown tooltip</button>
+    </SuperTooltip>
+
+    @code {
+        private const string MarkdownContent = ""\"
+        ### Details
+        - Supporte **gras** et *italique*
+        - Affiche du `code inline`
+
+        | Champ | Statut |
+        |---|:---:|
+        | Nom | **OK** |
+        | Code | `unique` |
+        ""\";
+    }
+    """;
+
+    private const string MarkdownTableTooltipCode = """
+    <SuperTooltip Markdown="@MarkdownTableContent"
+                  Position="SuperTooltipPosition.Bottom"
+                  TooltipCssClass="super-tooltip-demo-table">
+        <button class="btn btn-outline-info">Show Markdown table tooltip</button>
+    </SuperTooltip>
+    """;
+
+    private const string DelayTooltipCode = """
+    <SuperTooltip Text="Ouverture apres 600 ms, fermeture automatique apres 5 secondes"
+                  Delay="600"
+                  Duration="5000">
+        <button class="btn btn-secondary">Show delayed tooltip</button>
+    </SuperTooltip>
+    """;
+
+    private const string ClickTooltipCode = """
+    <SuperTooltip Text="Cliquez ailleurs dans la page pour fermer ce tooltip"
+                  Trigger="SuperTooltipTrigger.Click"
+                  CloseOnDocumentClick="true"
+                  Position="SuperTooltipPosition.Bottom"
+                  TooltipStyle="--bs-tooltip-bg: var(--bs-primary); --bs-tooltip-color: #fff;">
+        <button class="btn btn-dark">Click to show tooltip</button>
+    </SuperTooltip>
+    """;
+
+    private const string HtmlElementTooltipCode = """
+    <SuperTooltip Text="Tooltip sur un element HTML natif">
+        <span class="text-decoration-underline text-primary" role="button" tabindex="0">Show tooltip</span>
+    </SuperTooltip>
+    """;
+
+    private const string ManualTooltipCode = """
+    <SuperTooltip @ref="_manualTooltip"
+                  Text="Tooltip affiche via ShowAsync, HideAsync ou ToggleAsync"
+                  Trigger="SuperTooltipTrigger.Manual"
+                  Position="SuperTooltipPosition.Right">
+        <button class="btn btn-outline-primary">Target</button>
+    </SuperTooltip>
+
+    <button class="btn btn-sm btn-primary" @onclick="ShowManualTooltipAsync">Show</button>
+    <button class="btn btn-sm btn-outline-secondary" @onclick="HideManualTooltipAsync">Hide</button>
+    <button class="btn btn-sm btn-outline-primary" @onclick="ToggleManualTooltipAsync">Toggle</button>
+
+    @code {
+        private SuperTooltip? _manualTooltip;
+
+        private Task ShowManualTooltipAsync()
+        {
+            return _manualTooltip?.ShowAsync() ?? Task.CompletedTask;
+        }
+    }
+    """;
 
     private const string MarkdownContent = """
     ### Details

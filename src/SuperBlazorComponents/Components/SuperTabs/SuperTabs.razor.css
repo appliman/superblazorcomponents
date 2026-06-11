@@ -437,10 +437,11 @@
     overflow: hidden;
     background-color: var(--bs-body-bg, #1e1e1e);
     border: none;
-    padding: 0rem;
+    padding: var(--super-tabs-content-padding, 0.5rem);
     display: flex;
     flex-direction: column;
     min-height: 0;
+    box-sizing: border-box;
 }
 
 .super-tabs.tabs-bottom .super-tabs-content {

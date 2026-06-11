@@ -1,0 +1,51 @@
+﻿@using System.Reflection
+@using Markdig
+@using SuperBlazorComponents.Components.Buttons
+
+
+@code {
+    [Parameter]
+    public string HelpFileName { get; set; } = null!;
+
+    [Parameter]
+    public EventCallback<bool> DisplayHtmlHelpText { get; set; }
+
+    public string HtmlDocumentationText { get; set; } = string.Empty;
+
+    bool _displayHelp;
+    string _buttonText => _displayHelp ? "Hide documentation" : "Show documentation";
+
+    async Task ToogleHelp()
+    {
+        _displayHelp = !_displayHelp;
+        if (_displayHelp)
+        {
+            HtmlDocumentationText = await GetMarkdownHelpText(HelpFileName);
+            await DisplayHtmlHelpText.InvokeAsync(true);
+        }
+        else
+        {
+            HtmlDocumentationText = string.Empty;
+            await DisplayHtmlHelpText.InvokeAsync(false);
+        }
+    }
+
+    async Task<string> GetMarkdownHelpText(string fileName)
+    {
+        var currentFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
+        var filePath = Path.Combine(currentFolder, "wwwroot", "help", fileName);
+        if (!System.IO.File.Exists(filePath))
+        {
+            return "documentation not found";
+        }
+        var content = await System.IO.File.ReadAllTextAsync(filePath);
+        var markdigBuilder = new Markdig.MarkdownPipelineBuilder()
+            .UseAdvancedExtensions()
+            .UseBootstrap()
+            .Build();
+        var html = Markdig.Markdown.ToHtml(content, markdigBuilder);
+        return html;
+    }
+}
+
+<SuperButton Text="@_buttonText" Click="ToogleHelp" Icon="fa-circle-question" />

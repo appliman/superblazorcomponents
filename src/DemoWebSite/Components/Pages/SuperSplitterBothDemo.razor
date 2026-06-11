@@ -5,43 +5,91 @@
 
 <h1>SuperSplitter - Both</h1>
 
-<SuperSplitter Orientation="@SuperSplitterOrientation.Vertical"
-                FirstPaneSize="@VerticalFirstPaneSize"
-                FirstPaneSizeChanged="@OnVerticalFirstPaneSizeChanged"
-                MinFirstPaneSize="10"
-                MaxFirstPaneSize="90"
-                PersistenceKey="AdminBlazorApp:SuperSplitterDemo:Both:Vertical">
-    <SplitPane>
-        <SuperSplitter Orientation="@SuperSplitterOrientation.Horizontal"
-                       FirstPaneSize="@HorizontalFirstPaneSize"
-                       FirstPaneSizeChanged="@OnHorizontalFirstPaneSizeChanged"
-                       MinFirstPaneSize="10"
-                       MaxFirstPaneSize="90"
-                       PersistenceKey="AdminBlazorApp:SuperSplitterDemo:Both:Horizontal">
-            <SplitPane>
-                <div class="h-100 p-3" style="background-color: var(--bs-tertiary-bg);">
-                    <h5 class="mb-2">Pane 1</h5>
-                    <p class="mb-0">Size: <strong>@HorizontalFirstPaneSize.ToString("0")%</strong></p>
-                </div>
-            </SplitPane>
-            <SplitPane>
-                <div class="h-100 p-3">
-                    <h5 class="mb-2">Pane 2</h5>
-                    <p class="mb-0">Orientation: <strong>Horizontal</strong></p>
-                </div>
-            </SplitPane>
-        </SuperSplitter>
-    </SplitPane>
-    <SplitPane>
-        <div class="h-100 p-3">
-            <h5 class="mb-2">Pane 3</h5>
-            <p class="mb-0">Orientation: <strong>Vertical</strong></p>
-        </div>
-    </SplitPane>
-</SuperSplitter>
+<DemoExample Title="Nested splitters"
+             Description="A vertical splitter containing a horizontal splitter in its first pane."
+             Code="@BothSplitterCode"
+             CodeHeight="640">
+    <SuperSplitter Orientation="@SuperSplitterOrientation.Vertical"
+                    FirstPaneSize="@VerticalFirstPaneSize"
+                    FirstPaneSizeChanged="@OnVerticalFirstPaneSizeChanged"
+                    MinFirstPaneSize="10"
+                    MaxFirstPaneSize="90"
+                    PersistenceKey="AdminBlazorApp:SuperSplitterDemo:Both:Vertical">
+        <SplitPane>
+            <SuperSplitter Orientation="@SuperSplitterOrientation.Horizontal"
+                           FirstPaneSize="@HorizontalFirstPaneSize"
+                           FirstPaneSizeChanged="@OnHorizontalFirstPaneSizeChanged"
+                           MinFirstPaneSize="10"
+                           MaxFirstPaneSize="90"
+                           PersistenceKey="AdminBlazorApp:SuperSplitterDemo:Both:Horizontal">
+                <SplitPane>
+                    <div class="h-100 p-3" style="background-color: var(--bs-tertiary-bg);">
+                        <h5 class="mb-2">Pane 1</h5>
+                        <p class="mb-0">Size: <strong>@HorizontalFirstPaneSize.ToString("0")%</strong></p>
+                    </div>
+                </SplitPane>
+                <SplitPane>
+                    <div class="h-100 p-3">
+                        <h5 class="mb-2">Pane 2</h5>
+                        <p class="mb-0">Orientation: <strong>Horizontal</strong></p>
+                    </div>
+                </SplitPane>
+            </SuperSplitter>
+        </SplitPane>
+        <SplitPane>
+            <div class="h-100 p-3">
+                <h5 class="mb-2">Pane 3</h5>
+                <p class="mb-0">Orientation: <strong>Vertical</strong></p>
+            </div>
+        </SplitPane>
+    </SuperSplitter>
+</DemoExample>
 
 
 @code {
+    private const string BothSplitterCode = """
+    @using SuperBlazorComponents.Components.SuperSplitter
+
+    <SuperSplitter Orientation="@SuperSplitterOrientation.Vertical"
+                   FirstPaneSize="@VerticalFirstPaneSize"
+                   FirstPaneSizeChanged="@OnVerticalFirstPaneSizeChanged"
+                   PersistenceKey="my-app:splitter:both:vertical">
+        <SplitPane>
+            <SuperSplitter Orientation="@SuperSplitterOrientation.Horizontal"
+                           FirstPaneSize="@HorizontalFirstPaneSize"
+                           FirstPaneSizeChanged="@OnHorizontalFirstPaneSizeChanged"
+                           PersistenceKey="my-app:splitter:both:horizontal">
+                <SplitPane>
+                    <div class="h-100 p-3">Pane 1</div>
+                </SplitPane>
+                <SplitPane>
+                    <div class="h-100 p-3">Pane 2</div>
+                </SplitPane>
+            </SuperSplitter>
+        </SplitPane>
+        <SplitPane>
+            <div class="h-100 p-3">Pane 3</div>
+        </SplitPane>
+    </SuperSplitter>
+
+    @code {
+        private double VerticalFirstPaneSize { get; set; } = 35;
+        private double HorizontalFirstPaneSize { get; set; } = 35;
+
+        private Task OnVerticalFirstPaneSizeChanged(double value)
+        {
+            VerticalFirstPaneSize = value;
+            return Task.CompletedTask;
+        }
+
+        private Task OnHorizontalFirstPaneSizeChanged(double value)
+        {
+            HorizontalFirstPaneSize = value;
+            return Task.CompletedTask;
+        }
+    }
+    """;
+
     private double VerticalFirstPaneSize { get; set; } = 35;
 
     private double HorizontalFirstPaneSize { get; set; } = 35;

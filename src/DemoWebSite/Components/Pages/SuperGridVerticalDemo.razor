@@ -11,6 +11,10 @@
     Double-click an item or use the <i class="fa-solid fa-pencil"></i> button to edit it.
 </p>
 
+<DemoExample Title="Vertical orientation"
+             Description="Compare vertical property-grid orientation with the classic horizontal grid."
+             Code="@VerticalGridCode"
+             CodeHeight="640">
 <div class="row">
     <div class="col-md-6">
         <h4 class="mt-3">Vertical</h4>
@@ -165,8 +169,46 @@
         </div>
     </div>
 </div>
+</DemoExample>
 
 @code {
+    private const string VerticalGridCode = """
+    <SuperDataGrid @ref="_gridVertical"
+                   TItem="Produit"
+                   ItemsProvider="LoadProduitsAsync"
+                   GridOrientation="SuperDataGridOrientation.Vertical"
+                   Height="100%"
+                   RowHeight="50"
+                   EditOnDoubleClick="true"
+                   AllowSorting="false"
+                   AllowFiltering="false"
+                   DisplaySelectionColumn="false">
+        <ActionsTemplate Context="item">
+            @if (_gridVertical is not null && _gridVertical.IsRowInEditMode(item))
+            {
+                <SuperButton Icon="fa-check" Style="SuperButtonStyle.Success"
+                             Click="@(async _ => await _gridVertical!.EndEditAsync(item))" />
+            }
+            else
+            {
+                <SuperButton Icon="fa-pencil" Style="SuperButtonStyle.Primary"
+                             Click="@(async _ => await _gridVertical!.BeginEditAsync(item))" />
+            }
+        </ActionsTemplate>
+        <ChildContent>
+            <DataGridColumn TItem="Produit" For="@(p => p.Reference)" Title="Reference" />
+            <DataGridColumn TItem="Produit" For="@(p => p.Nom)" Title="Name">
+                <EditTemplate>
+                    <input type="text" class="form-control form-control-sm"
+                           value="@context.Nom"
+                           @onchange="@(e => context.Nom = e.Value?.ToString() ?? string.Empty)" />
+                </EditTemplate>
+            </DataGridColumn>
+            <DataGridColumn TItem="Produit" For="@(p => p.PrixUnitaire)" Title="Unit Price" FormatString="{0:C}" />
+        </ChildContent>
+    </SuperDataGrid>
+    """;
+
     private SuperDataGrid<Produit>? _gridVertical;
 
     private readonly List<Produit> _produits =

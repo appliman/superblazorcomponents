@@ -8,29 +8,62 @@
 
 <p class="text-muted">Exemple: <code>&lt;SuperTabs&gt;&lt;Tabs&gt;&lt;TabItem&gt;...&lt;/TabItem&gt;&lt;/Tabs&gt;&lt;/SuperTabs&gt;</code></p>
 
-<SuperTabs InstanceId="@_instanceId"
-           PersistInUrl="false"
-           Position="@SuperTabPosition.Top"
-           LeftHeaderWidth="320px"
-           EnableAnimations="true"
-           EnableKeyboardNavigation="true"
-           Height="240px">
-    <Tabs>
-        <TabItem Id="decl-1" Title="Declarative 1" Icon="fa-solid fa-cube" BadgeText="A" BadgeClass="badge-primary">
-            <h2 class="h5">Declarative 1</h2>
-            <p>Content defined directly in <code>TabItem</code>.</p>
-        </TabItem>
-        <TabItem Id="decl-2" Title="Declarative 2" Icon="fa-solid fa-cubes" Closable="true" BadgeText="2" BadgeClass="badge-secondary">
-            <h2 class="h5">Declarative 2</h2>
-            <p>Closable tab in declarative mode.</p>
-        </TabItem>
-        <TabItem Id="decl-3" Title="Lazy" Icon="fa-solid fa-bolt" LazyLoad="true" Tooltip="Rendered on first display">
-            <h2 class="h5">Lazy (declarative)</h2>
-            <p>Rendered on first selection. Date/time: @DateTimeOffset.Now</p>
-        </TabItem>
-    </Tabs>
-</SuperTabs>
+<DemoExample Title="Declarative tabs"
+             Description="Tabs declared inline with the Tabs and TabItem render fragments."
+             Code="@DeclarativeTabsCode"
+             CodeHeight="520">
+    <SuperTabs InstanceId="@_instanceId"
+               PersistInUrl="false"
+               Position="@SuperTabPosition.Top"
+               LeftHeaderWidth="320px"
+               EnableAnimations="true"
+               EnableKeyboardNavigation="true"
+               Height="240px">
+        <Tabs>
+            <TabItem Id="decl-1" Title="Declarative 1" Icon="fa-solid fa-cube" BadgeText="A" BadgeClass="badge-primary">
+                <h2 class="h5">Declarative 1</h2>
+                <p>Content defined directly in <code>TabItem</code>.</p>
+            </TabItem>
+            <TabItem Id="decl-2" Title="Declarative 2" Icon="fa-solid fa-cubes" Closable="true" BadgeText="2" BadgeClass="badge-secondary">
+                <h2 class="h5">Declarative 2</h2>
+                <p>Closable tab in declarative mode.</p>
+            </TabItem>
+            <TabItem Id="decl-3" Title="Lazy" Icon="fa-solid fa-bolt" LazyLoad="true" Tooltip="Rendered on first display">
+                <h2 class="h5">Lazy (declarative)</h2>
+                <p>Rendered on first selection. Date/time: @DateTimeOffset.Now</p>
+            </TabItem>
+        </Tabs>
+    </SuperTabs>
+</DemoExample>
 
 @code {
+    private const string DeclarativeTabsCode = """
+    @using SuperBlazorComponents.Components.SuperTabs
+
+    <SuperTabs InstanceId="super-tabs-demo-declaratif"
+               PersistInUrl="false"
+               Position="@SuperTabPosition.Top"
+               EnableAnimations="true"
+               EnableKeyboardNavigation="true"
+               Height="240px">
+        <Tabs>
+            <TabItem Id="decl-1" Title="Declarative 1" Icon="fa-solid fa-cube" BadgeText="A" BadgeClass="badge-primary">
+                <h2 class="h5">Declarative 1</h2>
+                <p>Content defined directly in <code>TabItem</code>.</p>
+            </TabItem>
+
+            <TabItem Id="decl-2" Title="Declarative 2" Icon="fa-solid fa-cubes" Closable="true">
+                <h2 class="h5">Declarative 2</h2>
+                <p>Closable tab in declarative mode.</p>
+            </TabItem>
+
+            <TabItem Id="decl-3" Title="Lazy" Icon="fa-solid fa-bolt" LazyLoad="true">
+                <h2 class="h5">Lazy</h2>
+                <p>Rendered on first selection.</p>
+            </TabItem>
+        </Tabs>
+    </SuperTabs>
+    """;
+
     private readonly string _instanceId = "super-tabs-demo-declaratif";
 }

@@ -2,10 +2,16 @@
 @using SuperBlazorComponents.Components
 @using SuperBlazorComponents.Components.Dialogs
 @using SuperBlazorComponents.Components.Notifications
+@using DemoWebSite.Components.Pages
 @using SuperBlazorComponents.Components.SuperLayout
 @using SuperBlazorComponents.Components.Themes
 
 @inherits LayoutComponentBase
+@implements IDisposable
+@implements IAsyncDisposable
+
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
 
 <SuperLayout>
     <SuperHeader>
@@ -15,6 +21,11 @@
         <ChildContent>
             <div class="d-flex flex-row w-100 align-items-center">
                 <div class="toolbar flex-grow-1">
+                    @if (CurrentHelpFileName is not null)
+                    {
+                        <SuperDocumentationButton @key="CurrentHelpFileName" HelpFileName="@CurrentHelpFileName"
+                                                  DisplayHtmlHelpText="OnDisplayHtmlHelpTextChanged" @ref="_displayHelpButton" />
+                    }
                     <SectionOutlet SectionName="toolbar" />
                 </div>
                 <div class="config">
@@ -50,9 +61,9 @@
             <SuperMenuItem Href="super-color-picker-demo" Match="NavLinkMatch.Prefix" Icon="fa-palette"
                            Text="SuperColorPicker" />
             <SuperMenuItem Href="super-html-editor-demo" Match="NavLinkMatch.Prefix" Icon="fa-pen-to-square"
-                           Text="SuperHtmlEditor" BadgeText="New" BadgeCssClass="badge text-bg-success" />
+                           Text="SuperHtmlEditor" />
             <SuperMenuItem Href="super-markdown-editor-demo" Match="NavLinkMatch.Prefix" Icon="fa-markdown"
-                           Text="SuperMarkdownEditor" BadgeText="New" BadgeCssClass="badge text-bg-success" />
+                           Text="SuperMarkdownEditor" />
             <SuperMenuItem Href="breadcrumb" Match="NavLinkMatch.Prefix" Icon="fa-ellipsis" Text="SuperBreadCrumb" />
             <SuperMenuItem Icon="fa-window-restore" Match="NavLinkMatch.Prefix" Text="Dialogs">
                 <Items>
@@ -110,10 +121,102 @@
         <p>Welcome to the AI assistant. Ask your questions here.</p>
     </SuperChat>
     <SuperBody>
-        @Body
+        <div class="m-2" @ref="_bodyContentElement">
+            @if (_displayHelp && _displayHelpButton is not null)
+            {
+                @(new MarkupString(_displayHelpButton.HtmlDocumentationText))
+            }
+            else
+            {
+                @Body
+            }
+        </div>
     </SuperBody>
 </SuperLayout>
 
 <SuperDialog />
 <SuperConfirmDialog />
 <SuperNotification Position="SuperBlazorComponents.Components.Notifications.NotificationPosition.TopRight" />
+
+@code {
+    private ElementReference _bodyContentElement;
+    private IJSObjectReference? _documentationModule;
+    private bool _displayHelp;
+    private bool _renderMermaid;
+    private SuperDocumentationButton? _displayHelpButton;
+
+    private string? CurrentHelpFileName => GetHelpFileName(NavigationManager.ToBaseRelativePath(NavigationManager.Uri));
+
+    protected override void OnInitialized()
+    {
+        NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    private Task OnDisplayHtmlHelpTextChanged(bool displayHelp)
+    {
+        _displayHelp = displayHelp;
+        _renderMermaid = displayHelp;
+        return Task.CompletedTask;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!_displayHelp || !_renderMermaid)
+        {
+            return;
+        }
+
+        _renderMermaid = false;
+        _documentationModule ??= await JS.InvokeAsync<IJSObjectReference>("import", "/documentation-mermaid.js?v=2");
+        await _documentationModule.InvokeVoidAsync("renderMermaid", _bodyContentElement);
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        _displayHelp = false;
+        _renderMermaid = false;
+        StateHasChanged();
+    }
+
+    private static string? GetHelpFileName(string relativePath)
+    {
+        var route = relativePath.Split('?', '#')[0].Trim('/').ToLowerInvariant();
+
+        return route switch
+        {
+            "superlayout" => "SUPERLAYOUT.md",
+            "google-charts-demo" or "google-pie-chart-demo" => "GOOGLECHARTS.md",
+            "super-date-range-picker-demo" => "SUPERDATERANGEPICKER.md",
+            "superbutton-demo" => "SUPERBUTTONS.md",
+            "supertooltip-demo" => "SUPERTOOLTIP.md",
+            "forms-demo" => "SUPERTRISTATECHECKBOX.md",
+            "super-color-picker-demo" => "SUPERCOLORPICKER.md",
+            "super-html-editor-demo" => "SUPERHTMLEDITOR.md",
+            "super-markdown-editor-demo" => "SUPERMARKDOWNEDITOR.md",
+            "breadcrumb" => "SUPERBREADCRUMB.md",
+            "confirm-demo" or "dialog-demo" or "super-date-range-dialog-demo" => "SUPERDIALOGS.md",
+            "notifications-demo" => "SUPERNOTIFICATIONS.md",
+            "supergrid-simple-demo" or "supergrid-demo" or "supergrid-vertical-demo" or
+                "supergrid-fixed-row-height-demo" or "supergrid-dynamic-component-demo" or
+                "todo-supergrid-demo" => "SUPERDATAGRID.md",
+            "super-tabs-demo" or "super-tabs-demo/horizontal" or "super-tabs-demo/vertical" or
+                "super-tabs-demo/declaratif" => "SUPERTABS.md",
+            "splitter-demo" or "splitter-demo/horizontal" or "splitter-demo/vertical" or
+                "splitter-demo/both" => "SUPERSPLITTER.md",
+            _ => null
+        };
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_documentationModule is not null)
+        {
+            await _documentationModule.DisposeAsync();
+        }
+    }
+}

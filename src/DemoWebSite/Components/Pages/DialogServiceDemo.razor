@@ -10,31 +10,47 @@
 
 <h1>DialogService (DynamicDialog)</h1>
 
-<div class="card mt-3">
-    <div class="card-header">
-        Open a dynamic modal
+<DemoExample Title="Open a dynamic modal"
+             Description="Ouverture d'un composant Razor dans une modale dynamique."
+             Code="@DialogServiceCode"
+             CodeHeight="700">
+    <div class="d-flex flex-wrap gap-2">
+        <SuperButton Text="Open (default)" Style="SuperButtonStyle.Primary" Click="@OpenDefaultAsync" />
+        <SuperButton Text="Open (large + height)" Style="SuperButtonStyle.Secondary" Click="@OpenLargeAsync" />
     </div>
-    <div class="card-body">
-        <div class="d-flex flex-wrap gap-2">
-            <SuperButton Text="Open (default)" Style="SuperButtonStyle.Primary" Click="@OpenDefaultAsync" />
-            <SuperButton Text="Open (large + height)" Style="SuperButtonStyle.Secondary" Click="@OpenLargeAsync" />
-        </div>
 
-        @if (!string.IsNullOrWhiteSpace(_result))
-        {
-            <div class="alert alert-success mt-3 mb-0">Result: @_result</div>
-        }
-        else if (_resultWasSet)
-        {
-            <div class="alert alert-warning mt-3 mb-0">Result: null</div>
-        }
-    </div>
-</div>
+    @if (!string.IsNullOrWhiteSpace(_result))
+    {
+        <div class="alert alert-success mt-3 mb-0">Result: @_result</div>
+    }
+    else if (_resultWasSet)
+    {
+        <div class="alert alert-warning mt-3 mb-0">Result: null</div>
+    }
+</DemoExample>
 
 @code
 {
     private string? _result;
     private bool _resultWasSet;
+
+    private const string DialogServiceCode = """
+    @inject SuperDialogService DialogService
+
+    <SuperButton Text="Open (default)" Style="SuperButtonStyle.Primary" Click="@OpenDefaultAsync" />
+
+    @code {
+        private async Task OpenDefaultAsync()
+        {
+            var result = await DialogService.OpenAsync<DialogServiceDemoDialog>(
+                "Modal Demo",
+                new Dictionary<string, object>
+                {
+                    [nameof(DialogServiceDemoDialog.Message)] = "Hello"
+                });
+        }
+    }
+    """;
 
     private async Task OpenDefaultAsync()
     {

@@ -9,34 +9,129 @@
     Examples of <code>GoogleComboChart</code> with line, column, and mixed series.
 </p>
 
-<div class="card mt-3">
-    <div class="card-header">
-        Line
-    </div>
-    <div class="card-body">
-        <GoogleComboChart Columns="_lineColumns" Data="_lineData" Options="_lineOptions" />
-    </div>
-</div>
+<DemoExample Title="Line"
+             Description="Courbes avec deux series numeriques et crosshair."
+             Code="@LineChartCode"
+             CodeHeight="620">
+    <GoogleComboChart Columns="_lineColumns" Data="_lineData" Options="_lineOptions" />
+</DemoExample>
 
-<div class="card mt-3">
-    <div class="card-header">
-        Column
-    </div>
-    <div class="card-body">
-        <GoogleComboChart Columns="_columnColumns" Data="_columnData" Options="_columnOptions" />
-    </div>
-</div>
+<DemoExample Title="Column"
+             Description="Colonnes groupees avec largeur de barre configuree."
+             Code="@ColumnChartCode"
+             CodeHeight="620">
+    <GoogleComboChart Columns="_columnColumns" Data="_columnData" Options="_columnOptions" />
+</DemoExample>
 
-<div class="card mt-3">
-    <div class="card-header">
-        Mixed
-    </div>
-    <div class="card-body">
-        <GoogleComboChart Columns="_mixedColumns" Data="_mixedData" Options="_mixedOptions" />
-    </div>
-</div>
+<DemoExample Title="Mixed"
+             Description="Colonnes et courbe sur axe secondaire."
+             Code="@MixedChartCode"
+             CodeHeight="700">
+    <GoogleComboChart Columns="_mixedColumns" Data="_mixedData" Options="_mixedOptions" />
+</DemoExample>
 
 @code {
+    private const string LineChartCode = """
+    <GoogleComboChart Columns="_lineColumns" Data="_lineData" Options="_lineOptions" />
+
+    @code {
+        private readonly List<GoogleChartColumn> _lineColumns =
+        [
+            new GoogleChartColumn { Label = "Month", Type = "date" },
+            new GoogleChartColumn { Label = "Sales", Type = "number" },
+            new GoogleChartColumn { Label = "Target", Type = "number" }
+        ];
+
+        private readonly List<GoogleChartDataRow> _lineData =
+        [
+            new GoogleChartDataRow { Label = CreateDate(2024, 1, 1), Values = [120m, 110m] },
+            new GoogleChartDataRow { Label = CreateDate(2024, 2, 1), Values = [135m, 130m] },
+            new GoogleChartDataRow { Label = CreateDate(2024, 3, 1), Values = [142m, 140m] }
+        ];
+
+        private readonly GoogleChartOptions _lineOptions = new()
+        {
+            Title = "Sales vs Target",
+            DefaultSeriesType = GoogleChartSeriesType.Line,
+            HAxisTitle = "Month",
+            VAxisTitle = "Amount (k€)",
+            Height = "320",
+            ShowCrosshair = true
+        };
+    }
+    """;
+
+    private const string ColumnChartCode = """
+    <GoogleComboChart Columns="_columnColumns" Data="_columnData" Options="_columnOptions" />
+
+    @code {
+        private readonly List<GoogleChartColumn> _columnColumns =
+        [
+            new GoogleChartColumn { Label = "Month", Type = "date" },
+            new GoogleChartColumn { Label = "Incoming Tickets", Type = "number" },
+            new GoogleChartColumn { Label = "Closed Tickets", Type = "number" }
+        ];
+
+        private readonly List<GoogleChartDataRow> _columnData =
+        [
+            new GoogleChartDataRow { Label = CreateDate(2024, 1, 1), Values = [420m, 380m] },
+            new GoogleChartDataRow { Label = CreateDate(2024, 2, 1), Values = [460m, 410m] },
+            new GoogleChartDataRow { Label = CreateDate(2024, 3, 1), Values = [510m, 480m] }
+        ];
+
+        private readonly GoogleChartOptions _columnOptions = new()
+        {
+            Title = "Support - Monthly Tickets",
+            DefaultSeriesType = GoogleChartSeriesType.Columns,
+            HAxisTitle = "Month",
+            VAxisTitle = "Tickets",
+            Height = "320",
+            BarGroupWidth = "70%"
+        };
+    }
+    """;
+
+    private const string MixedChartCode = """
+    <GoogleComboChart Columns="_mixedColumns" Data="_mixedData" Options="_mixedOptions" />
+
+    @code {
+        private readonly List<GoogleChartColumn> _mixedColumns =
+        [
+            new GoogleChartColumn { Label = "Month", Type = "date" },
+            new GoogleChartColumn { Label = "Revenue", Type = "number" },
+            new GoogleChartColumn { Label = "Conversion Rate", Type = "number" }
+        ];
+
+        private readonly List<GoogleChartDataRow> _mixedData =
+        [
+            new GoogleChartDataRow { Label = CreateDate(2024, 1, 1), Values = [980m, 0.054m] },
+            new GoogleChartDataRow { Label = CreateDate(2024, 2, 1), Values = [1040m, 0.061m] },
+            new GoogleChartDataRow { Label = CreateDate(2024, 3, 1), Values = [1110m, 0.067m] }
+        ];
+
+        private readonly GoogleChartOptions _mixedOptions = new()
+        {
+            Title = "Revenue and Conversion",
+            DefaultSeriesType = GoogleChartSeriesType.Columns,
+            HAxisTitle = "Month",
+            VAxisTitle = "Revenue (k€)",
+            VAxis2Title = "Conversion",
+            VAxis2Format = "percent",
+            Height = "320",
+            Series = new Dictionary<int, GoogleChartSeries>
+            {
+                [0] = new GoogleChartSeries { Type = GoogleChartSeriesType.Columns, Color = "#00897b" },
+                [1] = new GoogleChartSeries
+                {
+                    Type = GoogleChartSeriesType.Line,
+                    Color = "#f4511e",
+                    TargetAxisIndex = 1
+                }
+            }
+        };
+    }
+    """;
+
     private readonly List<GoogleChartColumn> _lineColumns =
     [
         new GoogleChartColumn { Label = "Month", Type = "date" },

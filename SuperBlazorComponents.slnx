@@ -2,7 +2,6 @@
   <Folder Name="/Solution Items/">
     <File Path=".github/workflows/ci-publish.yml" />
     <File Path="README.md" />
-    <File Path="SUPERDATAGRID.md" />
   </Folder>
   <Project Path="docker-compose.dcproj">
     <Build />

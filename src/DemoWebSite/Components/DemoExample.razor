@@ -1,0 +1,145 @@
+@inject IJSRuntime JS
+@implements IAsyncDisposable
+
+<div class="demo-example card mt-3">
+    <div class="demo-example-header">
+        <div>
+            <h3 class="demo-example-title">@Title</h3>
+            @if (!string.IsNullOrWhiteSpace(Description))
+            {
+                <p class="demo-example-description">@Description</p>
+            }
+        </div>
+    </div>
+
+    <div class="demo-example-tabs" role="tablist" aria-label="@Title">
+        <button type="button"
+                class="demo-example-tab @GetTabClass(false)"
+                role="tab"
+                aria-selected="@(!_showCode)"
+                @onclick="ShowExampleAsync">
+            Exemple
+        </button>
+        <button type="button"
+                class="demo-example-tab @GetTabClass(true)"
+                role="tab"
+                aria-selected="@_showCode"
+                @onclick="ShowCodeAsync">
+            Code
+        </button>
+    </div>
+
+    <div class="demo-example-toolbar">
+        <button type="button" class="btn btn-sm btn-link demo-example-action" @onclick="ShowExampleAsync">
+            <i class="fa-solid fa-play" aria-hidden="true"></i>
+            <span>Run</span>
+        </button>
+        <button type="button" class="btn btn-sm btn-link demo-example-action" @onclick="CopyCodeAsync">
+            <i class="fa-regular fa-copy" aria-hidden="true"></i>
+            <span>Copier</span>
+        </button>
+        @if (Reset.HasDelegate)
+        {
+            <button type="button" class="btn btn-sm btn-link demo-example-action" @onclick="ResetAsync">
+                <i class="fa-solid fa-rotate-left" aria-hidden="true"></i>
+                <span>Reset</span>
+            </button>
+        }
+    </div>
+
+    <div class="demo-example-content">
+        @if (_showCode)
+        {
+            <div class="demo-example-code" style="height:@CodeHeightCss" @ref="_codeElement">
+                <pre>@Code</pre>
+            </div>
+        }
+        else
+        {
+            <div class="demo-example-preview">
+                @ChildContent
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private ElementReference _codeElement;
+    private IJSObjectReference? _module;
+    private bool _showCode;
+
+    [Parameter, EditorRequired]
+    public string Title { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? Description { get; set; }
+
+    [Parameter, EditorRequired]
+    public string Code { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Language { get; set; } = "razor";
+
+    [Parameter]
+    public int CodeHeight { get; set; } = 360;
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public EventCallback Reset { get; set; }
+
+    private string CodeHeightCss => $"{CodeHeight}px";
+
+    private string GetTabClass(bool codeTab)
+    {
+        return _showCode == codeTab ? "active" : string.Empty;
+    }
+
+    private Task ShowExampleAsync()
+    {
+        _showCode = false;
+        return Task.CompletedTask;
+    }
+
+    private async Task ShowCodeAsync()
+    {
+        _showCode = true;
+        await InvokeAsync(StateHasChanged);
+        await RenderEditorAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_showCode)
+        {
+            await RenderEditorAsync();
+        }
+    }
+
+    private async Task RenderEditorAsync()
+    {
+        _module ??= await JS.InvokeAsync<IJSObjectReference>("import", "/demo-example.js");
+        await _module.InvokeVoidAsync("renderCode", _codeElement, Code, Language);
+    }
+
+    private async Task CopyCodeAsync()
+    {
+        _module ??= await JS.InvokeAsync<IJSObjectReference>("import", "/demo-example.js");
+        await _module.InvokeVoidAsync("copyText", Code);
+    }
+
+    private Task ResetAsync()
+    {
+        return Reset.InvokeAsync();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_module is not null)
+        {
+            await _module.InvokeVoidAsync("disposeEditors");
+            await _module.DisposeAsync();
+        }
+    }
+}

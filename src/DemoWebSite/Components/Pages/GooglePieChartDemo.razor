@@ -9,34 +9,93 @@
     Examples of pie charts with <code>GooglePieChart</code>.
 </p>
 
-<div class="card mt-3">
-    <div class="card-header">
-        Standard
-    </div>
-    <div class="card-body">
-        <GooglePieChart Columns="_pieColumns" Data="_pieData" Options="_standardOptions" />
-    </div>
-</div>
+<DemoExample Title="Standard"
+             Description="Camembert standard avec libelle en pourcentage."
+             Code="@StandardPieChartCode"
+             CodeHeight="520">
+    <GooglePieChart Columns="_pieColumns" Data="_pieData" Options="_standardOptions" />
+</DemoExample>
 
-<div class="card mt-3">
-    <div class="card-header">
-        Donut
-    </div>
-    <div class="card-body">
-        <GooglePieChart Columns="_pieColumns" Data="_pieData" Options="_donutOptions" />
-    </div>
-</div>
+<DemoExample Title="Donut"
+             Description="Graphique donut avec trou central."
+             Code="@DonutPieChartCode"
+             CodeHeight="520">
+    <GooglePieChart Columns="_pieColumns" Data="_pieData" Options="_donutOptions" />
+</DemoExample>
 
-<div class="card mt-3">
-    <div class="card-header">
-        3D
-    </div>
-    <div class="card-body">
-        <GooglePieChart Columns="_pieColumns" Data="_budgetData" Options="_threeDimensionalOptions" />
-    </div>
-</div>
+<DemoExample Title="3D"
+             Description="Camembert 3D avec valeurs affichees sur les parts."
+             Code="@ThreeDimensionalPieChartCode"
+             CodeHeight="520">
+    <GooglePieChart Columns="_pieColumns" Data="_budgetData" Options="_threeDimensionalOptions" />
+</DemoExample>
 
 @code {
+    private const string StandardPieChartCode = """
+    <GooglePieChart Columns="_pieColumns" Data="_pieData" Options="_standardOptions" />
+
+    @code {
+        private readonly List<GoogleChartColumn> _pieColumns =
+        [
+            new GoogleChartColumn { Label = "Activity", Type = "string" },
+            new GoogleChartColumn { Label = "Hours", Type = "number" }
+        ];
+
+        private readonly List<GoogleChartDataRow> _pieData =
+        [
+            new GoogleChartDataRow { Label = "Work", Values = [11m] },
+            new GoogleChartDataRow { Label = "Meals", Values = [2m] },
+            new GoogleChartDataRow { Label = "Commute", Values = [2m] },
+            new GoogleChartDataRow { Label = "Leisure", Values = [3m] },
+            new GoogleChartDataRow { Label = "Sleep", Values = [6m] }
+        ];
+
+        private readonly GooglePieChartOptions _standardOptions = new()
+        {
+            Title = "Daily Breakdown",
+            Height = "320",
+            PieSliceText = "percentage"
+        };
+    }
+    """;
+
+    private const string DonutPieChartCode = """
+    <GooglePieChart Columns="_pieColumns" Data="_pieData" Options="_donutOptions" />
+
+    @code {
+        private readonly GooglePieChartOptions _donutOptions = new()
+        {
+            Title = "Task Distribution",
+            Height = "320",
+            PieHole = 0.45,
+            PieSliceText = "label"
+        };
+    }
+    """;
+
+    private const string ThreeDimensionalPieChartCode = """
+    <GooglePieChart Columns="_pieColumns" Data="_budgetData" Options="_threeDimensionalOptions" />
+
+    @code {
+        private readonly List<GoogleChartDataRow> _budgetData =
+        [
+            new GoogleChartDataRow { Label = "Product", Values = [45m] },
+            new GoogleChartDataRow { Label = "Marketing", Values = [18m] },
+            new GoogleChartDataRow { Label = "Support", Values = [12m] },
+            new GoogleChartDataRow { Label = "Ops", Values = [15m] },
+            new GoogleChartDataRow { Label = "Finance", Values = [10m] }
+        ];
+
+        private readonly GooglePieChartOptions _threeDimensionalOptions = new()
+        {
+            Title = "Budget by Department",
+            Height = "320",
+            Is3D = true,
+            PieSliceText = "value"
+        };
+    }
+    """;
+
     private readonly List<GoogleChartColumn> _pieColumns =
     [
         new GoogleChartColumn { Label = "Activity", Type = "string" },

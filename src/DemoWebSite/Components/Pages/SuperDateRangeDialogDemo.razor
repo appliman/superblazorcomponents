@@ -16,11 +16,11 @@
     Demonstration of the period selector displayed in a dynamic modal via <code>DialogService</code>.
 </p>
 
-<div class="card mt-3">
-    <div class="card-header">
-        Open Modal
-    </div>
-    <div class="card-body d-flex flex-column gap-3">
+<DemoExample Title="Open Modal"
+             Description="Selection d'une periode dans une modale dynamique."
+             Code="@DateRangeDialogCode"
+             CodeHeight="620">
+    <div class="d-flex flex-column gap-3">
         <div class="d-flex flex-wrap gap-2">
             <SuperButton Text="Choose a period" Style="SuperButtonStyle.Primary" Click="OpenDialogAsync" />
             <SuperButton Text="Allow future dates" Style="SuperButtonStyle.Secondary" Click="OpenDialogWithFutureDatesAsync" />
@@ -53,12 +53,32 @@
             </div>
         </div>
     </div>
-</div>
+</DemoExample>
 
 @code {
     private static readonly CultureInfo FrCulture = CultureInfo.GetCultureInfo("en-US");
 
     private SuperDateRangeSelection? _selectedRange = new(null, null, SuperDateRangePreset.AllTime);
+
+    private const string DateRangeDialogCode = """
+    @inject SuperDialogService DialogService
+
+    <SuperButton Text="Choose a period" Style="SuperButtonStyle.Primary" Click="OpenDialogAsync" />
+    <SuperButton Text="Allow future dates" Style="SuperButtonStyle.Secondary" Click="OpenDialogWithFutureDatesAsync" />
+
+    @code {
+        private SuperDateRangeSelection? _selectedRange = new(null, null, SuperDateRangePreset.AllTime);
+
+        private async Task OpenDialogAsync()
+        {
+            _selectedRange = await DialogService.OpenDateRangeDialogAsync(
+                "Select a Period",
+                _selectedRange,
+                displayWeekNumbers: true,
+                disableFutureDates: true);
+        }
+    }
+    """;
 
     private async Task OpenDialogAsync()
     {
