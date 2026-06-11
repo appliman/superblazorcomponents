@@ -11,43 +11,39 @@
     Period selector inspired by Google Ads with predefined periods, custom selection, and nullable bounds.
 </p>
 
-<div class="card mt-3">
-    <div class="card-header">
-        Demonstration
-    </div>
-    <div class="card-body">
-        <div class="d-flex flex-column gap-3 align-items-start">
-            <SuperDateRangePicker @bind-Value="_selectedRange" Applied="OnAppliedAsync" />
+<DemoExample Title="Demonstration" Description="Selection d'une periode avec presets et callback Applied."
+             Code="@DateRangePickerCode" CodeHeight="620">
+    <div class="d-flex flex-column gap-3 align-items-start">
+        <SuperDateRangePicker @bind-Value="_selectedRange" Applied="OnAppliedAsync" />
 
-            <div class="row g-3 w-100">
-                <div class="col-md-3">
-                    <div class="border rounded p-3 h-100 bg-body-tertiary">
-                        <div class="small text-body-secondary">Preset</div>
-                        <div class="fw-semibold">@GetPresetLabel(_selectedRange.Preset)</div>
-                    </div>
+        <div class="row g-3 w-100">
+            <div class="col-md-3">
+                <div class="border rounded p-3 h-100 bg-body-tertiary">
+                    <div class="small text-body-secondary">Preset</div>
+                    <div class="fw-semibold">@GetPresetLabel(_selectedRange.Preset)</div>
                 </div>
-                <div class="col-md-3">
-                    <div class="border rounded p-3 h-100 bg-body-tertiary">
-                        <div class="small text-body-secondary">Start Date</div>
-                        <div class="fw-semibold">@GetDateText(_selectedRange.StartDate)</div>
-                    </div>
+            </div>
+            <div class="col-md-3">
+                <div class="border rounded p-3 h-100 bg-body-tertiary">
+                    <div class="small text-body-secondary">Start Date</div>
+                    <div class="fw-semibold">@GetDateText(_selectedRange.StartDate)</div>
                 </div>
-                <div class="col-md-3">
-                    <div class="border rounded p-3 h-100 bg-body-tertiary">
-                        <div class="small text-body-secondary">End Date</div>
-                        <div class="fw-semibold">@GetDateText(_selectedRange.EndDate)</div>
-                    </div>
+            </div>
+            <div class="col-md-3">
+                <div class="border rounded p-3 h-100 bg-body-tertiary">
+                    <div class="small text-body-secondary">End Date</div>
+                    <div class="fw-semibold">@GetDateText(_selectedRange.EndDate)</div>
                 </div>
-                <div class="col-md-3">
-                    <div class="border rounded p-3 h-100 bg-body-tertiary">
-                        <div class="small text-body-secondary">Last Applied</div>
-                        <div class="fw-semibold">@_lastAppliedSummary</div>
-                    </div>
+            </div>
+            <div class="col-md-3">
+                <div class="border rounded p-3 h-100 bg-body-tertiary">
+                    <div class="small text-body-secondary">Last Applied</div>
+                    <div class="fw-semibold">@_lastAppliedSummary</div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</DemoExample>
 
 @code {
     private static readonly CultureInfo FrCulture = CultureInfo.GetCultureInfo("en-US");
@@ -55,13 +51,28 @@
     private SuperDateRangeSelection _selectedRange = new(null, null, SuperDateRangePreset.AllTime);
     private string _lastAppliedSummary = "All Time";
 
+    private const string DateRangePickerCode = """
+    <SuperDateRangePicker @bind-Value="_selectedRange" Applied="OnAppliedAsync" />
+
+    @code {
+        private SuperDateRangeSelection _selectedRange = new(null, null, SuperDateRangePreset.AllTime);
+        private string _lastAppliedSummary = "All Time";
+
+        private Task OnAppliedAsync(SuperDateRangeSelection range)
+        {
+            _lastAppliedSummary = range.PeriodName ?? range.Preset.ToString();
+            return Task.CompletedTask;
+        }
+    }
+    """;
+
     private Task OnAppliedAsync(SuperDateRangeSelection range)
     {
         _lastAppliedSummary = GetSummaryText(range);
         return Task.CompletedTask;
     }
 
-  private static string GetDateText(DateTimeOffset? value)
+    private static string GetDateText(DateTimeOffset? value)
     {
         return value?.ToString("d MMM yyyy", FrCulture) ?? "Not set";
     }
@@ -80,7 +91,8 @@
                 return range.StartDate.Value.ToString("d MMM yyyy", FrCulture);
             }
 
-            return $"{range.StartDate.Value.ToString("d MMM yyyy", FrCulture)} - {range.EndDate.Value.ToString("d MMM yyyy", FrCulture)}";
+            return $"{range.StartDate.Value.ToString("d MMM yyyy", FrCulture)} - {range.EndDate.Value.ToString("d MMM yyyy",
+FrCulture)}";
         }
 
         if (range.StartDate is not null)

@@ -21,24 +21,29 @@
     <div><strong>Current tab:</strong> <code>@(TabsService.GetCurrentTabTitle(_instanceId) ?? "(none)")</code></div>
 </div>
 
-<SuperTabs InstanceId="@_instanceId"
-           Tabs="@_tabs"
-           Position="@SuperTabPosition.Left"
-           LeftHeaderWidth="320px"
-           Height="@_height"
-           AllowAddTab="true"
-           PersistInUrl="true"
-           PersistenceKey="@_persistenceKey"
-           EnableAnimations="true"
-           EnableKeyboardNavigation="true"
-           SelectedIndex="@_selectedIndex"
-           SelectedIndexChanged="OnSelectedIndexChanged"
-           OnTabChanging="OnTabChanging"
-           OnTabChanged="OnTabChanged"
-           OnTabClosing="OnTabClosing"
-           OnTabClosed="OnTabClosed"
-           OnAddTabClicked="OnAddTabClicked">
-</SuperTabs>
+<DemoExample Title="Vertical tabs"
+             Description="Programmatic tabs rendered on the left with a fixed header width."
+             Code="@VerticalTabsCode"
+             CodeHeight="620">
+    <SuperTabs InstanceId="@_instanceId"
+               Tabs="@_tabs"
+               Position="@SuperTabPosition.Left"
+               LeftHeaderWidth="320px"
+               Height="@_height"
+               AllowAddTab="true"
+               PersistInUrl="true"
+               PersistenceKey="@_persistenceKey"
+               EnableAnimations="true"
+               EnableKeyboardNavigation="true"
+               SelectedIndex="@_selectedIndex"
+               SelectedIndexChanged="OnSelectedIndexChanged"
+               OnTabChanging="OnTabChanging"
+               OnTabChanged="OnTabChanged"
+               OnTabClosing="OnTabClosing"
+               OnTabClosed="OnTabClosed"
+               OnAddTabClicked="OnAddTabClicked">
+    </SuperTabs>
+</DemoExample>
 
 <div class="mt-3">
     <h2 class="h5">Log</h2>
@@ -60,6 +65,56 @@
 </div>
 
 @code {
+    private const string VerticalTabsCode = """
+    @using SuperBlazorComponents.Components.SuperTabs
+
+    <SuperTabs InstanceId="super-tabs-demo-vertical"
+               Tabs="@_tabs"
+               Position="@SuperTabPosition.Left"
+               LeftHeaderWidth="320px"
+               Height="420px"
+               AllowAddTab="true"
+               PersistInUrl="true"
+               PersistenceKey="super-tabs-demo-vertical:selected"
+               EnableAnimations="true"
+               EnableKeyboardNavigation="true"
+               SelectedIndex="@_selectedIndex"
+               SelectedIndexChanged="OnSelectedIndexChanged" />
+
+    @code {
+        private readonly List<SuperTabItem> _tabs = [];
+        private int _selectedIndex;
+
+        protected override void OnInitialized()
+        {
+            _tabs.Add(new SuperTabItem
+            {
+                Id = "overview",
+                Title = "Overview",
+                Icon = "fa-solid fa-compass",
+                BadgeText = "New",
+                Content = builder => builder.AddMarkupContent(0, "<h3>Overview</h3><p>Vertical tab content.</p>")
+            });
+
+            _tabs.Add(new SuperTabItem
+            {
+                Id = "lazy",
+                Title = "Lazy",
+                Icon = "fa-solid fa-bolt",
+                LazyLoad = true,
+                Tooltip = "Rendered on first display",
+                Content = builder => builder.AddContent(0, $"Rendered at {DateTimeOffset.Now:O}")
+            });
+        }
+
+        private Task OnSelectedIndexChanged(int index)
+        {
+            _selectedIndex = index;
+            return Task.CompletedTask;
+        }
+    }
+    """;
+
     private readonly string _instanceId = "super-tabs-demo-vertical";
     private readonly string _persistenceKey = "super-tabs-demo-vertical:selected";
 

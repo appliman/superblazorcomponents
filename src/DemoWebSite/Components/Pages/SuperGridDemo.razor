@@ -46,6 +46,10 @@
     <span>@_simulatedDelayMs ms</span>
 </div>
 
+<DemoExample Title="Virtualized SuperDataGrid"
+             Description="Grid with ItemsProvider, virtualization, frozen header/footer, filtering, sorting, selection and hierarchy."
+             Code="@VirtualizedGridCode"
+             CodeHeight="620">
 <div style="height: 600px; width: 1200px;">
     <SuperDataGrid @ref="_grid"
                    TItem="DemoItem"
@@ -167,9 +171,59 @@
         </FooterTemplate>
     </SuperDataGrid>
 </div>
+</DemoExample>
 
 
 @code {
+    private const string VirtualizedGridCode = """
+    <div style="height: 600px; width: 1200px;">
+        <SuperDataGrid @ref="_grid"
+                       TItem="DemoItem"
+                       ItemsProvider="@LoadItemsFromDatabaseAsync"
+                       Height="100%"
+                       RowHeight="50"
+                       OverscanCount="5"
+                       SelectionMode="SuperDataGridSelectionMode.Multiple"
+                       FreezeHeader="true"
+                       FreezeFooter="true"
+                       AllowColumnReorder="true"
+                       AllowColumnResize="true"
+                       AllowSorting="true"
+                       Hierarchical="true"
+                       HierarchyKeySelector="@(item => item.Id)"
+                       FreezeLeftColumns="1"
+                       GridId="supergrid-demo">
+            <HeaderTemplate>
+                <button type="button" class="btn btn-sm btn-outline-primary" @onclick="ExpandAllHierarchyAsync">
+                    Expand all
+                </button>
+            </HeaderTemplate>
+            <ChildContent>
+                <DataGridColumn TItem="DemoItem" Property="Id" Title="ID" Width="100px" />
+                <DataGridColumn TItem="DemoItem" Property="FirstName" Title="First Name" Width="150px">
+                    <FilterTemplate>
+                        <SuperDataGridStringFilter PropertyName="FirstName" />
+                    </FilterTemplate>
+                </DataGridColumn>
+                <DataGridColumn TItem="DemoItem" Property="Salary" Title="Salary" Width="120px" FormatString="{0:C}" />
+            </ChildContent>
+        </SuperDataGrid>
+    </div>
+
+    @code {
+        private SuperDataGrid<DemoItem>? _grid;
+
+        private async ValueTask<GridItemsProviderResult<DemoItem>> LoadItemsFromDatabaseAsync(
+            GridItemsProviderRequest<DemoItem> request)
+        {
+            var query = _allItems.AsEnumerable();
+            var filtered = query.ToList();
+            var page = filtered.Skip(request.StartIndex).Take(request.Count ?? filtered.Count).ToList();
+            return GridItemsProviderResult<DemoItem>.From(page, filtered.Count);
+        }
+    }
+    """;
+
     private SuperDataGrid<DemoItem>? _grid;
     private List<DemoItem> _allItems = [];
     private int _totalItemCount;

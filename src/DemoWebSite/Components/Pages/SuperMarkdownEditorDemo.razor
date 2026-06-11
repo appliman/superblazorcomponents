@@ -9,58 +9,85 @@
     Simple Markdown editor with a rendered view by default and a toggle to Markdown source.
 </p>
 
-<div class="card mt-3">
-    <div class="card-header">Minimal usage</div>
-    <div class="card-body">
-        <p class="text-muted mb-3">
-            The component starts in rendered mode. Click <strong>Markdown</strong> in the toolbar to switch to source
-            editing.
-        </p>
+<DemoExample Title="Minimal usage"
+             Description="Rendered mode by default with a toolbar toggle to Markdown source."
+             Code="@MinimalMarkdownCode">
+    <SuperMarkdownEditor @bind-Value="_basicMarkdown" />
+</DemoExample>
 
-        <SuperMarkdownEditor @bind-Value="_basicMarkdown" />
-    </div>
-</div>
+<DemoExample Title="Integrated toolbar"
+             Description="Toolbar with help and Markdown / rendered toggle."
+             Code="@IntegratedToolbarCode">
+    <SuperMarkdownEditor Label="Notes" @bind-Value="_toolbarMarkdown" MinHeight="180" />
+</DemoExample>
 
-<div class="card mt-3">
-    <div class="card-header">Integrated toolbar</div>
-    <div class="card-body">
-        <p class="text-muted mb-3">
-            The toolbar provides Markdown help and the Markdown / rendered toggle.
-        </p>
+<DemoExample Title="External toolbar"
+             Description="Toolbar rendered outside the editor and bound to the same view mode."
+             Code="@ExternalToolbarCode"
+             CodeHeight="420">
+    <SuperMarkdownEditorToolbar @bind-RenderedView="_integratedRenderedView" />
+    <SuperMarkdownEditor EditorId="markdown-integrated" @bind-Value="_integratedMarkdown"
+                         @bind-RenderedView="_integratedRenderedView" ShowToolbar="false" MinHeight="200" />
+</DemoExample>
 
-        <SuperMarkdownEditor Label="Notes" @bind-Value="_toolbarMarkdown" MinHeight="180" />
-    </div>
-</div>
+<DemoExample Title="Disabled"
+             Description="Read-only Markdown content."
+             Code="@DisabledMarkdownCode">
+    <SuperMarkdownEditor Label="Read-only" Value="# Locked document\n\nThis content cannot be edited."
+                         Disabled="true" />
+</DemoExample>
 
-<div class="card mt-3">
-    <div class="card-header">External toolbar</div>
-    <div class="card-body">
-        <p class="text-muted mb-3">
-            You can render the toolbar elsewhere on the page and bind it to the editor mode.
-        </p>
-
-        <SuperMarkdownEditorToolbar @bind-RenderedView="_integratedRenderedView" />
-        <SuperMarkdownEditor EditorId="markdown-integrated" @bind-Value="_integratedMarkdown"
-                             @bind-RenderedView="_integratedRenderedView" ShowToolbar="false" MinHeight="200" />
-    </div>
-</div>
-
-<div class="card mt-3">
-    <div class="card-header">Disabled</div>
-    <div class="card-body">
-        <SuperMarkdownEditor Label="Read-only" Value="# Locked document\n\nThis content cannot be edited."
-                             Disabled="true" />
-    </div>
-</div>
-
-<div class="card mt-3">
-    <div class="card-header">Initial content example</div>
-    <div class="card-body">
-        <SuperMarkdownEditor Label="Draft" @bind-Value="_prefilledMarkdown" MinHeight="220" />
-    </div>
-</div>
+<DemoExample Title="Initial content example"
+             Description="Editor initialized with Markdown content."
+             Code="@InitialMarkdownCode">
+    <SuperMarkdownEditor Label="Draft" @bind-Value="_prefilledMarkdown" MinHeight="220" />
+</DemoExample>
 
 @code {
+    private const string MinimalMarkdownCode = """
+    <SuperMarkdownEditor @bind-Value="_basicMarkdown" />
+
+    @code {
+        private string? _basicMarkdown = "# Hello\n\nStart writing in **Markdown** here.";
+    }
+    """;
+
+    private const string IntegratedToolbarCode = """
+    <SuperMarkdownEditor Label="Notes" @bind-Value="_toolbarMarkdown" MinHeight="180" />
+
+    @code {
+        private string? _toolbarMarkdown = "## Notes\n\n- List\n- Rendered view by default\n";
+    }
+    """;
+
+    private const string ExternalToolbarCode = """
+    <SuperMarkdownEditorToolbar @bind-RenderedView="_renderedView" />
+    <SuperMarkdownEditor EditorId="markdown-integrated"
+                         @bind-Value="_markdown"
+                         @bind-RenderedView="_renderedView"
+                         ShowToolbar="false"
+                         MinHeight="200" />
+
+    @code {
+        private string? _markdown = "### External toolbar";
+        private bool _renderedView = true;
+    }
+    """;
+
+    private const string DisabledMarkdownCode = """
+    <SuperMarkdownEditor Label="Read-only"
+                         Value="# Locked document\n\nThis content cannot be edited."
+                         Disabled="true" />
+    """;
+
+    private const string InitialMarkdownCode = """
+    <SuperMarkdownEditor Label="Draft" @bind-Value="_prefilledMarkdown" MinHeight="220" />
+
+    @code {
+        private string? _prefilledMarkdown = "# Title\n\nA paragraph with **bold** and *italic* text.";
+    }
+    """;
+
     private string? _basicMarkdown = "# Hello\n\nStart writing in **Markdown** here.";
 
     private string? _toolbarMarkdown = "## Notes\n\n- List\n- Rendered view by default\n";

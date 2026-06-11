@@ -84,6 +84,14 @@
                     disabled="@Disabled" title="Basculer HEX / RGB(A)">⇄</button>
 
         </div>
+
+        @if (ShowConfirmButton)
+        {
+            <div class="scp-actions-row">
+                <button type="button" class="scp-ok-btn btn btn-sm btn-primary" @onclick="ConfirmSelection"
+                        disabled="@Disabled">OK</button>
+            </div>
+        }
     </div>
 </div>
 
@@ -133,6 +141,9 @@
 
     /// <summary>Additional CSS class on the wrapper element.</summary>
     [Parameter] public string? CssClass { get; set; }
+
+    /// <summary>Shows an explicit confirmation button and defers ValueChanged until it is clicked.</summary>
+    [Parameter] public bool ShowConfirmButton { get; set; }
 
     [CascadingParameter] public EditContext? CurrentEditContext { get; set; }
 
@@ -229,7 +240,10 @@
         }
 
         RefreshHex();
-        await NotifyChange();
+        if (!ShowConfirmButton)
+        {
+            await NotifyChange();
+        }
         await InvokeAsync(StateHasChanged);
     }
 
@@ -245,7 +259,10 @@
             (_r, _g, _b) = (r, g, b);
             if (ShowAlpha) { _a = a; _alpha = a / 255.0; }
             SyncHsvFromRgb();
-            await NotifyChange();
+            if (!ShowConfirmButton)
+            {
+                await NotifyChange();
+            }
         }
     }
 
@@ -270,11 +287,16 @@
             SyncHsvFromRgb();
         }
         RefreshHex();
-        await NotifyChange();
+        if (!ShowConfirmButton)
+        {
+            await NotifyChange();
+        }
     }
 
     private void ToggleMode() =>
         _mode = _mode == ColorInputMode.Hex ? ColorInputMode.Rgba : ColorInputMode.Hex;
+
+    private async Task ConfirmSelection() => await NotifyChange();
 
     // ── Helpers ───────────────────────────────────────────────────────
 

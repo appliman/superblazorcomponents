@@ -21,6 +21,10 @@
     <span class="badge bg-secondary">GridId: dynamic-component-demo</span>
 </div>
 
+<DemoExample Title="Dynamic component columns"
+             Description="Inject external columns with DynamicComponent inside the grid ChildContent."
+             Code="@DynamicComponentGridCode"
+             CodeHeight="620">
 <div style="height: 520px; width: 1100px;">
     <SuperDataGrid TItem="DemoProduct"
                    ItemsProvider="LoadProductsAsync"
@@ -51,8 +55,43 @@
         </ChildContent>
     </SuperDataGrid>
 </div>
+</DemoExample>
 
 @code {
+    private const string DynamicComponentGridCode = """
+    <div style="height: 520px; width: 1100px;">
+        <SuperDataGrid TItem="DemoProduct"
+                       ItemsProvider="LoadProductsAsync"
+                       Height="100%"
+                       RowHeight="48"
+                       GridId="dynamic-component-demo"
+                       FreezeHeader="true"
+                       FreezeFooter="true"
+                       AllowColumnReorder="true"
+                       AllowColumnResize="true"
+                       AllowSorting="true">
+            <ChildContent>
+                <DataGridColumn TItem="DemoProduct" For="@(p => p.Id)" Title="ID" Width="80px" AlwaysVisible="true" />
+                <DataGridColumn TItem="DemoProduct" For="@(p => p.Name)" Title="Name" Width="240px" />
+
+                <DynamicComponent Type="@_externalInjectorType" Parameters="@_externalInjectorParameters" />
+
+                <DataGridColumn TItem="DemoProduct" For="@(p => p.Category)" Title="Category" Width="180px" />
+                <DataGridColumn TItem="DemoProduct" For="@(p => p.Stock)" Title="Stock" Width="110px" />
+            </ChildContent>
+        </SuperDataGrid>
+    </div>
+
+    @code {
+        private readonly Type _externalInjectorType = typeof(ProductDynamicColumnsInjector);
+        private Dictionary<string, object?> _externalInjectorParameters = new()
+        {
+            [nameof(ProductDynamicColumnsInjector.PricePosition)] = 1,
+            [nameof(ProductDynamicColumnsInjector.StatusPosition)] = 3
+        };
+    }
+    """;
+
     private readonly List<DemoProduct> _products =
     [
         new() { Id = 1, Name = "Mechanical Keyboard", Category = "Peripherals", Price = 129.90m, IsActive = true, Stock = 42, UpdatedAt = new DateTimeOffset(2026, 5, 10, 0, 0, 0, TimeSpan.Zero) },

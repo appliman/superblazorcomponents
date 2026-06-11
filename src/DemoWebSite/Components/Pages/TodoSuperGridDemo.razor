@@ -51,6 +51,10 @@
     <span class="badge text-bg-secondary">@OpenCount en cours</span>
 </div>
 
+<DemoExample Title="Editable todo grid"
+             Description="Editable SuperDataGrid with row actions, toolbar filters, sorting and grid filters."
+             Code="@TodoGridCode"
+             CodeHeight="640">
 <div style="height: 520px;">
     <SuperDataGrid @ref="_grid" TItem="TodoItem" ItemsProvider="LoadTasksAsync" Height="100%" RowHeight="52"
                    OverscanCount="4" GridId="todo-supergrid-demo" EditOnDoubleClick="true" DisplaySelectionColumn="false"
@@ -149,8 +153,56 @@
         </FooterTemplate>
     </SuperDataGrid>
 </div>
+</DemoExample>
 
 @code {
+    private const string TodoGridCode = """
+    <SuperDataGrid @ref="_grid"
+                   TItem="TodoItem"
+                   ItemsProvider="LoadTasksAsync"
+                   Height="100%"
+                   RowHeight="52"
+                   GridId="todo-supergrid-demo"
+                   EditOnDoubleClick="true"
+                   DisplaySelectionColumn="false"
+                   AllowSorting="true"
+                   AllowFiltering="true"
+                   AllowColumnResize="true"
+                   AllowColumnReorder="true"
+                   FreezeHeader="true"
+                   FreezeFooter="true"
+                   ActionsWidth="70">
+        <ActionsTemplate Context="item">
+            @if (_grid is not null && _grid.IsRowInEditMode(item))
+            {
+                <SuperButton Icon="fa-check" Style="SuperButtonStyle.Success" Size="SuperButtonSize.Small"
+                             Click="@(async _ => await _grid!.EndEditAsync(item))" />
+                <SuperButton Icon="fa-xmark" Style="SuperButtonStyle.Secondary" Size="SuperButtonSize.Small"
+                             Click="@(async _ => await _grid!.CancelEditAsync(item))" />
+            }
+            else
+            {
+                <SuperButton Icon="fa-pencil" Style="SuperButtonStyle.Primary" Size="SuperButtonSize.Small"
+                             Click="@(async _ => await _grid!.BeginEditAsync(item))" />
+            }
+        </ActionsTemplate>
+        <ChildContent>
+            <DataGridColumn For="@(task => task.Title)" Title="Tache" Width="360px" AlwaysVisible="true">
+                <EditTemplate>
+                    <input type="text" class="form-control form-control-sm" value="@context.Title"
+                           @onchange="@(e => context.Title = e.Value?.ToString() ?? string.Empty)" />
+                </EditTemplate>
+            </DataGridColumn>
+            <DataGridColumn For="@(task => task.Priority)" Title="Priorite" Width="140px">
+                <Template>
+                    <span class="@GetPriorityBadgeClass(context.Priority)">@context.Priority</span>
+                </Template>
+            </DataGridColumn>
+            <DataGridColumn For="@(task => task.DueDate)" Title="Echeance" Width="160px" FormatString="{0:dd/MM/yyyy}" />
+        </ChildContent>
+    </SuperDataGrid>
+    """;
+
     private const string LowPriority = "Basse";
     private const string NormalPriority = "Normale";
     private const string HighPriority = "Haute";

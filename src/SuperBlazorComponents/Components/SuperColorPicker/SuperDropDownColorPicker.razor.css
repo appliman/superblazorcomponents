@@ -7,6 +7,11 @@
     -webkit-user-select: none;
 }
 
+.scpdd-wrapper.scpdd-open {
+    position: relative;
+    z-index: 2147483000;
+}
+
 .scpdd-wrapper.scpdd-disabled {
     opacity: 0.55;
     pointer-events: none;
@@ -99,10 +104,8 @@
 /* ── Popup ──────────────────────────────────────────────────────────── */
 
 .scpdd-popup {
-    position: absolute;
-    top: calc(100% + 5px);
-    left: 0;
-    z-index: 1050;
+    position: fixed;
+    z-index: 2147483000;
     animation: scpdd-fadein 0.12s ease-out;
 }
 
@@ -123,6 +126,6 @@
 .scpdd-backdrop {
     position: fixed;
     inset: 0;
-    z-index: 1049;
+    z-index: 2147482999;
     background: transparent;
 }

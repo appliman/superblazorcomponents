@@ -10,6 +10,22 @@
     This page lets you test Bootstrap variants via <code>Style</code> and the busy mode via <code>BusyText</code>.
 </p>
 
+<DemoExample Title="Filled buttons"
+             Description="Boutons standards avec les styles Bootstrap exposes par SuperButton."
+             Code="@FilledButtonsCode">
+    <div class="d-flex flex-wrap gap-2">
+        <SuperButton Text="Primary" Style="SuperButtonStyle.Primary" />
+        <SuperButton Text="Secondary" Style="SuperButtonStyle.Secondary" />
+        <SuperButton Text="Success" Style="SuperButtonStyle.Success" />
+        <SuperButton Text="Danger" Style="SuperButtonStyle.Danger" />
+        <SuperButton Text="Warning" Style="SuperButtonStyle.Warning" />
+        <SuperButton Text="Info" Style="SuperButtonStyle.Info" />
+        <SuperButton Text="Light" Style="SuperButtonStyle.Light" />
+        <SuperButton Text="Dark" Style="SuperButtonStyle.Dark" />
+        <SuperButton Text="Link" Style="SuperButtonStyle.Link" />
+    </div>
+</DemoExample>
+
 <div class="card mt-3">
     <div class="card-header">
         Styles
@@ -289,6 +305,20 @@
 {
     private string? _lastClickMessage;
     private string? _lastSplitActionName;
+
+    private const string FilledButtonsCode = """
+    <div class="d-flex flex-wrap gap-2">
+        <SuperButton Text="Primary" Style="SuperButtonStyle.Primary" />
+        <SuperButton Text="Secondary" Style="SuperButtonStyle.Secondary" />
+        <SuperButton Text="Success" Style="SuperButtonStyle.Success" />
+        <SuperButton Text="Danger" Style="SuperButtonStyle.Danger" />
+        <SuperButton Text="Warning" Style="SuperButtonStyle.Warning" />
+        <SuperButton Text="Info" Style="SuperButtonStyle.Info" />
+        <SuperButton Text="Light" Style="SuperButtonStyle.Light" />
+        <SuperButton Text="Dark" Style="SuperButtonStyle.Dark" />
+        <SuperButton Text="Link" Style="SuperButtonStyle.Link" />
+    </div>
+    """;
 
     private Task OnSplitActionSelected(SuperSplitButtonActionEventArgs e)
     {

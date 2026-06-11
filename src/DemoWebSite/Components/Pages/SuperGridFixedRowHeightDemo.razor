@@ -8,6 +8,10 @@
     Rows are fixed at <code>44px</code>. Cells with taller content keep the row height stable and scroll vertically inside the cell.
 </p>
 
+<DemoExample Title="Fixed row height"
+             Description="Cells with rich content keep the configured row height and scroll inside the cell."
+             Code="@FixedRowHeightCode"
+             CodeHeight="560">
 <div style="height: 520px;">
     <SuperDataGrid TItem="InventoryAlert"
                    ItemsProvider="LoadAlertsAsync"
@@ -54,8 +58,39 @@
         </ChildContent>
     </SuperDataGrid>
 </div>
+</DemoExample>
 
 @code {
+    private const string FixedRowHeightCode = """
+    <div style="height: 520px;">
+        <SuperDataGrid TItem="InventoryAlert"
+                       ItemsProvider="LoadAlertsAsync"
+                       RowHeight="44"
+                       FixedRowHeight="true"
+                       DisplaySelectionColumn="false"
+                       DisplayRefreshButton="true"
+                       FreezeLeftColumns="1">
+            <ChildContent>
+                <DataGridColumn For="@(alert => alert.Reference)" Title="Reference" Width="130px" AlwaysVisible="true" />
+                <DataGridColumn For="@(alert => alert.Designation)" Title="Designation" Width="220px">
+                    <Template>
+                        <div class="fw-semibold">@context.Designation</div>
+                        <div class="text-muted small">@context.Category</div>
+                    </Template>
+                </DataGridColumn>
+                <DataGridColumn For="@(alert => alert.SupplierNotes)" Title="Supplier notes" Width="260px">
+                    <Template>
+                        @foreach (var line in context.SupplierNotes)
+                        {
+                            <div>@line</div>
+                        }
+                    </Template>
+                </DataGridColumn>
+            </ChildContent>
+        </SuperDataGrid>
+    </div>
+    """;
+
     private static readonly List<InventoryAlert> _alerts =
     [
         new(

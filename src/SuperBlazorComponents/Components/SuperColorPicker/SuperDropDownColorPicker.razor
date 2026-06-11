@@ -2,6 +2,8 @@
 @using System.Globalization
 @using System.Linq.Expressions
 @using Microsoft.AspNetCore.Components.Forms
+@implements IAsyncDisposable
+@inject IJSRuntime JSRuntime
 
 <div class="@WrapperClass">
 
@@ -13,7 +15,7 @@
     <div class="scpdd-anchor">
 
         <!-- ── Trigger button ──────────────────────────────────────── -->
-        <button type="button" class="scpdd-trigger" @onclick="Toggle" @onkeydown="OnTriggerKeyDown" disabled="@Disabled"
+        <button type="button" class="scpdd-trigger" @ref="_triggerRef" @onclick="Toggle" @onkeydown="OnTriggerKeyDown" disabled="@Disabled"
                 aria-haspopup="true" aria-expanded="@_isOpen.ToString().ToLowerInvariant()">
             <span class="scpdd-swatch">
                 <span class="scpdd-checker"></span>
@@ -25,9 +27,9 @@
         <!-- ── Dropdown popup ──────────────────────────────────────── -->
         @if (_isOpen)
         {
-            <div class="scpdd-popup">
+            <div class="scpdd-popup" @ref="_popupRef" style="@_popupStyle">
                 <SuperColorPicker Value="@_value" ValueChanged="OnPickerChanged" ShowAlpha="ShowAlpha"
-                                  Disabled="Disabled" />
+                                  Disabled="Disabled" ShowConfirmButton="true" />
             </div>
         }
 
@@ -45,6 +47,11 @@
     private string? _value;
     private string? _prevValue;
     private bool _isOpen;
+    private bool _pendingPosition;
+    private string _popupStyle = string.Empty;
+    private ElementReference _triggerRef;
+    private ElementReference _popupRef;
+    private IJSObjectReference? _js;
 
     // ── Parameters ────────────────────────────────────────────────────
 
@@ -72,7 +79,7 @@
     // ── Computed ──────────────────────────────────────────────────────
 
     private string WrapperClass => string.Join(" ", new[]
-        { "scpdd-wrapper", Disabled ? "scpdd-disabled" : null, CssClass }
+        { "scpdd-wrapper", _isOpen ? "scpdd-open" : null, Disabled ? "scpdd-disabled" : null, CssClass }
         .Where(s => !string.IsNullOrWhiteSpace(s)));
 
     /// <summary>
@@ -121,6 +128,20 @@
         }
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_isOpen && _pendingPosition)
+        {
+            _pendingPosition = false;
+            _js ??= await JSRuntime.InvokeAsync<IJSObjectReference>(
+                "import",
+                "./_content/SuperBlazorComponents/Components/SuperColorPicker/SuperDropDownColorPicker.razor.js");
+
+            _popupStyle = await _js.InvokeAsync<string>("positionPopup", _triggerRef, _popupRef);
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
     // ── Interactions ──────────────────────────────────────────────────
 
     private void Toggle()
@@ -128,10 +149,16 @@
         if (!Disabled)
         {
             _isOpen = !_isOpen;
+            _pendingPosition = _isOpen;
+            _popupStyle = _isOpen ? "visibility:hidden;" : string.Empty;
         }
     }
 
-    private void Close() => _isOpen = false;
+    private void Close()
+    {
+        _isOpen = false;
+        _popupStyle = string.Empty;
+    }
 
     private void OnTriggerKeyDown(KeyboardEventArgs e)
     {
@@ -155,6 +182,16 @@
         if (ValueExpression is not null && CurrentEditContext is not null)
         {
             CurrentEditContext.NotifyFieldChanged(FieldIdentifier.Create(ValueExpression));
+        }
+
+        Close();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_js is not null)
+        {
+            await _js.DisposeAsync();
         }
     }
 }

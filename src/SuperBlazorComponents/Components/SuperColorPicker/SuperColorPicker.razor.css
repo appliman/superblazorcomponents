@@ -236,3 +236,16 @@
     line-height: 1.25rem;
     flex-shrink: 0;
 }
+
+/* ── Actions row ───────────────────────────────────────────────────── */
+
+.scp-actions-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 0.75rem;
+}
+
+.scp-ok-btn {
+    min-width: 4.5rem;
+    font-weight: 500;
+}

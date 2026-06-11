@@ -58,3 +58,85 @@ h1:focus {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
     text-align: start;
 }
+
+.demo-source-card {
+    overflow: hidden;
+}
+
+.demo-source-tabs {
+    display: flex;
+    gap: .25rem;
+    padding: 0 1.25rem;
+    border-bottom: 1px solid var(--bs-border-color);
+    background: var(--bs-tertiary-bg);
+}
+
+.demo-source-tab {
+    border: 0;
+    border-bottom: 2px solid transparent;
+    background: transparent;
+    color: var(--bs-body-color);
+    padding: .75rem .25rem .65rem;
+    margin-right: 1.25rem;
+}
+
+.demo-source-tab.active {
+    border-bottom-color: var(--bs-primary);
+    color: var(--bs-primary);
+    font-weight: 600;
+}
+
+.demo-source-toolbar {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    min-height: 2.5rem;
+    padding: .35rem 1rem;
+    border-bottom: 1px solid var(--bs-border-color);
+    background: var(--bs-body-bg);
+}
+
+.demo-source-action {
+    align-items: center;
+    color: var(--bs-body-color);
+    display: inline-flex;
+    gap: .35rem;
+    padding-left: .25rem;
+    padding-right: .25rem;
+    text-decoration: none;
+}
+
+.demo-source-action:hover,
+.demo-source-action:focus-visible {
+    color: var(--bs-primary);
+}
+
+.demo-source-code {
+    min-height: 16rem;
+    overflow: hidden;
+}
+
+.documentation-mermaid {
+    background: var(--bs-body-bg);
+    border: 1px solid var(--bs-border-color);
+    border-radius: .375rem;
+    margin: 1rem 0;
+    overflow-x: auto;
+    padding: 1rem;
+    text-align: center;
+}
+
+.documentation-mermaid svg {
+    max-width: 100%;
+}
+
+.documentation-mermaid-error {
+    background: var(--bs-danger-bg-subtle);
+    border: 1px solid var(--bs-danger-border-subtle);
+    border-radius: .375rem;
+    color: var(--bs-danger-text-emphasis);
+    margin: 1rem 0;
+    overflow-x: auto;
+    padding: 1rem;
+    white-space: pre-wrap;
+}

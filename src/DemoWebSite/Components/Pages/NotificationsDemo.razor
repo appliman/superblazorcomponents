@@ -14,21 +14,39 @@
     Toast demo via <code>NotificationService.Notify</code>.
 </p>
 
-<div class="card mt-3">
-    <div class="card-header">Trigger</div>
-    <div class="card-body">
-        <div class="d-flex flex-wrap gap-2">
-            <SuperButton Text="Info" Style="SuperButtonStyle.Info" Icon="fa-solid fa-circle-info" Click="@NotifyInfoAsync" />
-            <SuperButton Text="Success" Style="SuperButtonStyle.Success" Icon="fa-solid fa-circle-check" Click="@NotifySuccessAsync" />
-            <SuperButton Text="Warning" Style="SuperButtonStyle.Warning" Icon="fa-solid fa-triangle-exclamation" Click="@NotifyWarningAsync" />
-            <SuperButton Text="Error" Style="SuperButtonStyle.Danger" Icon="fa-solid fa-circle-xmark" Click="@NotifyDangerAsync" />
-            <SuperButton Text="Click action" Style="SuperButtonStyle.Primary" Icon="fa-solid fa-bolt" Click="@NotifyClickableAsync" />
-        </div>
+<DemoExample Title="Trigger"
+             Description="Declenchement de notifications depuis SuperNotificationService."
+             Code="@NotificationsCode"
+             CodeHeight="620">
+    <div class="d-flex flex-wrap gap-2">
+        <SuperButton Text="Info" Style="SuperButtonStyle.Info" Icon="fa-solid fa-circle-info" Click="@NotifyInfoAsync" />
+        <SuperButton Text="Success" Style="SuperButtonStyle.Success" Icon="fa-solid fa-circle-check" Click="@NotifySuccessAsync" />
+        <SuperButton Text="Warning" Style="SuperButtonStyle.Warning" Icon="fa-solid fa-triangle-exclamation" Click="@NotifyWarningAsync" />
+        <SuperButton Text="Error" Style="SuperButtonStyle.Danger" Icon="fa-solid fa-circle-xmark" Click="@NotifyDangerAsync" />
+        <SuperButton Text="Click action" Style="SuperButtonStyle.Primary" Icon="fa-solid fa-bolt" Click="@NotifyClickableAsync" />
     </div>
-</div>
+</DemoExample>
 
 @code
 {
+    private const string NotificationsCode = """
+    @inject SuperNotificationService NotificationService
+
+    <div class="d-flex flex-wrap gap-2">
+        <SuperButton Text="Info" Style="SuperButtonStyle.Info" Icon="fa-solid fa-circle-info" Click="@NotifyInfoAsync" />
+        <SuperButton Text="Success" Style="SuperButtonStyle.Success" Icon="fa-solid fa-circle-check" Click="@NotifySuccessAsync" />
+        <SuperButton Text="Warning" Style="SuperButtonStyle.Warning" Icon="fa-solid fa-triangle-exclamation" Click="@NotifyWarningAsync" />
+        <SuperButton Text="Error" Style="SuperButtonStyle.Danger" Icon="fa-solid fa-circle-xmark" Click="@NotifyDangerAsync" />
+    </div>
+
+    @code {
+        private Task NotifyInfoAsync()
+        {
+            return NotificationService.Notify(NotificationSeverity.Info, "Info", "Information notification", 3000);
+        }
+    }
+    """;
+
     private Task NotifyInfoAsync()
     {
         return NotificationService.Notify(NotificationSeverity.Info, "Info", "Information notification", 3000);

@@ -13,9 +13,65 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\css\" />
+    <Folder Include="wwwroot\help\" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="..\..\GOOGLECHARTS.md" Link="wwwroot\help\GOOGLECHARTS.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\SUPERBREADCRUMB.md" Link="wwwroot\help\SUPERBREADCRUMB.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\SUPERBUTTONS.md" Link="wwwroot\help\SUPERBUTTONS.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\SUPERCOLORPICKER.md" Link="wwwroot\help\SUPERCOLORPICKER.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\SUPERDATAGRID.md" Link="wwwroot\help\SUPERDATAGRID.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\SUPERDATERANGEPICKER.md" Link="wwwroot\help\SUPERDATERANGEPICKER.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\SUPERDIALOGS.md" Link="wwwroot\help\SUPERDIALOGS.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\SUPERHTMLEDITOR.md" Link="wwwroot\help\SUPERHTMLEDITOR.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\SUPERLAYOUT.md" Link="wwwroot\help\SUPERLAYOUT.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\SUPERMARKDOWNEDITOR.md" Link="wwwroot\help\SUPERMARKDOWNEDITOR.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\SUPERMENUITEM.md" Link="wwwroot\help\SUPERMENUITEM.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\SUPERNOTIFICATIONS.md" Link="wwwroot\help\SUPERNOTIFICATIONS.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\SUPERSPLITTER.md" Link="wwwroot\help\SUPERSPLITTER.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\SUPERTABS.md" Link="wwwroot\help\SUPERTABS.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\SUPERTOOLTIP.md" Link="wwwroot\help\SUPERTOOLTIP.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\SUPERTRISTATECHECKBOX.md" Link="wwwroot\help\SUPERTRISTATECHECKBOX.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\THEMETOGGLE.md" Link="wwwroot\help\THEMETOGGLE.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Markdig" Version="1.2.0" />
     <PackageReference Include="ModelContextProtocol.AspNetCore" Version="1.2.0" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.23.0" />
   </ItemGroup>
