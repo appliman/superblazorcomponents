@@ -3,12 +3,20 @@ using SuperBlazorComponents.Components;
 using SuperBlazorComponents.Components.SuperDataGrid.Filters;
 
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Localization;
 using SuperBlazorComponents.Components.SuperDateRange;
 
 namespace SuperBlazorComponents.Services;
 
 public class SuperDialogService
 {
+	private readonly IStringLocalizer _localizer;
+
+	public SuperDialogService(IStringLocalizer localizer)
+	{
+		_localizer = localizer;
+	}
+
 	private TaskCompletionSource<bool>? _confirmTcs;
 	private TaskCompletionSource<object?>? _dialogTcs;
 
@@ -34,7 +42,7 @@ public class SuperDialogService
 	/// <param name="message">Le message à afficher.</param>
 	/// <param name="confirmOptions">Les options de configuration des boutons.</param>
 	/// <returns>True si l'utilisateur confirme, false sinon.</returns>
-	public async Task<bool> Confirm(string title, string message, ConfirmOptions confirmOptions)
+	public async Task<bool> Confirm(string title, string message, ConfirmOptions? confirmOptions = null)
 	{
 		if (_confirmTcs is { Task.IsCompleted: false })
 		{
@@ -51,7 +59,8 @@ public class SuperDialogService
 
 		try
 		{
-			await OnShow.Invoke(title, message, confirmOptions);
+			var options = confirmOptions ?? ConfirmOptions.CreateDefault(_localizer);
+			await OnShow.Invoke(title, message, options);
 			return await completionSource.Task;
 		}
 		catch
@@ -79,7 +88,8 @@ public class SuperDialogService
 	/// <param name="parameters">Les paramètres à passer au composant.</param>
 	/// <param name="options">Les options de configuration de la modale.</param>
 	/// <returns>Le résultat retourné par le composant via Close().</returns>
-	public async Task<dynamic?> OpenAsync<T>(string title, Dictionary<string, object>? parameters = null, DialogOptions? options = null) where T : IComponent
+	public async Task<dynamic?> OpenAsync<T>(string title, Dictionary<string, object>? parameters = null, DialogOptions? options = null)
+		where T : IComponent
 	{
 		if (_dialogTcs is { Task.IsCompleted: false })
 		{
