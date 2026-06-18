@@ -106,6 +106,11 @@ public partial class SuperDataGrid<TItem>
 	/// </summary>
 	public async Task SelectItemAsync(TItem item)
 	{
+		if (IsRowDeleted(item))
+		{
+			return;
+		}
+
 		if (SelectionMode != SuperDataGridSelectionMode.Multiple)
 		{
 			_selectionInfo.SelectedItems.Clear();
@@ -131,7 +136,7 @@ public partial class SuperDataGrid<TItem>
 	/// <param name="clearOthers">If true, clears other selections (default: true for single selection mode).</param>
 	public async Task SelectRow(TItem item, bool clearOthers = true)
 	{
-		if (item is null)
+		if (item is null || IsRowDeleted(item))
 		{
 			return;
 		}
@@ -167,7 +172,7 @@ public partial class SuperDataGrid<TItem>
 	/// <returns><c>true</c> if the first row was selected; otherwise <c>false</c>.</returns>
 	public async Task<bool> TrySelectFirstRow()
 	{
-		var firstItem = _renderedItems.FirstOrDefault();
+		var firstItem = _renderedItems.FirstOrDefault(item => !IsRowDeleted(item));
 		if (firstItem is null)
 		{
 			return false;
@@ -184,7 +189,7 @@ public partial class SuperDataGrid<TItem>
 	/// </summary>
 	public Task SetCurrentRowAsync(TItem item)
 	{
-		if (item is null)
+		if (item is null || IsRowDeleted(item))
 		{
 			return Task.CompletedTask;
 		}
@@ -237,6 +242,14 @@ public partial class SuperDataGrid<TItem>
 
 		foreach (var renderedItem in _renderedItems)
 		{
+			if (IsRowDeleted(renderedItem))
+			{
+				_selectionInfo.SelectedItems.Remove(renderedItem);
+				_selectionInfo.UnselectedItemKeys.Add(TryGetItemKey(renderedItem));
+				SetItemSelected(renderedItem, false);
+				continue;
+			}
+
 			_selectionInfo.SelectedItems.Add(renderedItem);
 			SetItemSelected(renderedItem, true);
 		}
@@ -267,6 +280,11 @@ public partial class SuperDataGrid<TItem>
 
 	private bool IsRowSelected(TItem item)
 	{
+		if (IsRowDeleted(item))
+		{
+			return false;
+		}
+
 		if (_selectionInfo.AllSelected)
 		{
 			return !IsExcludedFromAllSelected(item);
@@ -277,6 +295,11 @@ public partial class SuperDataGrid<TItem>
 
 	private async Task OnRowClick(TItem item)
 	{
+		if (IsRowDeleted(item))
+		{
+			return;
+		}
+
 		_currentRowKey = TryGetItemKey(item);
 		await RowClicked.InvokeAsync(item);
 
@@ -285,6 +308,11 @@ public partial class SuperDataGrid<TItem>
 
 	private async Task OnCellClick(TItem item, DataGridColumn<TItem> column)
 	{
+		if (IsRowDeleted(item))
+		{
+			return;
+		}
+
 		_currentRowKey = TryGetItemKey(item);
 
 		if (!CellClicked.HasDelegate)
@@ -320,6 +348,11 @@ public partial class SuperDataGrid<TItem>
 
 	private async Task OnSelectionCheckboxChangeAsync(TItem item, ChangeEventArgs args)
 	{
+		if (IsRowDeleted(item))
+		{
+			return;
+		}
+
 		var isChecked = args.Value is bool value && value;
         CurrentItem = item;
 
@@ -377,6 +410,19 @@ public partial class SuperDataGrid<TItem>
 	{
 		foreach (var renderedItem in _renderedItems)
 		{
+			if (IsRowDeleted(renderedItem))
+			{
+				_selectionInfo.SelectedItems.Remove(renderedItem);
+				SetItemSelected(renderedItem, false);
+
+				if (_selectionInfo.AllSelected)
+				{
+					_selectionInfo.UnselectedItemKeys.Add(TryGetItemKey(renderedItem));
+				}
+
+				continue;
+			}
+
 			if (_selectionInfo.AllSelected)
 			{
 				var isSelected = !IsExcludedFromAllSelected(renderedItem);
@@ -400,6 +446,17 @@ public partial class SuperDataGrid<TItem>
 
 	private async Task NotifySelectionChangedAsync(TItem? selectedItem)
 	{
+		foreach (var deletedItem in _selectionInfo.SelectedItems.Where(IsRowDeleted).ToList())
+		{
+			_selectionInfo.SelectedItems.Remove(deletedItem);
+			SetItemSelected(deletedItem, false);
+		}
+
+		if (selectedItem is not null && IsRowDeleted(selectedItem))
+		{
+			selectedItem = default;
+		}
+
 		await CurrentItemChanged.InvokeAsync(selectedItem);
 		await SelectionChanged.InvokeAsync(_selectionInfo.SelectedItems);
 

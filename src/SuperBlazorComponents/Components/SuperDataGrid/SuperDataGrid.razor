@@ -304,6 +304,7 @@
                                             <input type="checkbox"
                                                    class="form-check-input"
                                                    checked="@IsRowSelected(rowItem)"
+                                                   disabled="@IsRowDeleted(rowItem)"
                                                    @onchange="@(e => OnSelectionCheckboxChangeAsync(rowItem, e))"
                                                    @onclick:stopPropagation />
                                         </td>
@@ -405,6 +406,7 @@
                                                 <input type="checkbox"
                                                        class="form-check-input"
                                                        checked="@IsRowSelected(rowItem)"
+                                                       disabled="@IsRowDeleted(rowItem)"
                                                        @onchange="@(e => OnSelectionCheckboxChangeAsync(rowItem, e))"
                                                        @onclick:stopPropagation />
                                             </td>

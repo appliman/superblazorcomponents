@@ -624,6 +624,15 @@
     background-color: var(--bs-warning-bg-subtle, #fff3cd) !important;
 }
 
+/* Logically deleted row */
+.sdg-container tbody tr.row-deleted > td,
+.sdg-container tbody tr.row-deleted:hover > td {
+    background-color: var(--bs-danger-bg-subtle, #f8d7da) !important;
+    color: var(--bs-danger-text-emphasis, #58151c);
+    text-decoration: line-through;
+    cursor: not-allowed;
+}
+
 /*    .sdg-cell-selected:first-child {
         border-left: var(--sdg-selected-border, 2px solid var(--bs-primary, #0d6efd));
     }

@@ -273,6 +273,13 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 	public string HeaderCssClass { get; set; } = "";
 
 	/// <summary>
+	/// Function that determines whether a row must be displayed as deleted.
+	/// Deleted rows receive the CSS classes <c>table-danger</c> and <c>row-deleted</c>.
+	/// </summary>
+	[Parameter]
+	public Func<TItem, bool>? DisplayRowDeleted { get; set; }
+
+	/// <summary>
 	/// Function to determine the CSS class for a row.
 	/// </summary>
 	[Parameter]
@@ -392,6 +399,11 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 	public async Task BeginEditAsync(TItem item)
 	{
 		ArgumentNullException.ThrowIfNull(item);
+		if (IsRowDeleted(item))
+		{
+			return;
+		}
+
 		var key = TryGetItemKey(item);
 		if (key is null)
 		{
@@ -1204,6 +1216,12 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 			classes.Add("sdg-row-editing");
 		}
 
+		if (IsRowDeleted(item))
+		{
+			classes.Add("table-danger");
+			classes.Add("row-deleted");
+		}
+
 		var customClass = RowClass?.Invoke(item);
 		if (!string.IsNullOrEmpty(customClass))
 		{
@@ -1395,6 +1413,11 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 
 	private async Task OnRowDoubleClick(TItem item)
 	{
+		if (IsRowDeleted(item))
+		{
+			return;
+		}
+
 		if (EditOnDoubleClick)
 		{
 			if (IsRowInEditMode(item))
@@ -1425,6 +1448,11 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 	   await NotifySelectionChangedAsync(CurrentItem);
 		await RowDoubleClicked.InvokeAsync(item);
 		StateHasChanged();
+	}
+
+	private bool IsRowDeleted(TItem item)
+	{
+		return DisplayRowDeleted?.Invoke(item) == true;
 	}
 
 	private void OnColumnDragStart(DragEventArgs e, DataGridColumn<TItem> column)

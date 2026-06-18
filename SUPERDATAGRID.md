@@ -308,6 +308,7 @@ When your model implements `IDataItem`:
 | `ContainerCssClass` | `string?` | `null` | Additional CSS class on the outer container |
 | `TableCssClass` | `string` | `"table-striped table-hover table-bordered"` | CSS classes on the `<table>` element |
 | `HeaderCssClass` | `string` | `""` | CSS class for the header section |
+| `DisplayRowDeleted` | `Func<TItem, bool>?` | `null` | Marks matching rows with `table-danger row-deleted`; deleted rows are read-only and excluded from selection |
 | `RowClass` | `Func<TItem, string?>?` | `null` | Function returning a CSS class per row |
 
 ### Templates
