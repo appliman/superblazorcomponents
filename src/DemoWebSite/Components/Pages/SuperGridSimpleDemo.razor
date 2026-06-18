@@ -13,6 +13,7 @@
 <div style="height: 400px;">
     <SuperDataGrid TItem="Personne"
                    ItemsProvider="LoadPersonnesAsync"
+                   DisplayRowDeleted="@(personne => personne.IsDeleted)"
                    DefaultSettingsName="SimpleGrid">
         <ChildContent>
             <DataGridColumn For="@(p => p.Nom)"     Title="Last Name"   Width="200px" Filterable="true" />
@@ -48,6 +49,7 @@
 <div style="height: 400px;">
     <SuperDataGrid TItem="Personne"
                    ItemsProvider="LoadPersonnesAsync"
+                   DisplayRowDeleted="@(personne => personne.IsDeleted)"
                    DefaultSettingsName="GridWithFooter">
         <ChildContent>
             <DataGridColumn For="@(p => p.Nom)"     Title="Last Name"   Width="200px" />
@@ -82,6 +84,7 @@
     <div style="height: 400px;">
         <SuperDataGrid TItem="Personne"
                        ItemsProvider="LoadPersonnesAsync"
+                       DisplayRowDeleted="@(personne => personne.IsDeleted)"
                        DefaultSettingsName="SimpleGrid">
             <ChildContent>
                 <DataGridColumn For="@(p => p.Nom)" Title="Last Name" Width="200px" Filterable="true" />
@@ -106,6 +109,7 @@
     <div style="height: 400px;">
         <SuperDataGrid TItem="Personne"
                        ItemsProvider="LoadPersonnesAsync"
+                       DisplayRowDeleted="@(personne => personne.IsDeleted)"
                        DefaultSettingsName="GridWithFooter">
             <ChildContent>
                 <DataGridColumn For="@(p => p.Nom)" Title="Last Name" Width="200px" />
@@ -121,7 +125,7 @@
     [
         new("Dupont",    "Alice",   "Paris",       FonctionPersonne.Cadre,      32, true,  42_000m),
         new("Martin",    "Bruno",   "Lyon",        FonctionPersonne.Ouvrier,    45, true,  55_500m),
-        new("Leroy",     "Claire",  "Marseille",   FonctionPersonne.Secretaire, 28, false, 31_200m),
+        new("Leroy",     "Claire",  "Marseille",   FonctionPersonne.Secretaire, 28, false, 31_200m) { IsDeleted = true },
         new("Bernard",   "David",   "Toulouse",    FonctionPersonne.Cadre,      38, true,  48_300m),
         new("Petit",     "Emma",    "Bordeaux",    FonctionPersonne.President,  52, false, 61_000m),
         new("Robert",    "Fabrice", "Nantes",      FonctionPersonne.Ouvrier,    41, true,  50_700m),
@@ -188,7 +192,10 @@
         FonctionPersonne Fonction,
         int Age,
         bool Actif,
-        decimal Salaire);
+        decimal Salaire)
+    {
+        public bool IsDeleted { get; init; }
+    }
 
     private enum FonctionPersonne
     {
