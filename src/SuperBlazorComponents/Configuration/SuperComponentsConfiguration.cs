@@ -11,6 +11,7 @@ public class SuperComponentsConfiguration
 	public SuperIconStyle DefaultSuperIconeStyle { get; set; } = SuperIconStyle.Solid;
 	public List<SuperDataGridSettings> SuperDataGridSettingsList { get; set; } = new();
 	public List<SuperDataGridFilterComponent>  SuperDataGridFilterComponentList { get; set; } = new();
+	public SuperContextConfiguration Contextualization { get; } = new();
 
 	/// <summary>
 	/// Gets the localization options for configuring built-in and external culture sources.

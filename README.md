@@ -20,6 +20,7 @@
 |---|---|---|---|
 | <img src="docs/images/components/superdatagrid.svg" width="88" alt="SuperDataGrid preview"> | **SuperDataGrid** | Virtualized data grid — frozen columns/rows, hierarchical lazy-loading rows, reordering, resizing, filtering, sorting, inline editing, row selection, settings persistence | [📖 SUPERDATAGRID.md](SUPERDATAGRID.md) |
 | <img src="docs/images/components/superlayout.svg" width="88" alt="SuperLayout preview"> | **SuperLayout** | Responsive app layout — header, sidebar, body, footer, chat panel with collapsible sidebar | [📖 SUPERLAYOUT.md](SUPERLAYOUT.md) |
+|  | **SuperContext** | Context-aware tabs and contextual panels — discover components by runtime type and zone, render one or many contexts, and isolate host state per instance | [📖 SUPERCONTEXT.md](SUPERCONTEXT.md) |
 | <img src="docs/images/components/supertabs.svg" width="88" alt="SuperTabs preview"> | **SuperTabs** | Dynamic tabbed interface — badges, closable tabs, lazy loading, persistence (URL + localStorage), keyboard navigation, service-driven management | [📖 SUPERTABS.md](SUPERTABS.md) |
 | <img src="docs/images/components/supersplitter.svg" width="88" alt="SuperSplitter preview"> | **SuperSplitter** | Resizable split panels — horizontal/vertical, collapsible, state persistence | [📖 SuperSplitter.md](SUPERSPLITTER.md) |
 | <img src="docs/images/components/superdaterangepicker.svg" width="88" alt="SuperDateRangePicker preview"> | **SuperDateRangePicker** | Calendar-based date range picker with presets | [📖 SUPERDATERANGEPICKER.md](SUPERDATERANGEPICKER.md) |
@@ -122,6 +123,7 @@ The server exposes tools such as:
 - `get_super_datagrid_guide`
 - `get_super_buttons_guide`
 - `get_super_tabs_guide`
+- `get_super_context_guide`
 - `get_super_layout_guide`
 - `get_super_dialogs_guide`
 
@@ -129,6 +131,7 @@ Example prompts:
 
 - `Use the SuperBlazorComponents MCP server and show me how to add SuperDataGrid to this Blazor app.`
 - `Get the SuperButtons guide and implement a confirmation delete button.`
+- `Get the SuperContext guide and add contextual panels for my selected entity.`
 - `List the available SuperBlazorComponents guides.`
 
 ### VS Code

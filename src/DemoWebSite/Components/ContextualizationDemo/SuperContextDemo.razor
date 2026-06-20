@@ -1,0 +1,10 @@
+@page "/super-context-demo"
+@inject NavigationManager NavigationManager
+
+<PageTitle>SuperContext</PageTitle>
+
+@code {
+	protected override void OnInitialized() =>
+		NavigationManager.NavigateTo("/super-context-demo/bottom", replace: true);
+}
+

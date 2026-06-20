@@ -1,0 +1,49 @@
+@page "/super-context-demo/right"
+@inherits SuperContextDemoBase
+@using SuperBlazorComponents.Components.Contextualization
+@using SuperBlazorComponents.Components.SuperSplitter
+
+<PageTitle>SuperContext - Right</PageTitle>
+<SuperContextDemoHeader Title="SuperContext — Right"
+	Description="The same context components are discovered for a right-hand zone." />
+
+<div class="context-demo-frame">
+	<SuperSplitter Orientation="SuperSplitterOrientation.Vertical" FirstPaneSize="68">
+		<SplitPane>
+			<div class="p-3 h-100 overflow-auto">
+				<h5>Customer workspace</h5>
+				<p class="text-muted">Choose an entity to update the panel on the right.</p>
+				<div class="row g-3">
+					@foreach (var customer in Customers)
+					{
+						<div class="col-md-6">
+							<button class="@SelectedClass(customer == SelectedCustomer) w-100 text-start"
+								@onclick="() => SelectCustomer(customer)">
+								<strong>@customer.Name</strong><br /><small>@customer.Status</small>
+							</button>
+						</div>
+					}
+				</div>
+			</div>
+		</SplitPane>
+		<SplitPane>
+			<div class="context-demo-zone h-100">
+				<SuperContextHost InstanceId="demo-right" Context="SelectedCustomer" Parent="this"
+					Zone="@SuperContextZones.Right"
+					TabPosition="SuperBlazorComponents.Components.SuperTabs.SuperTabPosition.Top" />
+			</div>
+		</SplitPane>
+	</SuperSplitter>
+</div>
+
+@code {
+	private void SelectCustomer(DemoCustomer customer)
+	{
+		SelectedCustomer = customer;
+	}
+}
+
+
+
+
+

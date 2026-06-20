@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 using ModelContextProtocol.Server;
 
@@ -46,6 +46,10 @@ public sealed class SuperComponentMcpTools(SuperComponentGuideCatalog catalog)
 	[McpServerTool]
 	[Description("Gets setup guidance for SuperDialog, SuperConfirmDialog, and dialog services.")]
 	public string get_super_dialogs_guide() => catalog.RenderGuide("super-dialogs");
+
+	[McpServerTool]
+	[Description("Gets setup guidance for SuperContextHost, SuperContextAttribute, SuperContextZones, and context-aware panels.")]
+	public string get_super_context_guide() => catalog.RenderGuide("super-context");
 
 	[McpServerTool]
 	[Description("Gets setup guidance for SuperLayout, SuperHeader, SuperSidebar, SuperBody, SuperFooter, and SuperChat.")]

@@ -1,0 +1,26 @@
+@using SuperBlazorComponents.Components.Contextualization
+
+@attribute [SuperContextAttribute<DemoCustomer>(
+	Title = "Activity",
+	Zone = SuperContextZones.Bottom,
+	Icon = "fa-clock-rotate-left",
+	Order = 2)]
+@attribute [SuperContextAttribute<DemoCustomer>(
+	Title = "Activity",
+	Zone = SuperContextZones.Right,
+	Icon = "fa-clock-rotate-left",
+	Order = 2)]
+
+<div class="p-3">
+	<h5>Recent activity</h5>
+	<ul class="list-group list-group-flush">
+		<li class="list-group-item px-0"><i class="fa-solid fa-envelope text-primary me-2"></i>Email sent to @Customer.Email</li>
+		<li class="list-group-item px-0"><i class="fa-solid fa-pen text-warning me-2"></i>Profile updated</li>
+		<li class="list-group-item px-0"><i class="fa-solid fa-circle-check text-success me-2"></i>Status set to @Customer.Status</li>
+	</ul>
+</div>
+
+@code {
+	[Parameter] public SuperContextItem ContextInfo { get; set; } = default!;
+	private DemoCustomer Customer => (DemoCustomer)ContextInfo.Context;
+}

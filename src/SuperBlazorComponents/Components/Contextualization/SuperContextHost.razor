@@ -1,0 +1,231 @@
+﻿@using SuperBlazorComponents.Components.SuperTabs
+@implements IDisposable
+@inject SuperContextService ContextService
+@inject SuperTabsService TabsService
+@inject NavigationManager NavigationManager
+
+@code {
+	private readonly List<SuperContextItem> contextItems = [];
+	private readonly List<SuperTabItem> tabItems = [];
+	private int selectedIndex;
+	private object? previousContext;
+	private IEnumerable<object>? previousContexts;
+
+	[Parameter] 
+	public string InstanceId { get; set; } = $"super-context-{Guid.NewGuid():N}";
+
+	[Parameter] 
+	public object? Parent { get; set; }
+
+	[Parameter] 
+	public object? Context { get; set; }
+
+	[Parameter] 
+	public IEnumerable<object>? Contexts { get; set; }
+
+	[Parameter] 
+	public string Zone { get; set; } = SuperContextZones.Default;
+
+	[Parameter] 
+	public SuperTabPosition TabPosition { get; set; } = SuperTabPosition.Bottom;
+
+	[Parameter] 
+	public string Height { get; set; } = "100%";
+
+	[Parameter] 
+	public string ContextParameterName { get; set; } = nameof(SuperContextComponentBase.ContextInfo);
+
+	[Parameter] 
+	public Func<SuperContextItem, IReadOnlyDictionary<string, object>>? ComponentParametersFactory { get; set; }
+
+	[Parameter] 
+	public Action<SuperContextItem>? ContextItemChanged { get; set; }
+
+	protected override void OnParametersSet()
+	{
+		if (Context is not null && !ReferenceEquals(previousContext, Context))
+		{
+			previousContext = Context;
+			SetContexts(Parent, [Context], Zone);
+		}
+		else if (Contexts is not null && !ReferenceEquals(previousContexts, Contexts))
+		{
+			previousContexts = Contexts;
+			SetContexts(Parent, Contexts, Zone);
+		}
+	}
+	protected override void OnInitialized()
+	{
+		ContextService.ItemChangeRequested += HandleItemChangeRequested;
+		ContextService.SelectRequested += HandleSelectRequested;
+		ContextService.ResetRequested += HandleResetRequested;
+	}
+
+	public void ContextChanged<TContext>(object? parent, TContext context, string? zone = null) where TContext : notnull =>
+		MultiContextChanged(parent, [context], zone);
+
+	public void MultiContextChanged<TContext>(object? parent, IEnumerable<TContext> contexts, string? zone = null) where TContext : notnull =>
+		SetContexts(parent, contexts.Cast<object>(), zone);
+
+	public void SetContexts(object? parent, IEnumerable<object> contexts, string? zone = null)
+	{
+		ArgumentNullException.ThrowIfNull(contexts);
+		var selectedContexts = contexts.Where(item => item is not null).ToList();
+		if (selectedContexts.Count == 0)
+		{
+			return;
+		}
+
+		var effectiveZone = zone ?? Zone;
+		var currentRoute = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+		var selectedTab = selectedIndex >= 0 && selectedIndex < tabItems.Count ? tabItems[selectedIndex] : null;
+		var selectedTabId = selectedTab?.Id;
+		var selectedTabTitle = selectedTab?.Title;
+		contextItems.Clear();
+		tabItems.Clear();
+
+		foreach (var context in selectedContexts)
+		{
+			foreach (var descriptor in ContextService.GetDescriptors(context.GetType(), effectiveZone).OrderBy(item => item.Order))
+			{
+				if (IsRouteExcluded(descriptor.ExcludeRoutes, currentRoute))
+				{
+					continue;
+				}
+				var item = new SuperContextItem
+				{
+					Descriptor = descriptor,
+					Context = context,
+					Parent = parent,
+					Visible = descriptor.Visible
+				};
+				if (parent is ISuperContextRefreshable refreshable)
+				{
+					item.ReloadHost = EventCallback.Factory.Create<object>(refreshable, refreshable.RefreshFromContextAsync);
+				}
+				var parameters = ComponentParametersFactory?.Invoke(item)
+					?? new Dictionary<string, object> { [ContextParameterName] = item };
+				contextItems.Add(item);
+				tabItems.Add(new SuperTabItem
+				{
+					Id = CreateTabId(item),
+					Title = item.Title,
+					Icon = item.Icon,
+					IconColor = item.IconColor,
+					Visible = item.Visible,
+					Order = item.Order,
+					Tag = item.Tag,
+					PolicyName = item.PolicyName,
+					ComponentType = item.ComponentType,
+					ComponentParameters = new Dictionary<string, object>(parameters)
+				});
+			}
+		}
+		selectedIndex =
+			!string.IsNullOrWhiteSpace(selectedTabId)
+				? tabItems.FindIndex(item => string.Equals(item.Id, selectedTabId, StringComparison.Ordinal))
+				: -1;
+
+		if (selectedIndex < 0 && !string.IsNullOrWhiteSpace(selectedTabTitle))
+		{
+			selectedIndex = tabItems.FindIndex(item => string.Equals(item.Title, selectedTabTitle, StringComparison.OrdinalIgnoreCase));
+		}
+
+		if (selectedIndex < 0)
+		{
+			selectedIndex = 0;
+		}
+
+		InvokeAsync(StateHasChanged);
+	}
+
+	public void SelectByTitle(string title) => TabsService.SelectTabByTitle(InstanceId, title);
+
+	private static bool IsRouteExcluded(string? routes, string currentRoute) =>
+		$"{routes}".Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+			.Any(route => currentRoute.StartsWith(route.TrimStart('/'), StringComparison.OrdinalIgnoreCase));
+
+	private static string CreateTabId(SuperContextItem item)
+	{
+		var value = $"tab-{item.ContextType.FullName}-{item.Title}";
+		return string.Concat(value.ToLowerInvariant().Select(character => char.IsLetterOrDigit(character) ? character : '-'));
+	}
+
+	private void HandleItemChangeRequested(object? sender, SuperContextItemChangeRequest request)
+	{
+		if (!TargetsThisHost(request.HostId))
+		{
+			return;
+		}
+		var item = contextItems.FirstOrDefault(value => string.Equals(value.Title, request.Title, StringComparison.OrdinalIgnoreCase));
+		var tab = tabItems.FirstOrDefault(value => string.Equals(value.Title, request.Title, StringComparison.OrdinalIgnoreCase));
+		if (item is null || tab is null)
+		{
+			return;
+		}
+		item.Tag = request.Tag;
+		item.Visible = request.Visible;
+		tab.Tag = request.Tag;
+		tab.Visible = request.Visible;
+		ContextItemChanged?.Invoke(item);
+		if (!request.Visible)
+		{
+			selectedIndex = 0;
+		}
+		else
+		{
+			SelectByTitle(request.Title);
+		}
+		InvokeAsync(StateHasChanged);
+	}
+
+	private void HandleSelectRequested(object? sender, SuperContextSelectRequest request)
+	{
+		if (TargetsThisHost(request.HostId))
+		{
+			SelectByTitle(request.Title);
+		}
+	}
+
+	private void HandleResetRequested(object? sender, string? hostId)
+	{
+		if (!TargetsThisHost(hostId))
+		{
+			return;
+		}
+		selectedIndex = 0;
+		TabsService.Reset(InstanceId);
+		InvokeAsync(StateHasChanged);
+	}
+
+	private bool TargetsThisHost(string? hostId) =>
+		string.IsNullOrWhiteSpace(hostId) || string.Equals(hostId, InstanceId, StringComparison.Ordinal);
+
+	private Task HandleTabChanged(SuperTabChangeEventArgs args)
+	{
+		if (args.NewTab is not null)
+		{
+			var item = contextItems.FirstOrDefault(value => string.Equals(value.Title, args.NewTab.Title, StringComparison.OrdinalIgnoreCase));
+			if (item is not null)
+			{
+				ContextService.NotifySelected(InstanceId, item);
+			}
+		}
+		return Task.CompletedTask;
+	}
+
+	public void Dispose()
+	{
+		ContextService.ItemChangeRequested -= HandleItemChangeRequested;
+		ContextService.SelectRequested -= HandleSelectRequested;
+		ContextService.ResetRequested -= HandleResetRequested;
+	}
+}
+
+<SuperTabs InstanceId="@InstanceId" 
+	Tabs="tabItems" 
+	Position="TabPosition"
+	@bind-SelectedIndex="selectedIndex" 
+	OnTabChanged="HandleTabChanged"
+	EnableKeyboardNavigation="true" 
+	Height="@Height" />

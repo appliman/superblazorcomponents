@@ -1,4 +1,5 @@
-﻿using SuperBlazorComponents.Components.SuperDataGrid;
+using SuperBlazorComponents.Components.Contextualization;
+using SuperBlazorComponents.Components.SuperDataGrid;
 using SuperBlazorComponents.Components.SuperTabs;
 using SuperBlazorComponents.Localization;
 using SuperBlazorComponents.Services;
@@ -24,6 +25,7 @@ public static class StartupExtensions
 		options?.Invoke(configuration);
 		services.AddSingleton(configuration);
 		services.AddSingleton(configuration.Localization);
+		services.AddSingleton(configuration.Contextualization);
 		services.AddSingleton<IStringLocalizerFactory, JsonStringLocalizerFactory>();
 		services.AddSingleton<IStringLocalizer>(sp =>
 			sp.GetRequiredService<IStringLocalizerFactory>().Create(typeof(StartupExtensions)));
@@ -36,6 +38,7 @@ public static class StartupExtensions
 			services.AddSingleton<ISuperDataGridSettingsStorage, InMemorySettingsStorage>();
 		}
 		services.AddScoped<SuperTabsService>();
+		services.AddScoped<SuperContextService>();
 		services.AddScoped<SuperDialogService>();
 		services.AddScoped<SuperNotificationService>();
 		return services;

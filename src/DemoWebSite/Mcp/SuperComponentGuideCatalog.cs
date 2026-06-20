@@ -1,4 +1,4 @@
-namespace DemoWebSite.Mcp;
+﻿namespace DemoWebSite.Mcp;
 
 public sealed class SuperComponentGuideCatalog
 {
@@ -139,9 +139,21 @@ public sealed class SuperComponentGuideCatalog
 			"Wrap routes in <SuperLayout>. Put navigation in SuperSidebar, page content in SuperBody, and optional actions in named SectionContent blocks consumed by the layout.",
 			"""
 			<SuperLayout>
-			    <SuperSidebar>...</SuperSidebar>
-			    <SuperBody>@Body</SuperBody>
+				<SuperSidebar>...</SuperSidebar>
+				<SuperBody>@Body</SuperBody>
 			</SuperLayout>
+			""");
+
+		yield return new(
+			"super-context",
+			"SuperContext",
+			"Context-aware tabs and contextual panels that discover components by runtime type and zone, render single or multiple contexts, and isolate host state by InstanceId.",
+			["SuperContext", "SuperContextHost", "SuperContextAttribute", "SuperContextZones"],
+			["SuperBlazorComponents.Components.Contextualization"],
+			["/super-context-demo/bottom", "/super-context-demo/right", "/super-context-demo/both", "/super-context-demo/multiple"],
+			"Register the assembly that contains contextual components with options.Contextualization.AddAssembly<T>(). Decorate panels with SuperContextAttribute<TContext>, render them through SuperContextHost, and use SuperContextComponentBase for strongly typed context panels.",
+			"""
+			<SuperContextHost InstanceId="customer-host" Context="SelectedCustomer" Parent="this" Zone="@SuperContextZones.Bottom" />
 			""");
 
 		yield return new(

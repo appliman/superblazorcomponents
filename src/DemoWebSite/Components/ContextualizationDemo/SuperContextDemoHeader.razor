@@ -1,0 +1,17 @@
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
+	<div>
+		<h1 class="h3 mb-1">@Title</h1>
+		<p class="text-muted mb-0">@Description</p>
+	</div>
+	<div class="btn-group" role="group" aria-label="Context demo navigation">
+		<a class="btn btn-outline-primary" href="/super-context-demo/bottom">Bottom</a>
+		<a class="btn btn-outline-primary" href="/super-context-demo/right">Right</a>
+		<a class="btn btn-outline-primary" href="/super-context-demo/both">Both</a>
+		<a class="btn btn-outline-primary" href="/super-context-demo/multiple">Multiple entities</a>
+	</div>
+</div>
+
+@code {
+	[Parameter] public string Title { get; set; } = default!;
+	[Parameter] public string Description { get; set; } = default!;
+}

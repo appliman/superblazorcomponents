@@ -1,0 +1,44 @@
+@page "/super-context-demo/bottom"
+@inherits SuperContextDemoBase
+@using SuperBlazorComponents.Components.Contextualization
+@using SuperBlazorComponents.Components.SuperSplitter
+
+<PageTitle>SuperContext - Bottom</PageTitle>
+<SuperContextDemoHeader Title="SuperContext — Bottom"
+	Description="Select a customer; the bottom context is rebuilt from discovered components." />
+
+<div class="context-demo-frame">
+	<SuperSplitter Orientation="SuperSplitterOrientation.Horizontal" FirstPaneSize="58">
+		<SplitPane>
+			<div class="p-3 h-100 overflow-auto">
+				<h5>Customers</h5>
+				<div class="list-group">
+					@foreach (var customer in Customers)
+					{
+						<button class="@SelectedClass(customer == SelectedCustomer)" @onclick="() => SelectCustomer(customer)">
+							<strong>@customer.Name</strong><br /><small>@customer.Email</small>
+						</button>
+					}
+				</div>
+			</div>
+		</SplitPane>
+		<SplitPane>
+			<div class="context-demo-zone h-100">
+				<SuperContextHost InstanceId="demo-bottom" Context="SelectedCustomer" Parent="this"
+					Zone="@SuperContextZones.Bottom" />
+			</div>
+		</SplitPane>
+	</SuperSplitter>
+</div>
+
+@code {
+	private void SelectCustomer(DemoCustomer customer)
+	{
+		SelectedCustomer = customer;
+	}
+}
+
+
+
+
+

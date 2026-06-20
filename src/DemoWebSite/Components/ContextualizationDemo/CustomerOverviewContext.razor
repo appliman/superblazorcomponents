@@ -1,0 +1,31 @@
+@using SuperBlazorComponents.Components.Contextualization
+
+@attribute [SuperContextAttribute<DemoCustomer>(
+	Title = "Overview",
+	Zone = SuperContextZones.Bottom,
+	Icon = "fa-address-card",
+	Order = 1)]
+@attribute [SuperContextAttribute<DemoCustomer>(
+	Title = "Overview",
+	Zone = SuperContextZones.Right,
+	Icon = "fa-address-card",
+	Order = 1)]
+
+<div class="p-3">
+	<div class="d-flex align-items-center gap-3 mb-3">
+		<div class="context-demo-avatar">@Customer.Name[0]</div>
+		<div>
+			<h5 class="mb-1">@Customer.Name</h5>
+			<div class="text-muted">@Customer.Email</div>
+		</div>
+	</div>
+	<div class="row g-3">
+		<div class="col-auto"><span class="badge text-bg-primary">Customer #@Customer.Id</span></div>
+		<div class="col-auto"><span class="badge text-bg-success">@Customer.Status</span></div>
+	</div>
+</div>
+
+@code {
+	[Parameter] public SuperContextItem ContextInfo { get; set; } = default!;
+	private DemoCustomer Customer => (DemoCustomer)ContextInfo.Context;
+}

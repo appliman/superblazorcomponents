@@ -1,4 +1,4 @@
-﻿@using Microsoft.AspNetCore.Components.Sections
+@using Microsoft.AspNetCore.Components.Sections
 @using SuperBlazorComponents.Components
 @using SuperBlazorComponents.Components.Dialogs
 @using SuperBlazorComponents.Components.Notifications
@@ -102,7 +102,14 @@
                                    Text="SuperTabs declarative" />
                 </Items>
             </SuperMenuItem>
-            <SuperMenuItem Icon="fa-grip" Match="NavLinkMatch.Prefix" Text="SuperSplitter">
+            <SuperMenuItem Icon="fa-object-group" Match="NavLinkMatch.Prefix" Text="SuperContext">
+                <Items>
+                    <SuperMenuItem Href="super-context-demo/bottom" Match="NavLinkMatch.Prefix" Icon="fa-down-long" Text="Bottom context" />
+                    <SuperMenuItem Href="super-context-demo/right" Match="NavLinkMatch.Prefix" Icon="fa-right-long" Text="Right context" />
+                    <SuperMenuItem Href="super-context-demo/both" Match="NavLinkMatch.Prefix" Icon="fa-table-columns" Text="Bottom + Right" />
+                    <SuperMenuItem Href="super-context-demo/multiple" Match="NavLinkMatch.Prefix" Icon="fa-layer-group" Text="Multiple entities" />
+                </Items>
+            </SuperMenuItem>            <SuperMenuItem Icon="fa-grip" Match="NavLinkMatch.Prefix" Text="SuperSplitter">
                 <Items>
                     <SuperMenuItem Href="splitter-demo/vertical" Match="NavLinkMatch.Prefix"
                                    Icon="fa-grip-lines-vertical" Text="Splitter vertical" />
