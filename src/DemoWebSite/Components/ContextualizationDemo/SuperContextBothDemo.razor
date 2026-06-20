@@ -1,0 +1,62 @@
+@page "/super-context-demo/both"
+@inherits SuperContextDemoBase
+@using SuperBlazorComponents.Components.Contextualization
+@using SuperBlazorComponents.Components.SuperSplitter
+
+<PageTitle>SuperContext - Bottom and Right</PageTitle>
+<SuperContextDemoHeader Title="SuperContext — Bottom + Right"
+	Description="Two independent hosts display the same entity in different zones." />
+
+<div class="context-demo-frame">
+	<SuperSplitter Orientation="SuperSplitterOrientation.Vertical" FirstPaneSize="70">
+		<SplitPane>
+			<SuperSplitter Orientation="SuperSplitterOrientation.Horizontal" FirstPaneSize="58">
+				<SplitPane>
+					<div class="p-3 h-100 overflow-auto">
+						<h5>Customer editor</h5>
+						<select class="form-select mb-3" @onchange="CustomerChanged">
+							@foreach (var customer in Customers)
+							{
+								<option value="@customer.Id">@customer.Name</option>
+							}
+						</select>
+						<div class="card">
+							<div class="card-body">
+								<h4>@SelectedCustomer.Name</h4>
+								<p class="mb-1">@SelectedCustomer.Email</p>
+								<span class="badge text-bg-success">@SelectedCustomer.Status</span>
+							</div>
+						</div>
+					</div>
+				</SplitPane>
+				<SplitPane>
+					<div class="context-demo-zone h-100">
+						<SuperContextHost InstanceId="demo-both-bottom" Context="SelectedCustomer" Parent="this"
+							Zone="@SuperContextZones.Bottom" />
+					</div>
+				</SplitPane>
+			</SuperSplitter>
+		</SplitPane>
+		<SplitPane>
+			<div class="context-demo-zone h-100">
+				<SuperContextHost InstanceId="demo-both-right" Context="SelectedCustomer" Parent="this"
+					Zone="@SuperContextZones.Right"
+					TabPosition="SuperBlazorComponents.Components.SuperTabs.SuperTabPosition.Top" />
+			</div>
+		</SplitPane>
+	</SuperSplitter>
+</div>
+
+@code {
+	private void CustomerChanged(ChangeEventArgs args)
+	{
+		SelectedCustomer = Customers.Single(customer => customer.Id == int.Parse($"{args.Value}"));
+	}
+
+}
+
+
+
+
+
+

@@ -1,0 +1,29 @@
+@using SuperBlazorComponents.Components.Contextualization
+
+@attribute [SuperContextAttribute<DemoInvoice>(
+	Title = "Invoice",
+	Zone = SuperContextZones.Bottom,
+	Icon = "fa-file-invoice-dollar",
+	Order = 3)]
+@attribute [SuperContextAttribute<DemoInvoice>(
+	Title = "Invoice",
+	Zone = SuperContextZones.Right,
+	Icon = "fa-file-invoice-dollar",
+	Order = 3)]
+
+<div class="p-3">
+	<h5 class="mb-3">@Invoice.Number</h5>
+	<dl class="row mb-0">
+		<dt class="col-5">Amount</dt>
+		<dd class="col-7 fw-semibold">@Invoice.Amount.ToString("C")</dd>
+		<dt class="col-5">Status</dt>
+		<dd class="col-7"><span class="badge text-bg-info">@Invoice.Status</span></dd>
+		<dt class="col-5">Identifier</dt>
+		<dd class="col-7">#@Invoice.Id</dd>
+	</dl>
+</div>
+
+@code {
+	[Parameter] public SuperContextItem ContextInfo { get; set; } = default!;
+	private DemoInvoice Invoice => (DemoInvoice)ContextInfo.Context;
+}

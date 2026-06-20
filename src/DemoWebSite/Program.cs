@@ -1,4 +1,4 @@
-﻿using DemoWebSite;
+using DemoWebSite;
 using DemoWebSite.Components;
 
 using DemoWebSite.Mcp;
@@ -39,6 +39,7 @@ builder.Services.AddMcpServer()
 
 builder.Services.AddSuperComponents(options =>
 {
+	options.Contextualization.AddAssembly<DemoWebSite.Components.ContextualizationDemo.DemoCustomer>();
 	options.SuperDataGridFilterComponentList.Add(new SuperBlazorComponents.Components.SuperDataGrid.Filters.SuperDataGridFilterComponent
 	{
 		Name = "MyFilter",

@@ -1,0 +1,63 @@
+@page "/super-context-demo/multiple"
+@inherits SuperContextDemoBase
+@using SuperBlazorComponents.Components.Contextualization
+@using SuperBlazorComponents.Components.SuperSplitter
+
+<PageTitle>SuperContext - Multiple entities</PageTitle>
+<SuperContextDemoHeader Title="SuperContext — Multiple entities"
+	Description="A heterogeneous selection combines context tabs from a customer and an invoice." />
+
+<div class="context-demo-frame">
+	<SuperSplitter Orientation="SuperSplitterOrientation.Horizontal" FirstPaneSize="55">
+		<SplitPane>
+			<div class="p-3 h-100 overflow-auto">
+				<div class="row g-3">
+					<div class="col-md-6">
+						<label class="form-label fw-semibold">Customer</label>
+						<select class="form-select" @onchange="CustomerChanged">
+							@foreach (var customer in Customers)
+							{
+								<option value="@customer.Id">@customer.Name</option>
+							}
+						</select>
+					</div>
+					<div class="col-md-6">
+						<label class="form-label fw-semibold">Invoice</label>
+						<select class="form-select" @onchange="InvoiceChanged">
+							@foreach (var invoice in Invoices)
+							{
+								<option value="@invoice.Id">@invoice.Number</option>
+							}
+						</select>
+					</div>
+				</div>
+				<div class="alert alert-info mt-3 mb-0">
+					The context host receives <code>object[]</code> containing two different runtime types.
+				</div>
+			</div>
+		</SplitPane>
+		<SplitPane>
+			<div class="context-demo-zone h-100">
+				<SuperContextHost InstanceId="demo-multiple" Contexts="SelectedContexts" Parent="this"
+					Zone="@SuperContextZones.Bottom" />
+			</div>
+		</SplitPane>
+	</SuperSplitter>
+</div>
+
+@code {
+	private IReadOnlyList<object> SelectedContexts => [SelectedCustomer, SelectedInvoice];
+	private void CustomerChanged(ChangeEventArgs args)
+	{
+		SelectedCustomer = Customers.Single(customer => customer.Id == int.Parse($"{args.Value}"));
+	}
+	private void InvoiceChanged(ChangeEventArgs args)
+	{
+		SelectedInvoice = Invoices.Single(invoice => invoice.Id == int.Parse($"{args.Value}"));
+	}
+}
+
+
+
+
+
