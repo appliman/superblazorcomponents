@@ -178,6 +178,7 @@ public partial class SuperDataGrid<TItem>
 			return false;
 		}
 
+		CurrentItem = firstItem;
 		_currentRowKey = TryGetItemKey(firstItem);
 		await InvokeAsync(StateHasChanged);
 
