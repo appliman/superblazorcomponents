@@ -209,8 +209,15 @@ public partial class SuperSplitter
 
 		if (jsModule != null)
 		{
-			await jsModule.InvokeVoidAsync("disposeSplitter", splitterContainer);
-			await jsModule.DisposeAsync();
+			try
+			{
+				await jsModule.InvokeVoidAsync("disposeSplitter", splitterContainer);
+				await jsModule.DisposeAsync();
+			}
+			catch (JSDisconnectedException)
+			{
+				// Circuit is disconnected, ignore
+			}
 		}
 		dotNetRef?.Dispose();
 	}

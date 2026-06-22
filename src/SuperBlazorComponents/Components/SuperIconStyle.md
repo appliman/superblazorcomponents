@@ -4,7 +4,7 @@
 
 L'enum `SuperIconStyle` permet de spécifier le style d'icône Font Awesome à utiliser dans les composants :
 - `SuperButton`
-- `SuperMenuItem`
+- `SuperMenuItem` 
 - `SuperSplitButton`
 - `SuperSplitLinkItem`
 
