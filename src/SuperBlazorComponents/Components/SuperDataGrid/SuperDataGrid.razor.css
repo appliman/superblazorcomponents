@@ -491,6 +491,7 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     font-size: inherit;
+    color: inherit;
 }
 
 /* Cells with line breaks: show content wrapped on hover */

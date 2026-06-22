@@ -102,7 +102,8 @@
                                 {
                                     var column = verticalVisibleCols[colIdx];
                                     var isLastRow = colIdx == verticalVisibleCols.Count - 1;
-                                    <tr class="sdg-vertical-row sdg-vertical-item @(isLastRow ? "sdg-vertical-item-last" : "") @verticalRowClass"
+                                    <tr @key="(TryGetItemKey(item), column.Property)"
+                                        class="sdg-vertical-row sdg-vertical-item @(isLastRow ? "sdg-vertical-item-last" : "") @verticalRowClass"
                                         @onclick="@(() => OnRowClick(item))"
                                         @ondblclick="@(() => OnRowDoubleClick(item))">
                                         @if (isFirst && DisplayRowNumberColumn)
@@ -255,7 +256,8 @@
                             @foreach (var hierarchyRow in GetHierarchyRows(item))
                             {
                                 var rowItem = hierarchyRow.Item;
-                                <tr class="@GetRowClass(rowItem) @(hierarchyRow.Level > 0 ? "sdg-hierarchy-child-row" : "")"
+                                <tr @key="TryGetItemKey(rowItem)"
+                                    class="@GetRowClass(rowItem) @(hierarchyRow.Level > 0 ? "sdg-hierarchy-child-row" : "")"
                                     @onclick="@(() => OnRowClick(rowItem))"
                                     @ondblclick="@(() => OnRowDoubleClick(rowItem))">
                                     @if (DisplayRowNumberColumn)
@@ -321,7 +323,8 @@
                                     @foreach (var column in visibleColumns)
                                     {
                                         var cellTitle = GetCellTitle(column, rowItem);
-                                        <td class="@GetCellClass(column, rowItem, cellTitle)"
+                                        <td @key="(TryGetItemKey(rowItem), column.Property)"
+                                            class="@GetCellClass(column, rowItem, cellTitle)"
                                             style="@GetCombinedCellStyle(column)"
                                             title="@cellTitle"
                                             @onclick="@(() => OnCellClick(rowItem, column))"
@@ -357,7 +360,8 @@
                                 @foreach (var hierarchyRow in GetHierarchyRows(item))
                                 {
                                     var rowItem = hierarchyRow.Item;
-                                    <tr class="@GetRowClass(rowItem) @(hierarchyRow.Level > 0 ? "sdg-hierarchy-child-row" : "")"
+                                    <tr @key="TryGetItemKey(rowItem)"
+                                        class="@GetRowClass(rowItem) @(hierarchyRow.Level > 0 ? "sdg-hierarchy-child-row" : "")"
                                         @onclick="@(() => OnRowClick(rowItem))"
                                         @ondblclick="@(() => OnRowDoubleClick(rowItem))">
                                         @if (DisplayRowNumberColumn)
@@ -423,7 +427,8 @@
                                                     @foreach (var column in visibleColumns)
                                                     {
                                                         var cellTitle = GetCellTitle(column, rowItem);
-                                                        <td class="@GetCellClass(column, rowItem, cellTitle)"
+                                                        <td @key="(TryGetItemKey(rowItem), column.Property)"
+                                                            class="@GetCellClass(column, rowItem, cellTitle)"
                                                             style="@GetCombinedCellStyle(column)"
                                                             title="@cellTitle"
                                                             @onclick="@(() => OnCellClick(rowItem, column))"
