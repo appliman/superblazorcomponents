@@ -102,7 +102,7 @@
                                 {
                                     var column = verticalVisibleCols[colIdx];
                                     var isLastRow = colIdx == verticalVisibleCols.Count - 1;
-                                    <tr @key="(TryGetItemKey(item), column.Property)"
+                                    <tr @key="(TryGetItemKey(item), column)"
                                         class="sdg-vertical-row sdg-vertical-item @(isLastRow ? "sdg-vertical-item-last" : "") @verticalRowClass"
                                         @onclick="@(() => OnRowClick(item))"
                                         @ondblclick="@(() => OnRowDoubleClick(item))">
@@ -323,7 +323,7 @@
                                     @foreach (var column in visibleColumns)
                                     {
                                         var cellTitle = GetCellTitle(column, rowItem);
-                                        <td @key="(TryGetItemKey(rowItem), column.Property)"
+                                        <td @key="(TryGetItemKey(rowItem), column)"
                                             class="@GetCellClass(column, rowItem, cellTitle)"
                                             style="@GetCombinedCellStyle(column)"
                                             title="@cellTitle"
@@ -427,7 +427,7 @@
                                                     @foreach (var column in visibleColumns)
                                                     {
                                                         var cellTitle = GetCellTitle(column, rowItem);
-                                                        <td @key="(TryGetItemKey(rowItem), column.Property)"
+                                                        <td @key="(TryGetItemKey(rowItem), column)"
                                                             class="@GetCellClass(column, rowItem, cellTitle)"
                                                             style="@GetCombinedCellStyle(column)"
                                                             title="@cellTitle"
