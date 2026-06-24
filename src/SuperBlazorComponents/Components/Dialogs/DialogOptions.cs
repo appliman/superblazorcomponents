@@ -18,7 +18,7 @@ public class DialogOptions
     /// <summary>
     /// Indique si la modale peut être fermée en cliquant sur le fond.
     /// </summary>
-    public bool CloseOnBackdropClick { get; set; } = true;
+    public bool CloseOnBackdropClick { get; set; } = false;
 
     /// <summary>
     /// Indique si la modale affiche un bouton de fermeture.
