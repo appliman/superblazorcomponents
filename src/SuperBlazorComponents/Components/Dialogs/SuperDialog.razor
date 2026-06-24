@@ -12,7 +12,7 @@
                     <h5 class="modal-title">@_title</h5>
                     @if (_options?.ShowCloseButton ?? true)
                     {
-                        <button type="button" class="btn-close" aria-label="Fermer" @onclick="CloseDialog"></button>
+                        <button type="button" class="btn-close" aria-label="Fermer" @onclick="() => DialogService.Close(null)"></button>
                     }
                 </div>
                 <div class="modal-body" style="@GetBodyStyle()">

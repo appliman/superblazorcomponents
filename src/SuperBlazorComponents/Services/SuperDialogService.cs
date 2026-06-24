@@ -93,7 +93,7 @@ public class SuperDialogService
 	{
 		if (_dialogTcs is { Task.IsCompleted: false })
 		{
-			throw new InvalidOperationException("A dialog is already open.");
+			await Close(null);
 		}
 
 		if (OnOpenDialog is null)

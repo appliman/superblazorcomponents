@@ -167,7 +167,7 @@ Listens to `SuperDialogService.OnShow`. Renders a Bootstrap modal with a single 
 |---|---|---|---|
 | `Width` | `string?` | `null` | Custom max-width (e.g. `"500px"`, `"80%"`) |
 | `Height` | `string?` | `null` | Custom modal body height with auto overflow |
-| `CloseOnBackdropClick` | `bool` | `true` | Click outside closes the modal (returns `null`) |
+| `CloseOnBackdropClick` | `bool` | `false` | Click outside closes the modal when enabled (returns `null`) |
 | `ShowCloseButton` | `bool` | `true` | Shows the `×` icon in the header |
 | `CssClass` | `string?` | `null` | Extra CSS class on `.modal-content` |
 | `Size` | `DialogSize` | `Default` | `Default`, `Small`, `Large`, `ExtraLarge` |
@@ -270,13 +270,12 @@ var options = new DialogOptions
 await DialogService.OpenAsync<EditorDialog>("Edit", null, options);
 ```
 
-### 5. Disable backdrop close (force a choice)
+### 5. Keep the dialog open on backdrop click (default)
 
 ```csharp
 await DialogService.OpenAsync<TermsDialog>("Terms of service", null,
     new DialogOptions
     {
-        CloseOnBackdropClick = false,
         ShowCloseButton = false
     });
 ```
@@ -342,17 +341,11 @@ await DialogService.Confirm(
 }
 ```
 
-### 10. Re-entrancy guard
+### 10. Reopening a dynamic dialog
 
 ```csharp
-try
-{
-    await DialogService.OpenAsync<EditorDialog>("Edit");
-}
-catch (InvalidOperationException)
-{
-    // a dialog is already open — ignore or queue
-}
+// If another dynamic dialog is still open, it is closed with a null result first.
+await DialogService.OpenAsync<EditorDialog>("Edit");
 ```
 
 ---
@@ -363,7 +356,7 @@ catch (InvalidOperationException)
 - ✅ For destructive actions, prefer **`SuperConfirmationButton`** (see [SUPERBUTTONS.md](SUPERBUTTONS.md)) — it wraps the confirm flow for free.
 - ✅ Make dialog components self-sufficient: inject `SuperDialogService` and call `Close(value)` to return their result.
 - ✅ Use **`DialogSize.ExtraLarge`** + custom `Width` for editor-style dialogs.
-- ⚠️ Only **one** dialog of each kind (confirm / dynamic) can be open at a time — opening another throws `InvalidOperationException`.
+- ⚠️ Only **one** dialog of each kind (confirm / dynamic) can be visible at a time. Opening a dynamic dialog closes the previous dynamic dialog first.
 - ⚠️ Avoid heavy initialization inside dialog components; they are mounted on every open.
 
 ---
@@ -373,9 +366,8 @@ catch (InvalidOperationException)
 | Symptom | Cause | Fix |
 |---|---|---|
 | `InvalidOperationException: No dialog host is registered` | `<SuperDialog />` not placed in layout | Add it once to `MainLayout.razor` |
-| `InvalidOperationException: A dialog is already open` | Concurrent `OpenAsync` calls | Await previous call or guard with try/catch |
 | Dialog never returns | Component never calls `DialogService.Close(...)` | Ensure all close paths call `Close(result)` |
-| Backdrop click discards user input | Default behavior | Set `CloseOnBackdropClick = false` |
+| Backdrop click does not close the dialog | Default behavior | Set `CloseOnBackdropClick = true` |
 | `result` is `null` when expected | User dismissed via backdrop/× | Check for `null` and treat as cancellation |
 
 ---

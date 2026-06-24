@@ -35,7 +35,7 @@ public partial class SuperDialog : IDisposable
 
 	private async Task OnBackdropClick()
 	{
-		if (_options?.CloseOnBackdropClick ?? true)
+		if (_options?.CloseOnBackdropClick ?? false)
 		{
 			await DialogService.Close(null);
 		}
