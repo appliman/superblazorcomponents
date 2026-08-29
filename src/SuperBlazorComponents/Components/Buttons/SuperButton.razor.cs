@@ -152,6 +152,15 @@ public partial class SuperButton : IAsyncDisposable
 
 	protected override void OnParametersSet()
 	{
+		if (CapturedHtmlStyleAttribute is not null)
+		{
+			CapturedAttributes["style"] = CapturedHtmlStyleAttribute;
+		}
+		else
+		{
+			CapturedAttributes.Remove("style");
+		}
+
 		CapturedAttributes.TryGetValue("class", out var cls);
 		_additionalCssClass = cls?.ToString();
 

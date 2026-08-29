@@ -44,6 +44,13 @@ public abstract class SuperDataGridExportButtonBase<TItem> : ComponentBase
     [Parameter]
     public bool IconOnly { get; set; }
 
+    /// <summary>
+    /// Additional attributes applied to the underlying <see cref="SuperButton"/>,
+    /// such as <c>class</c> or <c>style</c>.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object> AdditionalAttributes { get; set; } = new();
+
     protected abstract SuperDataGridExportFormat Format { get; }
     protected abstract string DefaultText { get; }
     protected abstract string DialogTitle { get; }
@@ -51,6 +58,36 @@ public abstract class SuperDataGridExportButtonBase<TItem> : ComponentBase
     protected string ResolvedText => string.IsNullOrWhiteSpace(Text) ? DefaultText : Text;
     private SuperDataGrid<TItem>? EffectiveGrid => Grid ?? CascadedGrid;
     protected bool IsDisabled => Disabled || EffectiveGrid is null;
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        var normalized = new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase);
+        string? htmlStyle = null;
+        var hasHtmlStyle = false;
+
+        foreach (var parameter in parameters)
+        {
+            if (string.Equals(parameter.Name, "style", StringComparison.OrdinalIgnoreCase)
+                && (parameter.Value is string || parameter.Value is null))
+            {
+                hasHtmlStyle = true;
+                htmlStyle = parameter.Value as string;
+                continue;
+            }
+
+            normalized[parameter.Name] = parameter.Value;
+        }
+
+        if (!hasHtmlStyle)
+        {
+            await base.SetParametersAsync(parameters);
+            return;
+        }
+
+        await base.SetParametersAsync(ParameterView.FromDictionary(normalized));
+        if (htmlStyle is not null)
+            AdditionalAttributes["style"] = htmlStyle;
+    }
 
     protected async Task OpenDialogAsync(MouseEventArgs _)
     {
