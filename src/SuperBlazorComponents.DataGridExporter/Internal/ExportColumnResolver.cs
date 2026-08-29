@@ -1,4 +1,4 @@
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Net;
 using System.Reflection;
@@ -20,6 +20,7 @@ internal static partial class ExportColumnResolver
     {
         var result = new List<ExportColumn<TItem>>();
 
+        int idx = 0;
         foreach (var column in grid.ColumnsCollection.Where(c => c.Exportable && c.IsCurrentlyVisible))
         {
             var header = FirstNotEmpty(
@@ -31,8 +32,10 @@ internal static partial class ExportColumnResolver
             if (string.IsNullOrWhiteSpace(header))
             {
                 throw new InvalidOperationException(
-                    "An exportable grid column has no resolvable header. Set ExportHeader on the column.");
+                    $"An exportable grid column has no resolvable header. Set ExportHeader on the column index {idx}.");
             }
+
+            idx++;
 
             Func<TItem, object?> accessor;
             if (column.ExportValue is not null)
