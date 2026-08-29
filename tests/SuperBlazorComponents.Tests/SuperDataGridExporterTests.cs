@@ -113,6 +113,7 @@ public sealed class SuperDataGridExporterTests
         });
         AddColumn(grid, new TestColumn { Property = nameof(TestRow.Name), Title = "Name" });
         AddColumn(grid, new TestColumn { Property = nameof(TestRow.Amount), Title = "Amount", FormatString = "{0:F2}" });
+        await _renderedGrids[grid].InvokeAsync(() => grid.SelectAllAsync());
         starts.Clear();
 
         var service = CreateService(batchSize: 2);
@@ -131,6 +132,97 @@ public sealed class SuperDataGridExporterTests
     }
 
     [TestMethod]
+    public async Task ExportWithoutSelection_ReturnsRequiredMessageAndCreatesNoFile()
+    {
+        var formats = new[] { SuperDataGridExportFormat.Csv, SuperDataGridExportFormat.Excel };
+        foreach (var format in formats)
+        {
+            var grid = CreateGrid(_ => ValueTask.FromResult(
+                GridItemsProviderResult<TestRow>.From(
+                    new[] { new TestRow(1, "One", 1, true) }, 1)));
+            AddColumn(grid, new TestColumn { Property = nameof(TestRow.Id), Title = "ID" });
+
+            var exception = await Assert.ThrowsExactlyAsync<InvalidOperationException>(
+                () => CreateService().ExportAsync(grid, format, "empty"));
+
+            Assert.AreEqual(
+                "Veuillez cocher au moins une ligne pour effectuer l’export.",
+                exception.Message);
+        }
+
+        Assert.IsFalse(Directory.Exists(_temporaryDirectory)
+            && Directory.GetFiles(_temporaryDirectory).Length > 0);
+    }
+
+    [TestMethod]
+    public async Task CsvExport_UsesOnlyIndividuallySelectedRowsInCapturedOrder()
+    {
+        var rows = Enumerable.Range(1, 3)
+            .Select(index => new TestRow(index, $"Name {index}", index, true))
+            .ToArray();
+        var grid = CreateGrid(request => ValueTask.FromResult(
+            GridItemsProviderResult<TestRow>.From(
+                rows.Skip(request.StartIndex).Take(request.Count ?? rows.Length), rows.Length)));
+        AddColumn(grid, new TestColumn { Property = nameof(TestRow.Id), Title = "ID" });
+        AddColumn(grid, new TestColumn { Property = nameof(TestRow.Name), Title = "Name" });
+
+        await _renderedGrids[grid].InvokeAsync(() => grid.SelectRow(rows[2], clearOthers: false));
+        await _renderedGrids[grid].InvokeAsync(() => grid.SelectRow(rows[0], clearOthers: false));
+
+        var result = await CreateService().ExportAsync(grid, SuperDataGridExportFormat.Csv, "selected");
+        var file = Directory.GetFiles(_temporaryDirectory, "*.csv").Single();
+        var lines = await File.ReadAllLinesAsync(file, Encoding.UTF8);
+
+        Assert.AreEqual(2, result.RowCount);
+        CollectionAssert.AreEqual(new[] { "ID,Name", "3,Name 3", "1,Name 1" }, lines);
+    }
+
+    [TestMethod]
+    public async Task CsvExport_AllSelectedReadsBatchesAndSkipsExcludedRows()
+    {
+        var rows = Enumerable.Range(1, 5)
+            .Select(index => new TestRow(index, $"Name {index}", index, true))
+            .ToArray();
+        var starts = new List<int>();
+        var grid = CreateGrid(request =>
+        {
+            starts.Add(request.StartIndex);
+            return ValueTask.FromResult(GridItemsProviderResult<TestRow>.From(
+                rows.Skip(request.StartIndex).Take(request.Count ?? rows.Length), rows.Length));
+        });
+        AddColumn(grid, new TestColumn { Property = nameof(TestRow.Id), Title = "ID" });
+        await _renderedGrids[grid].InvokeAsync(() => grid.SelectAllAsync());
+        starts.Clear();
+        await _renderedGrids[grid].InvokeAsync(() => grid.DeselectRowAsync(rows[1]));
+
+        var result = await CreateService(batchSize: 2)
+            .ExportAsync(grid, SuperDataGridExportFormat.Csv, "all-selected");
+        var file = Directory.GetFiles(_temporaryDirectory, "*.csv").Single();
+        var lines = await File.ReadAllLinesAsync(file, Encoding.UTF8);
+
+        Assert.AreEqual(4, result.RowCount);
+        CollectionAssert.AreEqual(new[] { 0, 2, 4 }, starts);
+        CollectionAssert.AreEqual(new[] { "ID", "1", "3", "4", "5" }, lines);
+    }
+
+    [TestMethod]
+    public async Task SelectionSnapshot_ExposesStableKeysAndAllSelectedState()
+    {
+        var row = new TestRow(7, "Seven", 7, true);
+        var grid = CreateGrid(_ => ValueTask.FromResult(
+            GridItemsProviderResult<TestRow>.From(new[] { row }, 1)));
+        AddColumn(grid, new TestColumn { Property = nameof(TestRow.Id), Title = "ID" });
+        await _renderedGrids[grid].InvokeAsync(() => grid.SelectRow(row));
+
+        var snapshot = grid.CaptureSelectionSnapshot();
+
+        Assert.IsTrue(snapshot.HasSelection);
+        Assert.IsFalse(snapshot.AllSelected);
+        Assert.IsTrue(snapshot.SelectedItemKeys.Contains(7));
+        Assert.AreEqual(7, grid.GetItemKey(row));
+    }
+
+    [TestMethod]
     public async Task ExcelExport_PreservesNativeCellTypes()
     {
         var rows = new[] { new TestRow(1, "Alpha", 12.5m, true) };
@@ -140,6 +232,7 @@ public sealed class SuperDataGridExporterTests
         AddColumn(grid, new TestColumn { Property = nameof(TestRow.Id), Title = "ID" });
         AddColumn(grid, new TestColumn { Property = nameof(TestRow.Amount), Title = "Amount" });
         AddColumn(grid, new TestColumn { Property = nameof(TestRow.Enabled), Title = "Enabled" });
+        await _renderedGrids[grid].InvokeAsync(() => grid.SelectAllAsync());
 
         var result = await CreateService().ExportAsync(
             grid, SuperDataGridExportFormat.Excel, "typed");
@@ -164,6 +257,7 @@ public sealed class SuperDataGridExporterTests
                     new[] { new TestRow(1, "One", 1, true) }, 2)
                 : GridItemsProviderResult<TestRow>.From([], 2)));
         AddColumn(grid, new TestColumn { Property = nameof(TestRow.Id), Title = "ID" });
+        await _renderedGrids[grid].InvokeAsync(() => grid.SelectAllAsync());
 
         var exception = await Assert.ThrowsExactlyAsync<InvalidOperationException>(
             () => CreateService(batchSize: 1).ExportAsync(
@@ -182,6 +276,7 @@ public sealed class SuperDataGridExporterTests
             GridItemsProviderResult<TestRow>.From(
                 new[] { new TestRow(1, "One", 1, true) }, 1)));
         AddColumn(grid, new TestColumn { Property = nameof(TestRow.Id), Title = "ID" });
+        await _renderedGrids[grid].InvokeAsync(() => grid.SelectAllAsync());
         using var cancellation = new CancellationTokenSource();
         cancellation.Cancel();
 
@@ -305,6 +400,30 @@ public sealed class SuperDataGridExporterTests
         });
     }
 
+    [TestMethod]
+    public void ExportDialog_WithoutSelectionShowsRetryableMessageImmediately()
+    {
+        using var context = new BunitContext();
+        context.JSInterop.Mode = JSRuntimeMode.Loose;
+        context.Services.AddSuperComponents();
+        context.Services.AddSingleton<ISuperDataGridExportService>(new FailingExportService());
+        var grid = new SuperDataGrid<TestRow>
+        {
+            ItemsProvider = _ => ValueTask.FromResult(GridItemsProviderResult<TestRow>.Empty())
+        };
+
+        var dialog = context.Render<SuperDataGridExportDialog<TestRow>>(parameters => parameters
+            .Add(component => component.Grid, grid)
+            .Add(component => component.Format, SuperDataGridExportFormat.Csv)
+            .Add(component => component.DefaultFileName, "products"));
+
+        StringAssert.Contains(dialog.Markup, "Veuillez cocher au moins une ligne pour effectuer l’export.");
+        Assert.IsFalse(dialog.Find("button.btn-primary").HasAttribute("disabled"));
+        dialog.Find("button.btn-primary").Click();
+        dialog.WaitForAssertion(() =>
+            StringAssert.Contains(dialog.Markup, "Veuillez cocher au moins une ligne pour effectuer l’export."));
+    }
+
     private SuperDataGridExportService CreateService(int batchSize = 200)
     {
         var options = CreateOptions();
@@ -352,7 +471,12 @@ public sealed class SuperDataGridExporterTests
         }
     }
 
-    private sealed record TestRow(int Id, string Name, decimal Amount, bool Enabled);
+    private sealed record TestRow(int Id, string Name, decimal Amount, bool Enabled) : IDataItem
+    {
+        public object KeyValue => Id;
+        public bool IsSelected { get; set; }
+        public int RowNumber { get; set; }
+    }
 
     private sealed class StubExportService : ISuperDataGridExportService
     {
@@ -363,6 +487,17 @@ public sealed class SuperDataGridExporterTests
             CancellationToken cancellationToken = default)
             => Task.FromResult(new SuperDataGridExportResult(
                 "products.csv", "/exports/token/csv", 42));
+    }
+
+    private sealed class FailingExportService : ISuperDataGridExportService
+    {
+        public Task<SuperDataGridExportResult> ExportAsync<TItem>(
+            SuperDataGrid<TItem> grid,
+            SuperDataGridExportFormat format,
+            string fileName,
+            CancellationToken cancellationToken = default)
+            => throw new InvalidOperationException(
+                "Veuillez cocher au moins une ligne pour effectuer l’export.");
     }
 
     private sealed class ManualTimeProvider(DateTimeOffset utcNow) : TimeProvider

@@ -1271,9 +1271,24 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 		return itemKey is not null && Equals(itemKey, _currentRowKey);
 	}
 
+	/// <summary>
+	/// Gets the key used by the grid to identify a row.
+	/// </summary>
+	/// <remarks>
+	/// When a type implements <see cref="IDataItem"/>, its <c>KeyValue</c> is used.
+	/// Otherwise the item instance itself is used as a fallback. Virtualized providers
+	/// should therefore expose a stable <c>IDataItem.KeyValue</c>.
+	/// </remarks>
+	public object? GetItemKey(TItem item) => TryGetItemKey(item);
+
 	private static object? TryGetItemKey(TItem item)
 	{
 		ArgumentNullException.ThrowIfNull(item);
+
+		if (item is IDataItem dataItem)
+		{
+			return dataItem.KeyValue;
+		}
 
 		var keyProperty = typeof(TItem).GetProperty(nameof(IDataItem.KeyValue));
 		if (keyProperty is not null)
