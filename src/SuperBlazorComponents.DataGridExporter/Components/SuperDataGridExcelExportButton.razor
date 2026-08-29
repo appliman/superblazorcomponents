@@ -1,0 +1,17 @@
+@typeparam TItem
+@inherits SuperDataGridExportButtonBase<TItem>
+
+<SuperButton Text="@ResolvedText"
+             Image="_content/SuperBlazorComponents.DataGridExporter/icons/microsoft-excel.svg"
+             IconOnly="@IconOnly"
+             Style="@Style"
+             Size="@Size"
+             Outline="@Outline"
+             Disabled="@IsDisabled"
+             Click="@OpenDialogAsync" />
+
+@code {
+    protected override SuperDataGridExportFormat Format => SuperDataGridExportFormat.Excel;
+    protected override string DefaultText => "Exporter Excel";
+    protected override string DialogTitle => "Export Excel";
+}

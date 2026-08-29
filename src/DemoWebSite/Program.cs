@@ -8,6 +8,7 @@ using ModelContextProtocol.Server;
 
 using SuperBlazorComponents;
 using SuperBlazorComponents.Components.SuperDataGrid;
+using SuperBlazorComponents.DataGridExporter;
 
 using System.Text.RegularExpressions;
 
@@ -76,6 +77,15 @@ builder.Services.AddSuperComponents(options =>
 		DisplayDefaultFooterTemplate = true
 	});
 });
+builder.Services.AddSuperDataGridExporter(options =>
+{
+	options.TemporaryDirectory = Path.Combine(
+		builder.Environment.ContentRootPath,
+		"_temp",
+		"data-grid-exports");
+	options.FileLifetime = TimeSpan.FromHours(24);
+	options.CleanupInterval = TimeSpan.FromDays(1);
+});
 
 System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = new System.Globalization.CultureInfo("en-US");
 System.Globalization.CultureInfo.DefaultThreadCurrentCulture = new System.Globalization.CultureInfo("en-US");
@@ -113,6 +123,7 @@ app.MapGet("/mcp", (SuperComponentGuideCatalog catalog) => Results.Ok(new
 	})
 }));
 app.MapMcp("/mcp");
+app.MapSuperDataGridExporter();
 
 app.MapGet("/demo-source", (string route, IWebHostEnvironment environment) =>
 {

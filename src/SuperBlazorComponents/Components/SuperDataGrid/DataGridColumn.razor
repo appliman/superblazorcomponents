@@ -132,6 +132,25 @@
     public RenderFragment? HeaderTemplate { get; set; }
 
     /// <summary>
+    /// Optional plain-text header used by data exporters. When omitted, exporters can
+    /// fall back to <see cref="HeaderTemplate"/>, <see cref="Title"/> and <see cref="Property"/>.
+    /// </summary>
+    [Parameter]
+    public string? ExportHeader { get; set; }
+
+    /// <summary>
+    /// Optional value selector used by data exporters for template-only or computed columns.
+    /// </summary>
+    [Parameter]
+    public Func<TItem, object?>? ExportValue { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether this column is included by data exporters.
+    /// </summary>
+    [Parameter]
+    public bool Exportable { get; set; } = true;
+
+    /// <summary>
     /// Custom template for rendering the footer.
     /// </summary>
     [Parameter]
@@ -165,6 +184,11 @@
     /// Gets the current visibility (considers runtime modifications)
     /// </summary>
     internal bool CurrentVisible => _currentVisible;
+
+    /// <summary>
+    /// Gets the effective visibility after runtime grid settings have been applied.
+    /// </summary>
+    public bool IsCurrentlyVisible => CurrentVisible;
 
     protected override void OnInitialized()
     {

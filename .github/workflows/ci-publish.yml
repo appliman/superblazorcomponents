@@ -12,7 +12,8 @@ env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
   SOLUTION_FILE: SuperBlazorComponents.slnx
-  PACKAGE_PROJECT: src/SuperBlazorComponents/SuperBlazorComponents.csproj
+  MAIN_PACKAGE_PROJECT: src/SuperBlazorComponents/SuperBlazorComponents.csproj
+  EXPORTER_PACKAGE_PROJECT: src/SuperBlazorComponents.DataGridExporter/SuperBlazorComponents.DataGridExporter.csproj
 
 permissions:
   contents: read
@@ -64,7 +65,14 @@ jobs:
 
       - name: Pack SuperBlazorComponents
         run: >
-          dotnet pack ${{ env.PACKAGE_PROJECT }}
+          dotnet pack ${{ env.MAIN_PACKAGE_PROJECT }}
+          --no-build
+          --configuration Release
+          --output ./nupkgs
+
+      - name: Pack SuperBlazorComponents.DataGridExporter
+        run: >
+          dotnet pack ${{ env.EXPORTER_PACKAGE_PROJECT }}
           --no-build
           --configuration Release
           --output ./nupkgs

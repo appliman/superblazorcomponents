@@ -25,7 +25,7 @@
                             <SuperDataGridRowSelector TItem="TItem" SuperDataGrid="this" Size="Components.Buttons.SuperButtonSize.Small" MenuItems="SelectorMenuItemsContent" MenuItemsSource="SelectorMenuItemsSource" ActionSelected="SelectorMenuItemSelected" />
                         </div>
                     }
-                    <div class="flex-grow-1 d-flex flex-row align-items-center">
+                    <div class="flex-grow-1 d-flex flex-row align-items-center @(HeaderTemplate is not null ? "me-2" : null)">
                         @if (HeaderTemplate is not null)
                         {
                             @HeaderTemplate
