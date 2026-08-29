@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>SuperBlazorComponents.DataGridExporter</RootNamespace>
+    <AssemblyName>SuperBlazorComponents.DataGridExporter</AssemblyName>
+    <VersionPrefix>2.0.7</VersionPrefix>
+    <PackageId>SuperBlazorComponents.DataGridExporter</PackageId>
+    <Title>SuperBlazorComponents DataGrid Exporter</Title>
+    <Authors>Appliman</Authors>
+    <Company>Appliman</Company>
+    <Description>CSV and Excel export components for SuperDataGrid, including virtualized data.</Description>
+    <PackageTags>blazor;datagrid;csv;excel;export;dotnet</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>SUPERDATAGRIDEXPORTER.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <ProjectReference Include="..\SuperBlazorComponents\SuperBlazorComponents.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ClosedXML" Version="0.105.1" />
+    <PackageReference Include="CsvHelper" Version="33.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\SUPERDATAGRIDEXPORTER.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+</Project>

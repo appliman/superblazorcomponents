@@ -4,6 +4,7 @@
 @using SuperBlazorComponents.Components.SuperDataGrid
 @using SuperBlazorComponents.Components.SuperDataGrid.Filters
 @using SuperBlazorComponents.Components.SuperDataGrid.Tools
+@using SuperBlazorComponents.DataGridExporter.Components
 
 <PageTitle>SuperGrid Demo - 5000 Items</PageTitle>
 
@@ -78,10 +79,24 @@
         </SelectorMenuItemsContent>
 
         <HeaderTemplate>
-            <div class="d-flex align-items-center gap-2">
+            <div class="d-flex align-items-center gap-2 w-100">
                 <span>Header</span>
                 <button type="button" class="btn btn-sm btn-outline-primary" @onclick="ExpandAllHierarchyAsync">Expand all</button>
                 <button type="button" class="btn btn-sm btn-outline-secondary" @onclick="CollapseAllHierarchyAsync">Collapse all</button>
+                <div class="ms-auto d-flex align-items-center gap-2">
+                    <SuperDataGridExcelExportButton TItem="DemoItem"
+                                                    Grid="@_grid"
+                                                    DefaultFileName="supergrid-demo"
+                                                    Size="SuperButtonSize.Small"
+                                                    IconOnly="true"
+                                                    Outline="true" />
+                    <SuperDataGridCsvExportButton TItem="DemoItem"
+                                                  Grid="@_grid"
+                                                  DefaultFileName="supergrid-demo"
+                                                  Size="SuperButtonSize.Small"
+                                                  IconOnly="true"
+                                                  Outline="true" />
+                </div>
             </div>
         </HeaderTemplate>
 
@@ -194,9 +209,23 @@
                        FreezeLeftColumns="1"
                        GridId="supergrid-demo">
             <HeaderTemplate>
-                <button type="button" class="btn btn-sm btn-outline-primary" @onclick="ExpandAllHierarchyAsync">
-                    Expand all
-                </button>
+                <div class="d-flex align-items-center gap-2 w-100">
+                    <button type="button" class="btn btn-sm btn-outline-primary" @onclick="ExpandAllHierarchyAsync">
+                        Expand all
+                    </button>
+                    <div class="ms-auto d-flex align-items-center gap-2">
+                        <SuperDataGridExcelExportButton TItem="DemoItem"
+                                                        Grid="@_grid"
+                                                        DefaultFileName="supergrid-demo"
+                                                        Size="SuperButtonSize.Small"
+                                                        IconOnly="true" />
+                        <SuperDataGridCsvExportButton TItem="DemoItem"
+                                                      Grid="@_grid"
+                                                      DefaultFileName="supergrid-demo"
+                                                      Size="SuperButtonSize.Small"
+                                                      IconOnly="true" />
+                    </div>
+                </div>
             </HeaderTemplate>
             <ChildContent>
                 <DataGridColumn TItem="DemoItem" Property="Id" Title="ID" Width="100px" />

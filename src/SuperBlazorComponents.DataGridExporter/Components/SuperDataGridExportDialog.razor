@@ -1,0 +1,114 @@
+@typeparam TItem
+@implements IDisposable
+@inject ISuperDataGridExportService ExportService
+@inject SuperDialogService DialogService
+
+<div class="d-flex flex-column gap-3">
+    @if (_result is null)
+    {
+        <div>
+            <label class="form-label" for="super-grid-export-file-name">Nom du fichier</label>
+            <input id="super-grid-export-file-name"
+                   class="form-control"
+                   maxlength="120"
+                   disabled="@_isGenerating"
+                   @bind="_fileName" />
+            <div class="form-text">L’extension @Extension sera ajoutée automatiquement.</div>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(_error))
+        {
+            <div class="alert alert-danger mb-0" role="alert">@_error</div>
+        }
+
+        <div class="d-flex justify-content-end gap-2">
+            <SuperButton Text="Annuler"
+                         Style="SuperButtonStyle.Secondary"
+                         Disabled="@_isGenerating"
+                         Click="@CancelAsync" />
+            <SuperButton Text="@(_error is null ? "Générer" : "Réessayer")"
+                         BusyText="Génération…"
+                         IsBusy="@_isGenerating"
+                         Disabled="@string.IsNullOrWhiteSpace(_fileName)"
+                         Click="@GenerateAsync" />
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-success mb-0" role="status">
+            Le fichier <strong>@_result.FileName</strong> est prêt (@_result.RowCount ligne(s)).
+        </div>
+        <div class="d-flex justify-content-end gap-2">
+            <SuperButton Text="Fermer" Style="SuperButtonStyle.Secondary" Click="@CloseAsync" />
+            <a class="btn btn-primary" href="@_result.DownloadUrl">
+                <i class="fa-solid fa-download" aria-hidden="true"></i>
+                <span class="ms-1">Télécharger</span>
+            </a>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public SuperDataGrid<TItem> Grid { get; set; } = default!;
+
+    [Parameter]
+    public SuperDataGridExportFormat Format { get; set; }
+
+    [Parameter]
+    public string DefaultFileName { get; set; } = string.Empty;
+
+    private readonly CancellationTokenSource _cancellationTokenSource = new();
+    private string _fileName = string.Empty;
+    private string? _error;
+    private bool _isGenerating;
+    private bool _initialized;
+    private SuperDataGridExportResult? _result;
+
+    private string Extension => Format == SuperDataGridExportFormat.Csv ? ".csv" : ".xlsx";
+
+    protected override void OnParametersSet()
+    {
+        if (_initialized)
+            return;
+
+        _fileName = string.IsNullOrWhiteSpace(DefaultFileName)
+            ? $"export-{DateTime.Now:yyyyMMdd-HHmmss}"
+            : DefaultFileName;
+        _initialized = true;
+    }
+
+    private async Task GenerateAsync(MouseEventArgs _)
+    {
+        if (_isGenerating || string.IsNullOrWhiteSpace(_fileName))
+            return;
+
+        _isGenerating = true;
+        _error = null;
+        try
+        {
+            _result = await ExportService.ExportAsync(
+                Grid, Format, _fileName, _cancellationTokenSource.Token);
+        }
+        catch (OperationCanceledException) when (_cancellationTokenSource.IsCancellationRequested)
+        {
+        }
+        catch (Exception exception)
+        {
+            _error = exception.Message;
+        }
+        finally
+        {
+            _isGenerating = false;
+        }
+    }
+
+    private Task CancelAsync(MouseEventArgs _) => DialogService.Close(null);
+    private Task CloseAsync(MouseEventArgs _) => DialogService.Close(_result);
+
+    public void Dispose()
+    {
+        _cancellationTokenSource.Cancel();
+        _cancellationTokenSource.Dispose();
+    }
+}

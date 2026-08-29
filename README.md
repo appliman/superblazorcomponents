@@ -19,6 +19,7 @@
 | Preview | Component | Description | Docs |
 |---|---|---|---|
 | <img src="docs/images/components/superdatagrid.svg" width="88" alt="SuperDataGrid preview"> | **SuperDataGrid** | Virtualized data grid — frozen columns/rows, hierarchical lazy-loading rows, reordering, resizing, filtering, sorting, inline editing, row selection, settings persistence | [📖 SUPERDATAGRID.md](SUPERDATAGRID.md) |
+| <img src="docs/images/components/superdatagrid.svg" width="88" alt="SuperDataGrid exporter preview"> | **SuperDataGrid Exporter** | Optional CSV and Excel export extension for complete filtered, sorted and virtualized datasets | [📖 SUPERDATAGRIDEXPORTER.md](SUPERDATAGRIDEXPORTER.md) |
 | <img src="docs/images/components/superlayout.svg" width="88" alt="SuperLayout preview"> | **SuperLayout** | Responsive app layout — header, sidebar, body, footer, chat panel with collapsible sidebar | [📖 SUPERLAYOUT.md](SUPERLAYOUT.md) |
 | <img src="docs/images/components/supercontext.svg" width="88" alt="SuperContext preview"> | **SuperContext** | Context-aware tabs and contextual panels — discover components by runtime type and zone, render one or many contexts, and isolate host state per instance | [📖 SUPERCONTEXT.md](SUPERCONTEXT.md) |
 | <img src="docs/images/components/supertabs.svg" width="88" alt="SuperTabs preview"> | **SuperTabs** | Dynamic tabbed interface — badges, closable tabs, lazy loading, persistence (URL + localStorage), keyboard navigation, service-driven management | [📖 SUPERTABS.md](SUPERTABS.md) |

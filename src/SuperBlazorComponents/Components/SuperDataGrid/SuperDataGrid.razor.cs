@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.Web.Virtualization;
 using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
+using System.Collections.Immutable;
 using System.Runtime.CompilerServices;
 
 namespace SuperBlazorComponents.Components.SuperDataGrid;
@@ -357,6 +358,32 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 	/// Gets the current collection of grid columns with their configured properties.
 	/// </summary>
 	public IReadOnlyList<DataGridColumn<TItem>> ColumnsCollection => _columns;
+
+	/// <summary>
+	/// Captures the current sorting and filtering state so a long-running operation can
+	/// consistently query the same grid view.
+	/// </summary>
+	public SuperDataGridQuerySnapshot CaptureQuerySnapshot()
+	{
+		var filters = _filterInfoList.Select(CreateFilterSnapshot).ToImmutableArray();
+		return new SuperDataGridQuerySnapshot(_sortColumn, _sortDirection, filters);
+	}
+
+	private static SuperDataGridFilterSnapshot CreateFilterSnapshot(SuperDataGridFilterInfo source)
+	{
+		return new SuperDataGridFilterSnapshot(
+			source.PropertyName,
+			source.PropertyValue,
+			source.SelectedValues.ToImmutableArray(),
+			source.StartDate,
+			source.EndDate,
+			source.FromNumericValue,
+			source.ToNumericValue,
+			source.PeriodName,
+			source.PeriodPreset,
+			source.PropertyType,
+			source.Operator);
+	}
 
 	public string FooterText
 	{

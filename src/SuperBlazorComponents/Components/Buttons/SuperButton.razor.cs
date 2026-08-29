@@ -32,6 +32,13 @@ public partial class SuperButton : IAsyncDisposable
 	public string? Icon { get; set; }
 
 	/// <summary>
+	/// Displays only the leading icon or image while retaining <see cref="Text"/>
+	/// as the accessible label and tooltip.
+	/// </summary>
+	[Parameter]
+	public bool IconOnly { get; set; }
+
+	/// <summary>
 	/// Url of the image displayed in place of the icon when provided.
 	/// </summary>
 	[Parameter]
@@ -77,7 +84,7 @@ public partial class SuperButton : IAsyncDisposable
 
 	private bool HasLeadingVisual => !string.IsNullOrWhiteSpace(Image) || !string.IsNullOrWhiteSpace(Icon);
 
-	private bool UseIconOnly => IsCollapsedOrHidden && HasLeadingVisual;
+	private bool UseIconOnly => HasLeadingVisual && (IconOnly || IsCollapsedOrHidden);
 
 	private string ButtonTypeAttributeValue => ButtonType switch
 	{
