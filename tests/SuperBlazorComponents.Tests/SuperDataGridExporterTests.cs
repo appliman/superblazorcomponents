@@ -263,6 +263,22 @@ public sealed class SuperDataGridExporterTests
     }
 
     [TestMethod]
+    public void ExportButtons_ForwardClassAndStyleToUnderlyingButton()
+    {
+        using var context = new BunitContext();
+        context.JSInterop.Mode = JSRuntimeMode.Loose;
+        context.Services.AddSuperComponents();
+
+        var button = context.Render<SuperDataGridCsvExportButton<TestRow>>(parameters => parameters
+            .AddUnmatched("class", "me-2")
+            .AddUnmatched("style", "margin-inline-end: 0.5rem"))
+            .Find("button");
+
+        StringAssert.Contains(button.GetAttribute("class")!, "me-2");
+        Assert.AreEqual("margin-inline-end: 0.5rem", button.GetAttribute("style"));
+    }
+
+    [TestMethod]
     public void ExportDialog_AfterGenerationDisplaysDownloadLink()
     {
         using var context = new BunitContext();

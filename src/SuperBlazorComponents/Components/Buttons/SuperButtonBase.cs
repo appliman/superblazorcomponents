@@ -5,6 +5,8 @@ namespace SuperBlazorComponents.Components.Buttons;
 
 public abstract class SuperButtonBase : ComponentBase
 {
+    protected string? CapturedHtmlStyleAttribute { get; private set; }
+
     [Parameter]
     public EventCallback<MouseEventArgs> Click { get; set; }
 
@@ -19,6 +21,34 @@ public abstract class SuperButtonBase : ComponentBase
 
     [Parameter]
     public bool IsBusy { get; set; } = false;
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        var normalized = new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase);
+        var hasHtmlStyle = false;
+        CapturedHtmlStyleAttribute = null;
+
+        foreach (var parameter in parameters)
+        {
+            if (string.Equals(parameter.Name, "style", StringComparison.OrdinalIgnoreCase)
+                && (parameter.Value is string || parameter.Value is null))
+            {
+                hasHtmlStyle = true;
+                CapturedHtmlStyleAttribute = parameter.Value as string;
+                continue;
+            }
+
+            normalized[parameter.Name] = parameter.Value;
+        }
+
+        if (!hasHtmlStyle)
+        {
+            await base.SetParametersAsync(parameters);
+            return;
+        }
+
+        await base.SetParametersAsync(ParameterView.FromDictionary(normalized));
+    }
 
     private bool _isBusy;
 

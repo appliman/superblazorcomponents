@@ -2,10 +2,10 @@
 
 on:
   push:
-    branches: [main]
+    branches: [prod]
     tags: ['v*']
   pull_request:
-    branches: [main]
+    branches: [prod]
   workflow_dispatch:
 
 env:
