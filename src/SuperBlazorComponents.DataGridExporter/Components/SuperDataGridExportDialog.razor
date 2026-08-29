@@ -65,6 +65,9 @@
     private bool _initialized;
     private SuperDataGridExportResult? _result;
 
+    private const string SelectionRequiredMessage =
+        "Veuillez cocher au moins une ligne pour effectuer l’export.";
+
     private string Extension => Format == SuperDataGridExportFormat.Csv ? ".csv" : ".xlsx";
 
     protected override void OnParametersSet()
@@ -75,6 +78,8 @@
         _fileName = string.IsNullOrWhiteSpace(DefaultFileName)
             ? $"export-{DateTime.Now:yyyyMMdd-HHmmss}"
             : DefaultFileName;
+        if (!Grid.CaptureSelectionSnapshot().HasSelection)
+            _error = SelectionRequiredMessage;
         _initialized = true;
     }
 

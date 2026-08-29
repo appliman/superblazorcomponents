@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 
+using System.Collections.Immutable;
+
 namespace SuperBlazorComponents.Components.SuperDataGrid;
 
 public partial class SuperDataGrid<TItem>
@@ -61,6 +63,43 @@ public partial class SuperDataGrid<TItem>
 	public int SelectedCountTotal => _selectionInfo.SelectedCountTotal;
 
 	/// <summary>
+	/// Captures the current row selection into an immutable snapshot. The snapshot is
+	/// independent from subsequent changes made to the grid selection.
+	/// </summary>
+	public SuperDataGridSelectionSnapshot<TItem> CaptureSelectionSnapshot()
+	{
+		UpdateSelectionInfo();
+
+		var selectedItems = _selectionInfo.SelectionOrder
+			.Where(_selectionInfo.SelectedItems.Contains)
+			.Concat(_selectionInfo.SelectedItems)
+			.Concat(GetSelectedHierarchyItems())
+			.Distinct()
+			.ToImmutableArray();
+		var selectedKeys = selectedItems
+			.Select(GetItemKey)
+			.ToImmutableHashSet();
+
+		return new SuperDataGridSelectionSnapshot<TItem>(
+			selectedItems,
+			selectedKeys,
+			_selectionInfo.AllSelected,
+			_selectionInfo.UnselectedItemKeys.ToImmutableHashSet(),
+			_selectionInfo.SelectedCountTotal);
+	}
+
+	private IEnumerable<TItem> GetSelectedHierarchyItems()
+	{
+		if (!IsHierarchicalRenderingEnabled() || !_hierarchicalRootItemsLoaded)
+			return [];
+
+		return _hierarchicalRootItems
+			.SelectMany(GetHierarchyRows)
+			.Select(row => row.Item)
+			.Where(IsRowSelected);
+	}
+
+	/// <summary>
 	/// Adds one item to the row selector menu at runtime.
 	/// </summary>
 	/// <param name="item">The row selector item to add.</param>
@@ -113,10 +152,10 @@ public partial class SuperDataGrid<TItem>
 
 		if (SelectionMode != SuperDataGridSelectionMode.Multiple)
 		{
-			_selectionInfo.SelectedItems.Clear();
+			_selectionInfo.ClearSelected();
 		}
 
-		_selectionInfo.SelectedItems.Add(item);
+		_selectionInfo.AddSelected(item);
 
 		if (_selectionInfo.AllSelected)
 		{
@@ -148,12 +187,12 @@ public partial class SuperDataGrid<TItem>
 				SetItemSelected(selectedItem, false);
 			}
 
-			_selectionInfo.SelectedItems.Clear();
+			_selectionInfo.ClearSelected();
 		}
 
 		if (!_selectionInfo.SelectedItems.Contains(item))
 		{
-			_selectionInfo.SelectedItems.Add(item);
+			_selectionInfo.AddSelected(item);
 			SetItemSelected(item, true);
 		}
 
@@ -162,6 +201,25 @@ public partial class SuperDataGrid<TItem>
 			_selectionInfo.UnselectedItemKeys.Remove(TryGetItemKey(item));
 		}
 
+		await NotifySelectionChangedAsync(item);
+		StateHasChanged();
+	}
+
+	/// <summary>
+	/// Unchecks a specific row.
+	/// </summary>
+	public async Task DeselectRowAsync(TItem item)
+	{
+		if (item is null || IsRowDeleted(item))
+		{
+			return;
+		}
+
+		_selectionInfo.RemoveSelected(item);
+		if (_selectionInfo.AllSelected)
+			_selectionInfo.UnselectedItemKeys.Add(TryGetItemKey(item));
+
+		SetItemSelected(item, false);
 		await NotifySelectionChangedAsync(item);
 		StateHasChanged();
 	}
@@ -212,7 +270,7 @@ public partial class SuperDataGrid<TItem>
 		}
 
 		CurrentItem = default;
-		_selectionInfo.SelectedItems.Clear();
+		_selectionInfo.ClearSelected();
 		_selectionInfo.UnselectedItemKeys.Clear();
 		_selectionInfo.AllSelected = false;
 
@@ -245,13 +303,13 @@ public partial class SuperDataGrid<TItem>
 		{
 			if (IsRowDeleted(renderedItem))
 			{
-				_selectionInfo.SelectedItems.Remove(renderedItem);
+				_selectionInfo.RemoveSelected(renderedItem);
 				_selectionInfo.UnselectedItemKeys.Add(TryGetItemKey(renderedItem));
 				SetItemSelected(renderedItem, false);
 				continue;
 			}
 
-			_selectionInfo.SelectedItems.Add(renderedItem);
+			_selectionInfo.AddSelected(renderedItem);
 			SetItemSelected(renderedItem, true);
 		}
 
@@ -364,7 +422,7 @@ public partial class SuperDataGrid<TItem>
 				SetItemSelected(selectedItem, false);
 			}
 
-			_selectionInfo.SelectedItems.Clear();
+			_selectionInfo.ClearSelected();
 			_selectionInfo.AllSelected = false;
 			_selectionInfo.UnselectedItemKeys.Clear();
 		}
@@ -375,13 +433,13 @@ public partial class SuperDataGrid<TItem>
 
 			if (isChecked)
 			{
-				_selectionInfo.SelectedItems.Add(item);
+				_selectionInfo.AddSelected(item);
 				_selectionInfo.UnselectedItemKeys.Remove(itemKey);
 				SetItemSelected(item, true);
 			}
 			else
 			{
-				_selectionInfo.SelectedItems.Remove(item);
+				_selectionInfo.RemoveSelected(item);
 				_selectionInfo.UnselectedItemKeys.Add(itemKey);
 				SetItemSelected(item, false);
 			}
@@ -393,12 +451,12 @@ public partial class SuperDataGrid<TItem>
 
 		if (isChecked)
 		{
-			_selectionInfo.SelectedItems.Add(item);
+			_selectionInfo.AddSelected(item);
 			SetItemSelected(item, true);
 		}
 		else
 		{
-			_selectionInfo.SelectedItems.Remove(item);
+			_selectionInfo.RemoveSelected(item);
 			SetItemSelected(item, false);
 			_selectionInfo.AllSelected = false;
 		}
@@ -413,7 +471,7 @@ public partial class SuperDataGrid<TItem>
 		{
 			if (IsRowDeleted(renderedItem))
 			{
-				_selectionInfo.SelectedItems.Remove(renderedItem);
+				_selectionInfo.RemoveSelected(renderedItem);
 				SetItemSelected(renderedItem, false);
 
 				if (_selectionInfo.AllSelected)
@@ -431,11 +489,11 @@ public partial class SuperDataGrid<TItem>
 
 				if (isSelected)
 				{
-					_selectionInfo.SelectedItems.Add(renderedItem);
+					_selectionInfo.AddSelected(renderedItem);
 				}
 				else
 				{
-					_selectionInfo.SelectedItems.Remove(renderedItem);
+					_selectionInfo.RemoveSelected(renderedItem);
 				}
 			}
 			else
@@ -449,7 +507,7 @@ public partial class SuperDataGrid<TItem>
 	{
 		foreach (var deletedItem in _selectionInfo.SelectedItems.Where(IsRowDeleted).ToList())
 		{
-			_selectionInfo.SelectedItems.Remove(deletedItem);
+			_selectionInfo.RemoveSelected(deletedItem);
 			SetItemSelected(deletedItem, false);
 		}
 
