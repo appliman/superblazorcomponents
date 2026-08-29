@@ -40,12 +40,16 @@ public sealed class SuperDataGridExporterTests
     public void Cleanup()
     {
         foreach (var context in _contexts)
+        {
             context.Dispose();
+        }
         _contexts.Clear();
         _renderedGrids.Clear();
 
         if (Directory.Exists(_temporaryDirectory))
+        {
             Directory.Delete(_temporaryDirectory, recursive: true);
+        }
     }
 
     [TestMethod]
@@ -74,6 +78,31 @@ public sealed class SuperDataGridExporterTests
         Assert.AreEqual("Explicit", resolved[0].Header);
         Assert.AreEqual("ALPHA", resolved[0].ValueAccessor(new TestRow(1, "Alpha", 12.5m, true)));
         Assert.IsTrue(column.IsCurrentlyVisible);
+    }
+
+    [TestMethod]
+    public void ColumnResolver_UsesTitleAndRenderedCellTemplateWithoutBinding()
+    {
+        var grid = CreateGrid((request) =>
+            ValueTask.FromResult(GridItemsProviderResult<TestRow>.Empty()));
+        var column = AddColumn(grid, new TestColumn
+        {
+            Title = "Fournisseurs",
+            Template = item => builder =>
+            {
+                builder.OpenElement(0, "div");
+                builder.AddContent(1, item.Name);
+                builder.CloseElement();
+            }
+        });
+
+        var resolved = ExportColumnResolver.Resolve(grid);
+
+        Assert.HasCount(1, resolved);
+        Assert.AreEqual("Fournisseurs", resolved[0].Header);
+        Assert.AreEqual(string.Empty, column.Property);
+        Assert.AreEqual("Alpha", resolved[0].ValueAccessor(
+            new TestRow(1, "Alpha", 12.5m, true)));
     }
 
     [TestMethod]

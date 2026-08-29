@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <RootNamespace>SuperBlazorComponents.DataGridExporter</RootNamespace>
     <AssemblyName>SuperBlazorComponents.DataGridExporter</AssemblyName>
-    <VersionPrefix>2.0.10</VersionPrefix>
+    <VersionPrefix>2.0.12</VersionPrefix>
     <PackageId>SuperBlazorComponents.DataGridExporter</PackageId>
     <Title>SuperBlazorComponents DataGrid Exporter</Title>
     <Authors>Appliman</Authors>

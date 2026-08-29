@@ -42,6 +42,11 @@ internal static partial class ExportColumnResolver
             {
                 accessor = column.ExportValue;
             }
+            else if (column.Template is not null)
+            {
+                var cellTemplate = column.Template;
+                accessor = item => ExtractCellText(cellTemplate, item);
+            }
             else if (!string.IsNullOrWhiteSpace(column.Property))
             {
                 var untypedAccessor = Accessors.GetOrAdd(
@@ -52,14 +57,16 @@ internal static partial class ExportColumnResolver
             else
             {
                 throw new InvalidOperationException(
-                    $"Column '{header}' has no resolvable value. Set Property, For, or ExportValue on the column.");
+                    $"Column '{header}' has no resolvable value. Set a Template, Property, For, or ExportValue on the column.");
             }
 
             result.Add(new ExportColumn<TItem>(header, column.FormatString, accessor));
         }
 
         if (result.Count == 0)
+        {
             throw new InvalidOperationException("The grid has no visible exportable columns.");
+        }
 
         return result;
     }
@@ -75,7 +82,9 @@ internal static partial class ExportColumnResolver
                 ?? currentType.GetField(segment, BindingFlags.Instance | BindingFlags.Public);
 
             if (member is null)
+            {
                 throw new InvalidOperationException($"Property path '{propertyPath}' was not found on '{itemType.Name}'.");
+            }
 
             members.Add(member);
             currentType = member switch
@@ -92,7 +101,9 @@ internal static partial class ExportColumnResolver
             foreach (var member in members)
             {
                 if (value is null)
+                {
                     return null;
+                }
                 value = member switch
                 {
                     PropertyInfo property => property.GetValue(value),
@@ -105,23 +116,51 @@ internal static partial class ExportColumnResolver
     }
 
 #pragma warning disable BL0006 // Deliberately inspect simple text frames; component output falls back to Title/Property.
+    private static string? ExtractCellText<TItem>(RenderFragment<TItem> template, TItem item)
+    {
+        var builder = new RenderTreeBuilder();
+        template(item)(builder);
+        return ExtractRenderedText(builder.GetFrames());
+    }
+
     private static string? ExtractHeaderText(RenderFragment? template)
     {
         if (template is null)
+        {
             return null;
+        }
 
         var builder = new RenderTreeBuilder();
         template(builder);
-        var frames = builder.GetFrames();
+        return ExtractRenderedText(builder.GetFrames());
+    }
+
+    private static string? ExtractRenderedText(ArrayRange<RenderTreeFrame> frames)
+    {
         var parts = new List<string>();
 
         for (var i = 0; i < frames.Count; i++)
         {
             var frame = frames.Array[i];
             if (frame.FrameType == RenderTreeFrameType.Text)
+            {
                 parts.Add(frame.TextContent);
+            }
             else if (frame.FrameType == RenderTreeFrameType.Markup)
+            {
                 parts.Add(HtmlTagRegex().Replace(frame.MarkupContent, " "));
+            }
+            else if (frame.FrameType == RenderTreeFrameType.Attribute
+                     && frame.AttributeValue is RenderFragment childContent)
+            {
+                var childBuilder = new RenderTreeBuilder();
+                childContent(childBuilder);
+                var childText = ExtractRenderedText(childBuilder.GetFrames());
+                if (!string.IsNullOrWhiteSpace(childText))
+                {
+                    parts.Add(childText);
+                }
+            }
         }
 
         var text = WhitespaceRegex().Replace(WebUtility.HtmlDecode(string.Join(" ", parts)), " ").Trim();

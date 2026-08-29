@@ -101,8 +101,26 @@ Headers are resolved in this order:
 3. **Title**
 4. **Property**
 
-Values use **ExportValue** first, then **Property** or **For**. Configure both
-overrides when a column is entirely template-driven:
+Values use **ExportValue** first, then the rendered text of **Template**, and
+finally **Property** or **For**. A template-only column can therefore be
+exported without declaring a binding; its title is taken from **Title** and
+its textual cell content is taken from the template:
+
+~~~razor
+<DataGridColumn Title="Suppliers">
+    <Template Context="product">
+        @foreach (var supplier in product.AvailableSupplierProductList)
+        {
+            <div>@supplier.SupplierName</div>
+        }
+    </Template>
+</DataGridColumn>
+~~~
+
+HTML elements are removed from the exported value and the remaining text is
+normalized. For a column whose output is produced only by a child component,
+configure **ExportValue** explicitly. Configure both overrides when a column
+is entirely template-driven and needs a custom header or value:
 
 ~~~razor
 <DataGridColumn Title="Status"
