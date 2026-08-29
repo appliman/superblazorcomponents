@@ -1,11 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk.Razor">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>SuperBlazorComponents.DataGridExporter</RootNamespace>
     <AssemblyName>SuperBlazorComponents.DataGridExporter</AssemblyName>
-    <VersionPrefix>2.0.9</VersionPrefix>
+    <VersionPrefix>2.0.10</VersionPrefix>
     <PackageId>SuperBlazorComponents.DataGridExporter</PackageId>
     <Title>SuperBlazorComponents DataGrid Exporter</Title>
     <Authors>Appliman</Authors>
