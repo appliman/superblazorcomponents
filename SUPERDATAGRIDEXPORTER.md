@@ -1,8 +1,8 @@
 # SuperDataGrid CSV and Excel exporter
 
-The **SuperBlazorComponents.DataGridExporter** extension exports the complete
-filtered and sorted view of a **SuperDataGrid**, including rows that are not
-currently rendered by virtualization.
+The **SuperBlazorComponents.DataGridExporter** extension exports the rows that
+are checked in a **SuperDataGrid**. A checked row is captured when generation
+starts, so it remains exportable even if a later filter hides it.
 
 ## Installation
 
@@ -74,11 +74,23 @@ actions to the right of the grid header. The grid keeps the custom header area
 separated from its built-in actions. Omit **IconOnly** to display the icon and
 text together.
 
-Only currently visible columns are exported, in their current order. The
-exporter captures the grid filters and sort order once, then reads the complete
-result from **ItemsProvider** in batches. Hierarchical grids export root items
-only. The default batch size is 200 rows and can be changed with
-**SuperDataGridExporterOptions.BatchSize**.
+Only currently visible columns are exported, in their current order. If rows
+are selected individually, those exact objects are exported in selection order.
+If **Tout sélectionner** is used, the exporter reads all rows matching the
+captured filters and sort order from **ItemsProvider**, in batches of 200 by
+default, and skips rows explicitly unchecked afterwards. The batch size can be
+changed with **SuperDataGridExporterOptions.BatchSize**.
+
+The dialog is still opened when nothing is checked, but immediately displays:
+“Veuillez cocher au moins une ligne pour effectuer l’export.” Check a row and
+choose **Réessayer** to continue; no file is created while the selection is
+empty. Selection is frozen at the start of generation.
+
+For hierarchical grids, every checked row is exported, including checked child
+rows. Unchecked or unexpanded children are not invented by the exporter.
+Virtualized providers should implement **IDataItem.KeyValue** with a stable,
+unique key. The same key is used to apply exclusions and deduplicate rows when
+the provider materializes a new object instance for each batch.
 
 ## Custom columns
 
@@ -120,5 +132,7 @@ Set **Exportable="false"** to exclude a visible column.
   sizes columns to their content. Excel cannot freeze columns from the right.
 - One worksheet supports at most 1,048,575 exported data rows because the
   header occupies the first Excel row.
-- The grid must use **ItemsProvider**; the currently rendered virtualized items
-  alone are intentionally never treated as the complete dataset.
+- **ItemsProvider** is required for **Tout sélectionner** so the exporter can
+  retrieve every filtered row; it never treats the currently rendered
+  virtualized items alone as the complete dataset. Individually checked objects
+  are exported from the immutable selection captured at the start.

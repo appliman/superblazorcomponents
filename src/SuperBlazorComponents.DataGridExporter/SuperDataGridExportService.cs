@@ -33,8 +33,18 @@ internal sealed class SuperDataGridExportService : ISuperDataGridExportService
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(grid);
-        if (grid.ItemsProvider is null)
-            throw new InvalidOperationException("The grid must define an ItemsProvider to export all rows.");
+
+        // Capture both parts of the view before starting any asynchronous work. This
+        // makes an export deterministic even when the user changes the grid while it
+        // is being generated.
+        var selection = grid.CaptureSelectionSnapshot();
+        if (!selection.HasSelection)
+            throw new InvalidOperationException(
+                "Veuillez cocher au moins une ligne pour effectuer l’export.");
+
+        if (selection.AllSelected && grid.ItemsProvider is null)
+            throw new InvalidOperationException(
+                "The grid must define an ItemsProvider to export all selected rows.");
 
         var columns = ExportColumnResolver.Resolve(grid);
         var query = grid.CaptureQuerySnapshot();
@@ -47,15 +57,17 @@ internal sealed class SuperDataGridExportService : ISuperDataGridExportService
             format,
             fileName,
             (path, token) => format == SuperDataGridExportFormat.Csv
-                ? WriteCsvAsync(path, grid.ItemsProvider, query, columns, token)
-                : WriteExcelAsync(path, grid.ItemsProvider, query, columns, frozenColumnCount, token),
+                ? WriteCsvAsync(path, grid, grid.ItemsProvider, query, selection, columns, token)
+                : WriteExcelAsync(path, grid, grid.ItemsProvider, query, selection, columns, frozenColumnCount, token),
             cancellationToken);
     }
 
     private async Task<int> WriteCsvAsync<TItem>(
         string path,
-        GridItemsProvider<TItem> provider,
+        SuperDataGrid<TItem> grid,
+        GridItemsProvider<TItem>? provider,
         SuperDataGridQuerySnapshot query,
+        SuperDataGridSelectionSnapshot<TItem> selection,
         IReadOnlyList<ExportColumn<TItem>> columns,
         CancellationToken cancellationToken)
     {
@@ -75,7 +87,7 @@ internal sealed class SuperDataGridExportService : ISuperDataGridExportService
         await csv.NextRecordAsync();
 
         var rowCount = 0;
-        await foreach (var item in ReadAllAsync(provider, query, cancellationToken))
+        await foreach (var item in ReadSelectedAsync(grid, provider, query, selection, cancellationToken))
         {
             foreach (var column in columns)
             {
@@ -94,8 +106,10 @@ internal sealed class SuperDataGridExportService : ISuperDataGridExportService
 
     private async Task<int> WriteExcelAsync<TItem>(
         string path,
-        GridItemsProvider<TItem> provider,
+        SuperDataGrid<TItem> grid,
+        GridItemsProvider<TItem>? provider,
         SuperDataGridQuerySnapshot query,
+        SuperDataGridSelectionSnapshot<TItem> selection,
         IReadOnlyList<ExportColumn<TItem>> columns,
         int frozenColumnCount,
         CancellationToken cancellationToken)
@@ -111,7 +125,7 @@ internal sealed class SuperDataGridExportService : ISuperDataGridExportService
         }
 
         var rowCount = 0;
-        await foreach (var item in ReadAllAsync(provider, query, cancellationToken))
+        await foreach (var item in ReadSelectedAsync(grid, provider, query, selection, cancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (rowCount >= ExcelMaximumDataRows)
@@ -136,6 +150,61 @@ internal sealed class SuperDataGridExportService : ISuperDataGridExportService
             Math.Min(rowCount + 1, 10_000));
         workbook.SaveAs(path);
         return rowCount;
+    }
+
+    private async IAsyncEnumerable<TItem> ReadSelectedAsync<TItem>(
+        SuperDataGrid<TItem> grid,
+        GridItemsProvider<TItem>? provider,
+        SuperDataGridQuerySnapshot query,
+        SuperDataGridSelectionSnapshot<TItem> selection,
+        [EnumeratorCancellation] CancellationToken cancellationToken)
+    {
+        var emittedKeys = new HashSet<object?>();
+
+        if (!selection.AllSelected)
+        {
+            // Keep the order in which the grid captured individual selections. The
+            // objects themselves are deliberately used so that a later filter or
+            // provider refresh cannot make a checked row disappear from the export.
+            foreach (var item in selection.SelectedItems)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                if (emittedKeys.Add(grid.GetItemKey(item)))
+                    yield return item;
+            }
+
+            yield break;
+        }
+
+        if (provider is null)
+            throw new InvalidOperationException(
+                "The grid must define an ItemsProvider to export all selected rows.");
+
+        // Select-all means all rows in the current filtered/sorted view, except the
+        // explicitly excluded keys. ItemsProvider is paged so virtualized grids are
+        // exported in full rather than only using the rendered viewport.
+        await foreach (var item in ReadAllAsync(provider, query, cancellationToken))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var key = grid.GetItemKey(item);
+            if (selection.ExcludedItemKeys.Contains(key) || !emittedKeys.Add(key))
+                continue;
+
+            yield return item;
+        }
+
+        // Explicitly checked rows (notably hierarchy children) are retained even if
+        // they are not part of the root ItemsProvider result or became hidden by a
+        // later filter. Stable keys still deduplicate them against provider rows.
+        foreach (var item in selection.SelectedItems)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var key = grid.GetItemKey(item);
+            if (selection.ExcludedItemKeys.Contains(key) || !emittedKeys.Add(key))
+                continue;
+
+            yield return item;
+        }
     }
 
     private async IAsyncEnumerable<TItem> ReadAllAsync<TItem>(
