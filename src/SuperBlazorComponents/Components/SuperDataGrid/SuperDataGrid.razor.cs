@@ -32,7 +32,7 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 	private bool _isLoading;
 	private bool _defaultSettingsApplied;
 	private List<DataGridColumn<TItem>> _columns = [];
-	private DataGridColumn<TItem>? _draggedColumn;
+	private readonly List<DataGridColumn<TItem>> _defaultColumns = [];
 	private string? _sortColumn;
 	private SortDirection _sortDirection = SortDirection.None;
 	private bool _settingsLoaded;
@@ -190,7 +190,7 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 	public int FreezeRightColumns { get; set; }
 
 	/// <summary>
-	/// Whether columns can be reordered by drag and drop.
+	/// Whether columns can be reordered using the Columns menu.
 	/// </summary>
 	[Parameter]
 	public bool AllowColumnReorder { get; set; } = true;
@@ -549,6 +549,8 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 	/// </summary>
 	public async Task ResetColumnSettingsAsync()
 	{
+		_columns = [.. _defaultColumns];
+		_loadedColumnSettings = null;
 		foreach (var column in _columns)
 		{
 			column.ResetToDefaults();
@@ -560,6 +562,7 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 		}
 
 		InvalidateColumnStyleCache();
+		await ColumnSettingsChanged.InvokeAsync(GetColumnSettings());
 		NotifyColumnStateChanged();
 		StateHasChanged();
 	}
@@ -662,6 +665,8 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 			targetIndex = Math.Clamp(position, 0, _columns.Count);
 		}
 
+		_defaultColumns.Remove(column);
+		_defaultColumns.Insert(Math.Clamp(position, 0, _defaultColumns.Count), column);
 		_columns.Insert(targetIndex, column);
 		column.MarkRegistrationState(true);
 		ApplyLoadedColumnSettingsIfAvailable();
@@ -684,6 +689,7 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 		}
 
 		_columns.Add(column);
+		_defaultColumns.Add(column);
 		column.MarkRegistrationState(true);
 		ApplyLoadedColumnSettingsIfAvailable();
 		InvalidateColumnStyleCache();
@@ -692,6 +698,7 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 
 	internal void RemoveColumn(DataGridColumn<TItem> column)
 	{
+		_defaultColumns.Remove(column);
 		if (_columns.Remove(column))
 		{
 			column.MarkRegistrationState(false);
@@ -1160,11 +1167,6 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 			classes.Add("sdg-sortable");
 		}
 
-		if (_draggedColumn == column)
-		{
-			classes.Add("sdg-dragging");
-		}
-
 		if (!string.IsNullOrEmpty(column.HeaderCssClass))
 		{
 			classes.Add(column.HeaderCssClass);
@@ -1497,46 +1499,32 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 		return DisplayRowDeleted?.Invoke(item) == true;
 	}
 
-	private void OnColumnDragStart(DragEventArgs e, DataGridColumn<TItem> column)
+	/// <summary>Checks whether a column can swap with its immediate neighbor.</summary>
+	public bool CanMoveColumn(int columnIndex, int direction)
 	{
-		if (!AllowColumnReorder)
+		var targetIndex = columnIndex + direction;
+		return AllowColumnReorder && (direction == -1 || direction == 1)
+			&& columnIndex >= 0 && columnIndex < _columns.Count
+			&& targetIndex >= 0 && targetIndex < _columns.Count
+			&& _columns[columnIndex].Reorderable && _columns[targetIndex].Reorderable;
+	}
+
+	/// <summary>Moves a column one position up (-1) or down (1) in the Columns menu.</summary>
+	public async Task MoveColumnAsync(int columnIndex, int direction)
+	{
+		if (!CanMoveColumn(columnIndex, direction))
 		{
 			return;
 		}
 
-		_draggedColumn = column;
-	}
-
-	private void OnColumnDragEnd(DragEventArgs e)
-	{
-		_draggedColumn = null;
-	}
-
-	private void OnColumnDragOver(DragEventArgs e, DataGridColumn<TItem> column)
-	{
-		// Allow drop
-	}
-
-	private async Task OnColumnDrop(DragEventArgs e, DataGridColumn<TItem> targetColumn)
-	{
-		if (_draggedColumn is null || _draggedColumn == targetColumn || !AllowColumnReorder)
-		{
-			return;
-		}
-
-		var draggedIndex = _columns.IndexOf(_draggedColumn);
-		var targetIndex = _columns.IndexOf(targetColumn);
-
-		_columns.RemoveAt(draggedIndex);
-		_columns.Insert(targetIndex, _draggedColumn);
-
-		_draggedColumn = null;
-
+		var targetIndex = columnIndex + direction;
+		(_columns[columnIndex], _columns[targetIndex]) = (_columns[targetIndex], _columns[columnIndex]);
+		_loadedColumnSettings = NormalizeColumnSettings(GetColumnSettings());
 		InvalidateColumnStyleCache();
 		await SaveSettingsAsync();
 		await ColumnSettingsChanged.InvokeAsync(GetColumnSettings());
 		NotifyColumnStateChanged();
-		StateHasChanged();
+		await InvokeAsync(StateHasChanged);
 	}
 
 	private async Task OnResizeStart(MouseEventArgs e, DataGridColumn<TItem> column)

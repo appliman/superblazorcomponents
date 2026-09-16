@@ -1,4 +1,8 @@
 ﻿{
+  "DataGrid.Columns.Reset": "Reset columns",
+  "DataGrid.Columns.MoveUp": "Move column {0} up",
+  "DataGrid.Columns.MoveDown": "Move column {0} down",
+
   "DataGrid.Refresh.Tooltip": "Refresh list contents",
   "DataGrid.Reset.Tooltip": "Reset grid configuration and remove saved preferences",
   "DataGrid.Columns.Label": "Columns",

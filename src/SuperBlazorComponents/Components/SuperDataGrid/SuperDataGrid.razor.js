@@ -1,6 +1,6 @@
 ﻿/**
  * VirtualDataGrid - JavaScript Isolation Module
- * Handles column resizing and drag-drop operations
+ * Handles column resizing and overflow previews
  */
 
 const gridInstances = new Map();

@@ -14,7 +14,6 @@
         @if (DisplaySelectionColumn
             || HeaderTemplate is not null
             || DisplayRefreshButton
-            || AllowColumnResize && !string.IsNullOrWhiteSpace(GridId)
             || DisplayColumnVisibilityToggle)
         {
             <div class="sdg-header-section">
@@ -35,12 +34,6 @@
                     {
                         <div class="me-1">
                             <SuperDatagridRefreshButton TItem="TItem" SuperDataGrid="this" Size="Components.Buttons.SuperButtonSize.Small" />
-                        </div>
-                    }
-                    @if (AllowColumnResize && !string.IsNullOrWhiteSpace(GridId))
-                    {
-                        <div class="me-1">
-                            <SuperDatagridResetButton TItem="TItem" SuperDataGrid="this" Size="Components.Buttons.SuperButtonSize.Small" />
                         </div>
                     }
                     @if (DisplayColumnVisibilityToggle)
@@ -190,28 +183,9 @@
                         @foreach (var column in visibleColumns)
                         {
                             <th class="@GetColumnHeaderClass(column)"
-                                style="@GetColumnHeaderStyle(column)"
-                                @ondragover="@(e => OnColumnDragOver(e, column))"
-                                @ondragover:preventDefault
-                                @ondrop="@(e => OnColumnDrop(e, column))">
+                                style="@GetColumnHeaderStyle(column)">
                                 <div class="sdg-header-content"
-                                     draggable="@(AllowColumnReorder.ToString().ToLower())"
-                                     @ondragstart="@(e => OnColumnDragStart(e, column))"
-                                     @ondragend="OnColumnDragEnd"
                                      @onclick="@(() => OnHeaderClick(column))">
-                                    @if (AllowColumnReorder && column.Reorderable)
-                                    {
-                                        <span class="sdg-drag-handle" @onclick:stopPropagation>
-                                            <svg width="10" height="16" viewBox="0 0 10 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <circle cx="2.5" cy="2.5" r="1.5" fill="currentColor" />
-                                                <circle cx="7.5" cy="2.5" r="1.5" fill="currentColor" />
-                                                <circle cx="2.5" cy="8" r="1.5" fill="currentColor" />
-                                                <circle cx="7.5" cy="8" r="1.5" fill="currentColor" />
-                                                <circle cx="2.5" cy="13.5" r="1.5" fill="currentColor" />
-                                                <circle cx="7.5" cy="13.5" r="1.5" fill="currentColor" />
-                                            </svg>
-                                        </span>
-                                    }
                                     @if (column.HeaderTemplate is not null)
                                     {
                                         @column.HeaderTemplate

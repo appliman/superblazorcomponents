@@ -24,9 +24,20 @@
                 <i class="fa-solid fa-eye me-2" aria-hidden="true"></i>
                 @Loc["DataGrid.Columns.Visible"]
             </li>
-            @foreach (var column in _columns)
+            @if (_effectiveSuperDataGrid.AllowColumnReorder || _effectiveSuperDataGrid.AllowColumnResize)
             {
                 <li>
+                    <button type="button" class="dropdown-item" title="@Loc["DataGrid.Reset.Tooltip"]"
+                            @onclick="_effectiveSuperDataGrid.ResetColumnSettingsAsync">
+                        <i class="fa-solid fa-rotate-left me-2" aria-hidden="true"></i>
+                        @Loc["DataGrid.Columns.Reset"]
+                    </button>
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+            }
+            @foreach (var column in _columns)
+            {
+                <li class="super-datagrid-column-row" @key="_effectiveSuperDataGrid.ColumnsCollection[column.ColumnIndex]">
                     <label class="dropdown-item super-datagrid-column-item">
                         <input type="checkbox"
                                class="form-check-input"
@@ -35,6 +46,25 @@
                                @onchange="@(args => OnColumnVisibilityChangedAsync(column, args))" />
                         <span>@column.DisplayName</span>
                     </label>
+                    @if (_effectiveSuperDataGrid.AllowColumnReorder)
+                    {
+                        <div class="super-datagrid-column-move">
+                            <button type="button" class="btn btn-outline-secondary btn-sm"
+                                    title="@Loc["DataGrid.Columns.MoveUp", column.DisplayName]"
+                                    aria-label="@Loc["DataGrid.Columns.MoveUp", column.DisplayName]"
+                                    disabled="@(!_effectiveSuperDataGrid.CanMoveColumn(column.ColumnIndex, -1))"
+                                    @onclick="@(() => _effectiveSuperDataGrid.MoveColumnAsync(column.ColumnIndex, -1))">
+                                <i class="fa-solid fa-arrow-up" aria-hidden="true"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm"
+                                    title="@Loc["DataGrid.Columns.MoveDown", column.DisplayName]"
+                                    aria-label="@Loc["DataGrid.Columns.MoveDown", column.DisplayName]"
+                                    disabled="@(!_effectiveSuperDataGrid.CanMoveColumn(column.ColumnIndex, 1))"
+                                    @onclick="@(() => _effectiveSuperDataGrid.MoveColumnAsync(column.ColumnIndex, 1))">
+                                <i class="fa-solid fa-arrow-down" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    }
                 </li>
             }
         </ul>
