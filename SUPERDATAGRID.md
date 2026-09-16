@@ -266,7 +266,7 @@ When your model implements `IDataItem`:
 
 | Parameter | Type | Default | Description |
 |---|---|---|---|
-| `AllowColumnReorder` | `bool` | `true` | Allow drag-and-drop column reordering |
+| `AllowColumnReorder` | `bool` | `true` | Allow column reordering with up/down buttons in the Columns menu |
 | `AllowColumnResize` | `bool` | `true` | Allow column resize via drag handles |
 | `AllowSorting` | `bool` | `true` | Enable column sorting on header click |
 | `AllowFiltering` | `bool` | `true` | Display filter controls in the header row |
