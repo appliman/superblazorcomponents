@@ -1,4 +1,8 @@
 ﻿{
+  "DataGrid.Columns.Reset": "Réinitialiser les colonnes",
+  "DataGrid.Columns.MoveUp": "Monter la colonne {0}",
+  "DataGrid.Columns.MoveDown": "Descendre la colonne {0}",
+
   "DataGrid.Refresh.Tooltip": "Rafraîchir le contenu de la liste",
   "DataGrid.Reset.Tooltip": "Réinitialiser la configuration de la grille et supprimer les préférences enregistrées",
   "DataGrid.Columns.Label": "Colonnes",

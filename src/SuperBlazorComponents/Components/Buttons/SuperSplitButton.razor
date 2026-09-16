@@ -3,7 +3,10 @@
 @implements IDisposable
 
 <div class="@ContainerCssClass" @attributes="@CapturedAttributes">
-    <button type="button" class="@MainButtonCssClass" @onclick="@OnMainClick" disabled="@Disabled">
+    <button type="button" class="@(Click.HasDelegate ? MainButtonCssClass : $"{MainButtonCssClass} dropdown-toggle")"
+            data-bs-toggle="@(Click.HasDelegate ? null : "dropdown")"
+            aria-expanded="@(Click.HasDelegate ? null : "false")"
+            @onclick="@OnMainClick" disabled="@Disabled">
         @if (!string.IsNullOrWhiteSpace(Icon))
         {
             <i class="@IconCssClass" title="@Text" aria-hidden="true"></i>
@@ -27,9 +30,12 @@
         }
     </button>
 
-    <button type="button" class="@ToggleButtonCssClass" data-bs-toggle="dropdown" aria-expanded="false" disabled="@Disabled">
-        <span class="visually-hidden">Toggle Dropdown</span>
-    </button>
+    @if (Click.HasDelegate)
+    {
+        <button type="button" class="@ToggleButtonCssClass" data-bs-toggle="dropdown" aria-expanded="false" disabled="@Disabled">
+            <span class="visually-hidden">Toggle Dropdown</span>
+        </button>
+    }
 
     <ul class="@DropdownMenuCssClass">
         <CascadingValue Value="this" IsFixed="true">
