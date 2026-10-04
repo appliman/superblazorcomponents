@@ -207,6 +207,23 @@ public sealed class SuperDataGridExporterTests
     }
 
     [TestMethod]
+    public async Task CsvExport_RangeContainsOnlySelectedRowsAfterReloadAndDeselect()
+    {
+        var rows = Enumerable.Range(1, 10).Select(id => new TestRow(id, $"Row-{id}", 0, true)).ToArray();
+        var grid = CreateGrid(request => ValueTask.FromResult(GridItemsProviderResult<TestRow>.From(
+            rows.Skip(request.StartIndex).Take(request.Count ?? rows.Length).Select(row => new TestRow(row.Id, row.Name, 0, true)).ToArray(), rows.Length)));
+        AddColumn(grid, new TestColumn { Property = nameof(TestRow.Name), Title = "Name" });
+        await _renderedGrids[grid].InvokeAsync(() => grid.SelectRangeAsync(3, 7));
+        await _renderedGrids[grid].InvokeAsync(() => grid.ReloadAsync());
+        await _renderedGrids[grid].InvokeAsync(() => grid.DeselectRowAsync(new TestRow(5, "Row-5", 0, true)));
+
+        var result = await CreateService().ExportAsync(grid, SuperDataGridExportFormat.Csv, "range");
+        var content = await File.ReadAllLinesAsync(Directory.GetFiles(_temporaryDirectory, "*.csv").Single());
+        Assert.AreEqual(4, result.RowCount);
+        CollectionAssert.AreEqual(new[] { "Name", "Row-3", "Row-4", "Row-6", "Row-7" }, content);
+    }
+
+    [TestMethod]
     public async Task CsvExport_AllSelectedReadsBatchesAndSkipsExcludedRows()
     {
         var rows = Enumerable.Range(1, 5)

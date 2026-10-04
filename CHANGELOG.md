@@ -2,6 +2,20 @@
 
 All notable changes to SuperBlazorComponents are documented in this file.
 
+## SuperBlazorComponents 2.0.11 / DataGridExporter 2.0.14 — 2026-10-04
+
+### Added
+
+- Added a localized selection-range dialog to the SuperDataGrid selector: select the first X rows or rows X through Y, inclusive, across the active filtered and sorted query.
+- Added `SelectRangeAsync(int fromRow, int toRow, CancellationToken cancellationToken = default)` with bounded provider requests, cancellation, and replacement only after successful loading.
+- Added tests for interval bounds, batching, selection replacement, stable keys, errors, query changes, dialog cancellation, and CSV export after deselection.
+
+### Changed
+
+- Checkbox selection now matches stable row keys when virtualized providers recreate item instances, preventing duplicate selections and allowing deselection with a new instance.
+- Expanded the SuperDataGrid guide with interactive dialog setup, selection semantics, range API examples, provider requirements, error handling, and memory/consistency limits.
+- Updated the exporter documentation and package version for compatibility with SuperBlazorComponents 2.0.11.
+
 ## 1.6.43.0
 
 ### Added

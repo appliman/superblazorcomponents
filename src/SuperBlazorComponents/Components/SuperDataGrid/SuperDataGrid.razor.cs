@@ -491,6 +491,7 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 	/// </summary>
 	public async Task ReloadAsync()
 	{
+		_rangeQueryVersion++;
 		ResetHierarchyState();
 
 		if (IsHierarchicalRenderingEnabled())
@@ -839,6 +840,8 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 
 	public async ValueTask DisposeAsync()
 	{
+		_rangeDisposed = true;
+		_rangeQueryVersion++;
 		if (_jsModule is not null)
 		{
 			try
