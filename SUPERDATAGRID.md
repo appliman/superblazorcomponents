@@ -1,6 +1,6 @@
 ﻿# 📊 SuperDataGrid — Complete Documentation
 
-> A high-performance, virtualized data grid component for Blazor with frozen columns/rows, hierarchical lazy-loading rows, column reordering & resizing, filtering, sorting, inline editing, row selection, and settings persistence.
+> A high-performance, virtualized data grid component for Blazor with frozen columns/rows, hierarchical lazy-loading rows, column reordering & resizing, filtering, sorting, inline editing, row selection (including inclusive ranges), and settings persistence.
 
 **[← Back to main README](README.md)**
 
@@ -29,6 +29,10 @@
   - [Events](#events)
 - [DataGridColumn Parameters](#datagridcolumn-parameters)
   - [Column Templates](#column-templates)
+- [Row Selection and Range Dialog](#row-selection-and-range-dialog)
+  - [Built-in Selection Menu](#built-in-selection-menu)
+  - [Selecting a Range in Code](#selecting-a-range-in-code)
+  - [Provider Requirements and Failures](#provider-requirements-and-failures)
 - [Public API (Methods & Properties)](#public-api-methods--properties)
 - [Usage Examples](#usage-examples)
   - [1 — Basic Grid with Sorting](#1--basic-grid-with-sorting)
@@ -86,6 +90,17 @@ builder.Services.AddSuperComponents(options =>
     options.DefaultSuperIconeStyle = SuperIconStyle.Solid;
 });
 ```
+
+For built-in range selection and filter dialogs, render one dialog host in the interactive layout containing the grid:
+
+```razor
+@using SuperBlazorComponents.Components.Dialogs
+
+@Body
+<SuperDialog />
+```
+
+The grid and dialog host must share the same interactive render scope and `SuperDialogService`. In a Blazor Web App, use interactive Server rendering for these controls; static SSR alone cannot handle clicks or dialog actions. If your layout already renders `<SuperDialog />`, reuse that host.
 
 ### Minimal Example
 
@@ -233,6 +248,8 @@ When your model implements `IDataItem`:
 - The `KeyValue` property is used for tracking selected rows across virtualization pages
 - `IsSelected` is automatically set/unset when rows are selected/deselected
 - `RowNumber` is automatically populated by the grid
+
+Keys must be unique, non-null, and stable across provider calls. Do not use a row number or object instance as the key of a virtualized record. Models without `IDataItem` can expose a public `KeyValue` property; without either, the grid falls back to object identity and cannot match newly materialized instances.
 
 ---
 
@@ -401,6 +418,94 @@ Each column supports four templates:
 
 ---
 
+## Row Selection and Range Dialog
+
+Range selection is available starting with **SuperBlazorComponents 2.0.11**.
+
+### Built-in Selection Menu
+
+With `DisplaySelectionColumn="true"`, the built-in selector offers these actions:
+
+| Action | Behavior |
+|---|---|
+| **Select all** | Selects the complete query, including offscreen rows, in multiple-selection mode. Individual unchecked rows become exclusions. |
+| **Select a range…** / **Sélectionner un intervalle…** | Opens a dialog to replace the current checkbox selection with an inclusive range. Available only in multiple-selection mode; disabled for an empty list. |
+| **Clear** | Removes the checkbox selection. |
+
+The range dialog starts on **The first X rows**, with no number entered. Switch to **From row X to row Y** to enter both bounds. It shows the current total and explains that the existing selection will be replaced.
+
+- Numbers start at **1**. Both bounds are included: rows **250 to 500** select **251 rows** when all rows are selectable.
+- The interval follows the active filters and sort across the complete query. It is independent of the current scroll position and does not require the row-number column to be visible.
+- Empty fields, fractions, values below 1, reversed bounds, and bounds above `TotalRowCount` cannot be applied.
+- In hierarchical mode, numbers refer to **root rows**. Children have their own numbering and are not automatically selected with their parents.
+- Rows marked as deleted through `DisplayRowDeleted` are skipped without extending the requested interval.
+- Applying shows a loading indicator and disables inputs and duplicate submissions. **Cancel**, or closing the dialog, cancels the operation.
+
+After successful loading, the new selection replaces both individually checked rows and any previous **Select all** state. Selection notifications are raised once for the completed operation. Range-selected rows are available in `SelectedItems`, even when offscreen, and remain checked when the provider recreates objects with the same stable keys.
+
+`CurrentItem` and `SetCurrentRowAsync` describe the current row/highlight; they are distinct from checkbox selection. For bulk actions, use the selection state rather than the highlighted row. With **Select all**, `SelectedItems` alone is not a materialized copy of the entire query; use `CaptureSelectionSnapshot()` to obtain the global selection flag and exclusion keys.
+
+The optional [CSV/Excel exporter](SUPERDATAGRIDEXPORTER.md#selection-behavior) exports only the selected rows. A range is captured in selection order, and a subsequently unchecked row is excluded from the export.
+
+### Selecting a Range in Code
+
+Use the grid reference from an interactive component, after the first data load:
+
+```razor
+@using SuperBlazorComponents.Components.SuperDataGrid
+
+<button type="button" @onclick="SelectFirstRowsAsync"
+        disabled="@(_grid is null || _grid.TotalRowCount < 100)">
+    Select the first 100 rows
+</button>
+
+<SuperDataGrid @ref="_grid" TItem="Product"
+               ItemsProvider="LoadProducts"
+               SelectionMode="SuperDataGridSelectionMode.Multiple"
+               DisplaySelectionColumn="true">
+    <DataGridColumn For="@(p => p.Name)" Title="Name" />
+</SuperDataGrid>
+
+@code {
+    private SuperDataGrid<Product>? _grid;
+
+    private async Task SelectFirstRowsAsync()
+    {
+        if (_grid is not null)
+        {
+            await _grid.SelectRangeAsync(1, 100);
+        }
+    }
+}
+```
+
+This snippet uses your existing `Product` model and `LoadProducts` provider. To select rows 250 through 500 or support cancellation:
+
+```csharp
+await grid.SelectRangeAsync(250, 500, cancellationToken);
+```
+
+The API is `Task SelectRangeAsync(int fromRow, int toRow, CancellationToken cancellationToken = default)`. It replaces the checkbox selection and uses one-based inclusive bounds. `DeselectRowAsync(item)` can then uncheck an individual row, including a new instance with the same key.
+
+### Provider Requirements and Failures
+
+Range selection calls `ItemsProvider` starting at `fromRow - 1`, with **at most 200 rows per request**, and stops at the inclusive upper bound. These batches use the sorting and filter snapshot captured when applying the interval. This batch size is independent of the exporter's configurable `BatchSize`.
+
+Your provider must:
+
+- Apply filters and sorting **before** paging. Return `TotalItemCount` for the filtered root query, not the page size or the unfiltered table count.
+- Honor `StartIndex` and `Count`, including in hierarchical root requests. Hierarchical display may request all roots with `Count = null`, while interval selection requests bounded pages.
+- Return a consistent order across batches. For database queries, add a unique tie-breaker to the chosen sort, and use a deterministic default order when no sort is requested.
+- Pass the supplied cancellation token to asynchronous database or HTTP calls.
+
+The grid prepares the requested rows before changing the existing selection. Provider failures, cancellation, a changed grid query/reload, or inconsistent page results leave the previous selection intact. The dialog displays a retry message for failures. Programmatic callers receive `ArgumentOutOfRangeException` for invalid bounds, `OperationCanceledException` for cancellation, and `InvalidOperationException` for an unsupported mode, unavailable operation, changed query, or inconsistent result. Provider exceptions propagate to the caller.
+
+The query snapshot freezes grid parameters; it does **not** create a database transaction or prevent external data changes. The grid rejects changed totals and incomplete results, but a data change that preserves the total can still shift row positions. Use provider-side snapshot consistency if your application requires an exact point-in-time interval.
+
+Selected objects are retained for checkbox state and export: loading is bounded per request, while retained memory grows with the number of selected rows. For selecting a whole large query, prefer **Select all** and its exclusion model.
+
+---
+
 ## Public API (Methods & Properties)
 
 ### Methods
@@ -422,9 +527,13 @@ Each column supports four templates:
 | `SelectItemAsync(TItem)` | `Task` | Adds an item to the selection |
 | `SelectRow(TItem, bool)` | `Task` | Selects a row (optionally clearing others) |
 | `SelectAllAsync()` | `Task` | Selects all rows (multiple mode only) |
-| `SelectAllRenderedAsync()` | `Task` | Selects all currently rendered rows |
+| `SelectAllRenderedAsync()` | `Task` | Compatibility alias for `SelectAllAsync()`; selects the complete query |
+| `SelectRangeAsync(int, int, CancellationToken)` | `Task` | Replaces selection with a one-based inclusive range in the active query |
+| `DeselectRowAsync(TItem)` | `Task` | Unchecks a row using its stable key |
+| `CaptureSelectionSnapshot()` | `SuperDataGridSelectionSnapshot<TItem>` | Captures selected items, keys, global selection, and exclusions independently of later changes |
+| `CaptureQuerySnapshot()` | `SuperDataGridQuerySnapshot` | Captures active sorting and filters |
 | `ClearSelectionAsync()` | `Task` | Clears the selection |
-| `TrySelectFirstRow()` | `Task<bool>` | Selects the first rendered row |
+| `TrySelectFirstRow()` | `Task<bool>` | Makes the first non-deleted rendered row current without changing checkbox selection |
 | `SetCurrentRowAsync(TItem)` | `Task` | Sets the current row highlight without changing checkbox state |
 | `GetSelectionInfo()` | `SelectionInfo<TItem>` | Returns the current selection summary |
 | `AddSelectorMenuItemAsync(...)` | `Task` | Adds a runtime selector menu item |
@@ -437,7 +546,7 @@ Each column supports four templates:
 |---|---|---|
 | `Items` | `IEnumerable<TItem>?` | Currently rendered items (null if no data loaded) |
 | `TotalRowCount` | `int` | Total item count from the last provider result |
-| `RowCount` | `int` | Number of registered columns |
+| `RowCount` | `int` | Number of currently rendered items |
 | `ColumnsCollection` | `IReadOnlyList<DataGridColumn<TItem>>` | Current column collection |
 | `SelectedItems` | `IReadOnlyCollection<TItem>` | Currently selected items |
 | `SelectedCountTotal` | `int` | Total selected count (including "select all") |
@@ -1721,6 +1830,7 @@ public interface ISuperDataGridSettingsStorage
 - **Set `RowHeight` accurately** — The closer this matches your actual row height, the smoother virtualization scrolling will be.
 - **Keep `FixedRowHeight` enabled for virtualized grids** — Overflowing cells scroll internally and show a hover preview, while virtualization keeps stable row measurements.
 - **Use `OverscanCount`** wisely — Default is 5. Increase for smoother scrolling, decrease for better memory usage.
+- **Use stable row keys and deterministic ordering** — Range selection and exports must identify the same rows across provider calls.
 - **Respect `CancellationToken`** — The grid cancels superseded requests when the user scrolls fast. Always pass the token to your data operations.
 
 ### Settings Persistence

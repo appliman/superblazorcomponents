@@ -3,6 +3,7 @@
 @typeparam TItem
 @implements IDisposable
 @inject IStringLocalizer Loc
+@inject SuperDialogService DialogService
 
 @{
     var hasProgrammaticItems = MenuItemsSource?.Any() == true;
@@ -18,6 +19,10 @@
                       ActionSelected="OnActionSelectedAsync">
         <Menu>
             <SuperSplitButtonItem ActionName="selectAll" Text="@Loc["DataGrid.Selection.SelectAll"]" Icon="fa-square-check" IconStyle="SuperIconStyle.Regular" />
+            @if (_effectiveSuperDataGrid.SelectionMode == SuperDataGridSelectionMode.Multiple)
+            {
+                <SuperSplitButtonItem ActionName="selectRange" Text="@Loc["DataGrid.Selection.Range.Title"]" Icon="fa-list-ol" Disabled="@(_rangeDialogOpen || _effectiveSuperDataGrid.TotalRowCount == 0)" />
+            }
             <SuperSplitButtonItem ActionName="clear" Text="@Loc["DataGrid.Selection.Clear"]" Icon="fa-square" IconStyle="SuperIconStyle.Regular" />
             @if (hasCustomItems)
             {
@@ -44,6 +49,7 @@
 
 @code {
     private SuperDataGrid<TItem>? _effectiveSuperDataGrid;
+    private bool _rangeDialogOpen;
 
     [Parameter]
     public SuperDataGrid<TItem>? SuperDataGrid { get; set; }
@@ -71,11 +77,19 @@
 
     protected override void OnParametersSet()
     {
-        _effectiveSuperDataGrid = SuperDataGrid ?? _effectiveSuperDataGrid;
+        if (SuperDataGrid is not null && _effectiveSuperDataGrid != SuperDataGrid)
+        {
+            if (_effectiveSuperDataGrid is not null)
+            {
+                _effectiveSuperDataGrid.SelectedRowsChanged -= OnSelectedRowsChanged;
+            }
+            _effectiveSuperDataGrid = SuperDataGrid;
+        }
         if (_effectiveSuperDataGrid is not null)
         {
             _effectiveSuperDataGrid.SelectedRowsChanged -= OnSelectedRowsChanged;
             _effectiveSuperDataGrid.SelectedRowsChanged += OnSelectedRowsChanged;
+            OnSelectedRowsChanged(_effectiveSuperDataGrid, EventArgs.Empty);
         }
         base.OnParametersSet();
     }
@@ -89,6 +103,8 @@
 
         _effectiveSuperDataGrid = grid;
         SuperDataGrid = grid;
+        grid.SelectedRowsChanged += OnSelectedRowsChanged;
+        OnSelectedRowsChanged(grid, EventArgs.Empty);
         _ = InvokeAsync(StateHasChanged);
     }
 
@@ -130,6 +146,30 @@
             await _effectiveSuperDataGrid.ClearSelectionAsync();
             return;
         }
+        else if (args.ActionName == "selectRange")
+        {
+            if (_rangeDialogOpen || _effectiveSuperDataGrid.TotalRowCount == 0
+                || _effectiveSuperDataGrid.SelectionMode != SuperDataGridSelectionMode.Multiple)
+            {
+                return;
+            }
+            _rangeDialogOpen = true;
+            try
+            {
+                await DialogService.OpenAsync<SuperDataGridRangeSelectionDialog<TItem>>(
+                    Loc["DataGrid.Selection.Range.Title"],
+                    new Dictionary<string, object>
+                    {
+                        [nameof(SuperDataGridRangeSelectionDialog<TItem>.SuperDataGrid)] = _effectiveSuperDataGrid
+                    },
+                    new SuperBlazorComponents.Components.Dialogs.DialogOptions { Width = "520px" });
+            }
+            finally
+            {
+                _rangeDialogOpen = false;
+            }
+            return;
+        }
 
         var selectionInfo = _effectiveSuperDataGrid.GetSelectionInfo();
         var selectionInfoArgs = new SelectedActionInfo<TItem>
@@ -149,9 +189,9 @@
     public void Dispose()
     {
         SuperDataGrid<TItem>.GridInstanceReady -= OnGridInstanceReady;
-        if (SuperDataGrid is not null)
+        if (_effectiveSuperDataGrid is not null)
         {
-            SuperDataGrid.SelectedRowsChanged -= OnSelectedRowsChanged;
+            _effectiveSuperDataGrid.SelectedRowsChanged -= OnSelectedRowsChanged;
         }
     }
 }

@@ -74,6 +74,8 @@ actions to the right of the grid header. The grid keeps the custom header area
 separated from its built-in actions. Omit **IconOnly** to display the icon and
 text together.
 
+## Selection behavior
+
 Only currently visible columns are exported, in their current order. If rows
 are selected individually, those exact objects are exported in selection order.
 If **Tout sélectionner** is used, the exporter reads all rows matching the
@@ -91,6 +93,11 @@ rows. Unchecked or unexpanded children are not invented by the exporter.
 Virtualized providers should implement **IDataItem.KeyValue** with a stable,
 unique key. The same key is used to apply exclusions and deduplicate rows when
 the provider materializes a new object instance for each batch.
+
+Rows selected through **Select a range…** are exported in selection order,
+including offscreen rows. The range replaces the old selection, and any row
+unchecked afterward is omitted. Range loading uses batches of at most 200 rows
+independently of the exporter's `BatchSize`. See the [range dialog and API](SUPERDATAGRID.md#row-selection-and-range-dialog).
 
 ## Custom columns
 
