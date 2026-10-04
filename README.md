@@ -18,7 +18,7 @@
 
 | Preview | Component | Description | Docs |
 |---|---|---|---|
-| <img src="docs/images/components/superdatagrid.svg" width="88" alt="SuperDataGrid preview"> | **SuperDataGrid** | Virtualized data grid — frozen columns/rows, hierarchical lazy-loading rows, reordering, resizing, filtering, sorting, inline editing, row selection, settings persistence | [📖 SUPERDATAGRID.md](SUPERDATAGRID.md) |
+| <img src="docs/images/components/superdatagrid.svg" width="88" alt="SuperDataGrid preview"> | **SuperDataGrid** | Virtualized data grid — frozen columns/rows, hierarchical lazy-loading rows, reordering, resizing, filtering, sorting, inline editing, checkbox and range selection, settings persistence | [📖 SUPERDATAGRID.md](SUPERDATAGRID.md) |
 | <img src="docs/images/components/superdatagrid.svg" width="88" alt="SuperDataGrid exporter preview"> | **SuperDataGrid Exporter** | Optional CSV and Excel export extension for checked rows, including filtered, sorted and virtualized data | [📖 SUPERDATAGRIDEXPORTER.md](SUPERDATAGRIDEXPORTER.md) |
 | <img src="docs/images/components/superlayout.svg" width="88" alt="SuperLayout preview"> | **SuperLayout** | Responsive app layout — header, sidebar, body, footer, chat panel with collapsible sidebar | [📖 SUPERLAYOUT.md](SUPERLAYOUT.md) |
 | <img src="docs/images/components/supercontext.svg" width="88" alt="SuperContext preview"> | **SuperContext** | Context-aware tabs and contextual panels — discover components by runtime type and zone, render one or many contexts, and isolate host state per instance | [📖 SUPERCONTEXT.md](SUPERCONTEXT.md) |
@@ -76,6 +76,8 @@ builder.Services.AddSuperComponents();
     <DataGridColumn Title="Category" For="@(c => c.Category)" Width="150" />
 </SuperDataGrid>
 ```
+
+The built-in selection menu can select the first X rows or an inclusive interval across the filtered, sorted query, including offscreen rows. Render `<SuperDialog />` in the interactive layout and expose stable row keys. See [range selection and provider requirements](SUPERDATAGRID.md#row-selection-and-range-dialog).
 
 For tree-like datasets, enable `Hierarchical="true"` and branch inside `ItemsProvider` when `request.IsHierarchyRequest` is true. Parent and child rows use the same `TItem` type.
 
