@@ -82,6 +82,8 @@ public partial class SuperDataGrid<TItem>
                     SetItemSelected(item, IsRowSelected(item));
                 }
             }
+            _selectionInfo.FromRow = fromRow;
+            _selectionInfo.ToRow = toRow;
             await NotifySelectionChangedAsync(default);
             StateHasChanged();
         }

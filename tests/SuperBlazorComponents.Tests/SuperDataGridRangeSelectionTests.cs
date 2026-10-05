@@ -31,7 +31,12 @@ public sealed class SuperDataGridRangeSelectionTests
             new() { PropertyName = "Name", PropertyValue = "test", SelectedValues = new[] { "A", "B" } }
         });
         var notifications = 0;
-        cut.Instance.SelectedRowsChanged += (_, _) => notifications++;
+        cut.Instance.SelectedRowsChanged += (_, args) =>
+        {
+            notifications++;
+            Assert.AreEqual(100, args.SelectionInfo.FromRow);
+            Assert.AreEqual(550, args.SelectionInfo.ToRow);
+        };
         requests.Clear();
 
         await cut.InvokeAsync(() => cut.Instance.SelectRangeAsync(100, 550));
@@ -56,13 +61,19 @@ public sealed class SuperDataGridRangeSelectionTests
         var original = new Row { Id = 9 };
         await cut.InvokeAsync(() => cut.Instance.SelectRow(original));
         await cut.InvokeAsync(() => cut.Instance.SelectRangeAsync(1, 3));
+        Assert.AreEqual(1, cut.Instance.GetSelectionInfo().FromRow);
+        Assert.AreEqual(3, cut.Instance.GetSelectionInfo().ToRow);
         Assert.IsFalse(original.IsSelected);
         CollectionAssert.AreEqual(new[] { 1, 2, 3 }, cut.Instance.SelectedItems.Select(r => r.Id).ToArray());
         await cut.InvokeAsync(() => cut.Instance.SelectAllAsync());
+        Assert.IsNull(cut.Instance.GetSelectionInfo().FromRow);
+        Assert.IsNull(cut.Instance.GetSelectionInfo().ToRow);
         await cut.InvokeAsync(() => cut.Instance.SelectRangeAsync(5, 5));
         Assert.AreEqual(1, cut.Instance.SelectedCountTotal);
         Assert.IsFalse(cut.Instance.GetSelectionInfo().AllSelected);
         Assert.AreEqual(5, cut.Instance.SelectedItems.Single().Id);
+        Assert.AreEqual(5, cut.Instance.GetSelectionInfo().FromRow);
+        Assert.AreEqual(5, cut.Instance.GetSelectionInfo().ToRow);
     }
 
     [TestMethod]
@@ -86,7 +97,11 @@ public sealed class SuperDataGridRangeSelectionTests
         var replacement = rendered.Single(r => r.Id == 4);
         await cut.InvokeAsync(() => cut.Instance.SelectRow(replacement, clearOthers: false));
         Assert.AreEqual(4, cut.Instance.SelectedCountTotal);
+        Assert.AreEqual(3, cut.Instance.GetSelectionInfo().FromRow);
+        Assert.AreEqual(6, cut.Instance.GetSelectionInfo().ToRow);
         await cut.InvokeAsync(() => cut.Instance.DeselectRowAsync(replacement));
+        Assert.IsNull(cut.Instance.GetSelectionInfo().FromRow);
+        Assert.IsNull(cut.Instance.GetSelectionInfo().ToRow);
         Assert.IsFalse(replacement.IsSelected);
         Assert.IsFalse(stored.IsSelected);
         Assert.AreEqual(3, cut.Instance.SelectedCountTotal);
@@ -287,6 +302,37 @@ public sealed class SuperDataGridRangeSelectionTests
         inconsistent = true;
         await Assert.ThrowsAsync<InvalidOperationException>(() => cut.InvokeAsync(() => cut.Instance.SelectRangeAsync(1, 3)));
         Assert.AreEqual(6, cut.Instance.SelectedCountTotal);
+    }
+
+    [TestMethod]
+    public async Task RangeBounds_ResetOnClearAndManualAddition_AndSurviveFailedOperations()
+    {
+        using var context = CreateContext();
+        var fail = false;
+        var cut = RenderGrid(context, request => fail ? throw new InvalidOperationException("offline") : Page(request, 10));
+        Assert.IsNull(cut.Instance.GetSelectionInfo().FromRow);
+        Assert.IsNull(cut.Instance.GetSelectionInfo().ToRow);
+        await cut.InvokeAsync(() => cut.Instance.SelectRangeAsync(3, 6));
+        fail = true;
+        await Assert.ThrowsAsync<InvalidOperationException>(() => cut.InvokeAsync(() => cut.Instance.SelectRangeAsync(1, 2)));
+        Assert.AreEqual(3, cut.Instance.GetSelectionInfo().FromRow);
+        Assert.AreEqual(6, cut.Instance.GetSelectionInfo().ToRow);
+        fail = false;
+        using var cancellation = new CancellationTokenSource();
+        cancellation.Cancel();
+        await Assert.ThrowsAsync<OperationCanceledException>(() => cut.InvokeAsync(() => cut.Instance.SelectRangeAsync(1, 2, cancellation.Token)));
+        Assert.AreEqual(3, cut.Instance.GetSelectionInfo().FromRow);
+        Assert.AreEqual(6, cut.Instance.GetSelectionInfo().ToRow);
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => cut.InvokeAsync(() => cut.Instance.SelectRangeAsync(0, 2)));
+        Assert.AreEqual(3, cut.Instance.GetSelectionInfo().FromRow);
+        Assert.AreEqual(6, cut.Instance.GetSelectionInfo().ToRow);
+        await cut.InvokeAsync(() => cut.Instance.SelectRow(new Row { Id = 8 }, clearOthers: false));
+        Assert.IsNull(cut.Instance.GetSelectionInfo().FromRow);
+        Assert.IsNull(cut.Instance.GetSelectionInfo().ToRow);
+        await cut.InvokeAsync(() => cut.Instance.SelectRangeAsync(1, 2));
+        await cut.InvokeAsync(() => cut.Instance.ClearSelectionAsync());
+        Assert.IsNull(cut.Instance.GetSelectionInfo().FromRow);
+        Assert.IsNull(cut.Instance.GetSelectionInfo().ToRow);
     }
 
     private static BunitContext CreateContext()

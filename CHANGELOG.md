@@ -2,6 +2,19 @@
 
 All notable changes to SuperBlazorComponents are documented in this file.
 
+## SuperBlazorComponents 2.0.12 / DataGridExporter 2.0.15 — 2026-10-05
+
+### Added
+
+- Added nullable `FromRow` and `ToRow` properties to `SelectionInfo<TItem>` with one-based, inclusive range bounds available before selection notifications and in selector action handlers.
+- Added tests for range metadata, first-X and single-row intervals, bounds reset, stable-key reloads, and preservation after failed or cancelled operations.
+
+### Changed
+
+- Clearing selection, selecting all, or manually changing selected membership clears both range bounds; reloading equivalent instances preserves them.
+- Documented the range metadata lifecycle, event usage, requested positions versus item identity, and asynchronous capture of the live selection state.
+- Updated the exporter package dependency to SuperBlazorComponents 2.0.12.
+
 ## SuperBlazorComponents 2.0.11 / DataGridExporter 2.0.14 — 2026-10-04
 
 ### Added

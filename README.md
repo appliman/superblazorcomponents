@@ -77,7 +77,7 @@ builder.Services.AddSuperComponents();
 </SuperDataGrid>
 ```
 
-The built-in selection menu can select the first X rows or an inclusive interval across the filtered, sorted query, including offscreen rows. Render `<SuperDialog />` in the interactive layout and expose stable row keys. See [range selection and provider requirements](SUPERDATAGRID.md#row-selection-and-range-dialog).
+The built-in selection menu can select the first X rows or an inclusive interval across the filtered, sorted query, including offscreen rows. Render `<SuperDialog />` in the interactive layout and expose stable row keys. See [range selection and provider requirements](SUPERDATAGRID.md#row-selection-and-range-dialog). `SelectionInfo<TItem>.FromRow` and `ToRow` expose the applied inclusive bounds; see [range metadata and selection events](SUPERDATAGRID.md#selectioninfo-range-metadata).
 
 For tree-like datasets, enable `Hierarchical="true"` and branch inside `ItemsProvider` when `request.IsHierarchyRequest` is true. Parent and child rows use the same `TItem` type.
 
