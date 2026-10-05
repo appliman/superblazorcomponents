@@ -32,6 +32,12 @@ public sealed class SelectionInfo<TItem>
 
     public int ExcludedCount { get; set; }
 
+    /// <summary>Inclusive, one-based starting row of the applied range, or null for a non-range selection.</summary>
+    public int? FromRow { get; set; }
+
+    /// <summary>Inclusive, one-based ending row of the applied range, or null for a non-range selection.</summary>
+    public int? ToRow { get; set; }
+
     public int SelectedCountTotal => Math.Max(0, SelectedCount - ExcludedCount);
 
     internal TItem GetSelectedInstance(TItem item)
@@ -47,6 +53,7 @@ public sealed class SelectionInfo<TItem>
         }
         if (SelectedItems.Add(item))
         {
+            ClearRange();
             _selectedByKey[SelectionKey(item)] = item;
             SelectionOrder.Add(item);
         }
@@ -59,6 +66,7 @@ public sealed class SelectionInfo<TItem>
         var removed = SelectedItems.Remove(storedItem);
         if (removed)
         {
+            ClearRange();
             SelectionOrder.Remove(storedItem);
         }
         return removed;
@@ -66,8 +74,15 @@ public sealed class SelectionInfo<TItem>
 
     internal void ClearSelected()
     {
+        ClearRange();
         SelectedItems.Clear();
         SelectionOrder.Clear();
         _selectedByKey.Clear();
+    }
+
+    internal void ClearRange()
+    {
+        FromRow = null;
+        ToRow = null;
     }
 }

@@ -31,6 +31,7 @@
   - [Column Templates](#column-templates)
 - [Row Selection and Range Dialog](#row-selection-and-range-dialog)
   - [Built-in Selection Menu](#built-in-selection-menu)
+  - [SelectionInfo Range Metadata](#selectioninfo-range-metadata)
   - [Selecting a Range in Code](#selecting-a-range-in-code)
   - [Provider Requirements and Failures](#provider-requirements-and-failures)
 - [Public API (Methods & Properties)](#public-api-methods--properties)
@@ -446,6 +447,59 @@ After successful loading, the new selection replaces both individually checked r
 `CurrentItem` and `SetCurrentRowAsync` describe the current row/highlight; they are distinct from checkbox selection. For bulk actions, use the selection state rather than the highlighted row. With **Select all**, `SelectedItems` alone is not a materialized copy of the entire query; use `CaptureSelectionSnapshot()` to obtain the global selection flag and exclusion keys.
 
 The optional [CSV/Excel exporter](SUPERDATAGRIDEXPORTER.md#selection-behavior) exports only the selected rows. A range is captured in selection order, and a subsequently unchecked row is excluded from the export.
+
+### SelectionInfo Range Metadata
+
+Starting with **SuperBlazorComponents 2.0.12**, `SelectionInfo<TItem>` exposes the bounds of an applied range:
+
+| Property | Type | Meaning |
+|---|---|---|
+| `FromRow` | `int?` | Requested first row, one-based and inclusive; `null` for a non-range selection. |
+| `ToRow` | `int?` | Requested last row, one-based and inclusive; `null` for a non-range selection. |
+
+Both values are populated **before** the successful range selection notifications. Read them through `GetSelectionInfo()`, `SelectionStateChanged`, `SelectedRowsChanged`, or `SelectedActionInfo<TItem>.DataGridSelectionInfo` in a selector action. `SelectionChanged` itself supplies only the selected items.
+
+| Operation | `FromRow` / `ToRow` afterward |
+|---|---|
+| Apply **The first 100 rows** | `1` / `100` |
+| Apply rows **250 to 500** | `250` / `500` |
+| Apply just row **5** | `5` / `5` |
+| Clear the selection or choose **Select all** | `null` / `null` |
+| Add a new selected key or uncheck a selected key | `null` / `null` |
+| Reload equivalent instances or add an already selected key without clearing others | Previous bounds preserved |
+| Invalid bounds, cancellation, or provider/query failure while loading | Previous selection and bounds preserved |
+
+These are the **requested positions**, not item identifiers. Rows marked as deleted may be skipped, so `ToRow - FromRow + 1` is the interval length rather than a guaranteed selected count. Use the selected items for processing; the bounds are metadata and do not replace the query's stable row keys.
+
+For example, observe the interval after a selection change:
+
+```razor
+<SuperDataGrid TItem="Product" ItemsProvider="LoadProducts"
+               SelectionStateChanged="OnSelectionStateChanged">
+    <DataGridColumn For="@(p => p.Name)" Title="Name" />
+</SuperDataGrid>
+
+<p>@_selectionDescription</p>
+
+@code {
+    private string _selectionDescription = "No range selected";
+
+    private void OnSelectionStateChanged(SelectionChangedEventArgs<Product> args)
+    {
+        var selection = args.SelectionInfo;
+        if (selection.FromRow is int from && selection.ToRow is int to)
+        {
+            _selectionDescription = $"Rows {from} to {to} (inclusive)";
+        }
+        else
+        {
+            _selectionDescription = "No range selected";
+        }
+    }
+}
+```
+
+For a custom selector action, read `action.DataGridSelectionInfo.FromRow` and `action.DataGridSelectionInfo.ToRow` in its handler. `SelectionInfo<TItem>` is live mutable state. Before asynchronous work, copy these nullable values to local variables; `CaptureSelectionSnapshot()` freezes selected objects and keys but does not include these two properties.
 
 ### Selecting a Range in Code
 
@@ -1854,7 +1908,7 @@ public interface ISuperDataGridSettingsStorage
 
 - For simple use cases, use `@bind-CurrentItem` for two-way binding.
 - For bulk operations, use `SelectionMode="Multiple"` combined with `SelectorMenuItemsContent`.
-- Access `GetSelectionInfo()` for detailed selection state (total count, excluded count when "select all" is active).
+- Access `GetSelectionInfo()` for detailed selection state, including nullable `FromRow`/`ToRow` range metadata and exclusions when "select all" is active.
 
 ---
 
