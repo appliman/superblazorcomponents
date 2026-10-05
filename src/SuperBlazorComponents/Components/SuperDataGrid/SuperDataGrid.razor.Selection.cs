@@ -303,6 +303,7 @@ public partial class SuperDataGrid<TItem>
 		}
 
 		_selectionInfo.AllSelected = true;
+		_selectionInfo.ClearRange();
 		_selectionInfo.UnselectedItemKeys.Clear();
 
 		foreach (var renderedItem in _renderedItems)

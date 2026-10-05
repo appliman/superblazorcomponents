@@ -99,6 +99,11 @@ including offscreen rows. The range replaces the old selection, and any row
 unchecked afterward is omitted. Range loading uses batches of at most 200 rows
 independently of the exporter's `BatchSize`. See the [range dialog and API](SUPERDATAGRID.md#row-selection-and-range-dialog).
 
+For application-level selector actions, `SelectionInfo<TItem>.FromRow` and
+`ToRow` expose the requested inclusive interval. They reset to `null` after a
+manual selection change. The exporter uses the captured selected items and
+keys, rather than re-querying those row positions. See [range metadata](SUPERDATAGRID.md#selectioninfo-range-metadata).
+
 ## Custom columns
 
 Headers are resolved in this order:
