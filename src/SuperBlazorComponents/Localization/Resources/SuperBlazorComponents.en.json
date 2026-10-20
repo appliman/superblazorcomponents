@@ -99,5 +99,20 @@
 
   "DropDown.EmptyOption": "-- Select --",
   "DropDown.RequiredField": "required field",
-  "DropDown.PropertyNotFound": "Property '{0}' does not exist on type '{1}'"
+  "DropDown.PropertyNotFound": "Property '{0}' does not exist on type '{1}'",
+  "DataGrid.Profiles.Label": "Configurations",
+  "DataGrid.Profiles.Current": "Current view",
+  "DataGrid.Profiles.AutoSave": "Changes saved automatically",
+  "DataGrid.Profiles.SaveAs": "Save as…",
+  "DataGrid.Profiles.Rename": "Rename",
+  "DataGrid.Profiles.Delete": "Delete",
+  "DataGrid.Profiles.DeleteConfirm": "Delete this configuration? The displayed view will be kept.",
+  "DataGrid.Profiles.Export": "Export JSON",
+  "DataGrid.Profiles.Import": "Import JSON",
+  "DataGrid.Profiles.Name": "Configuration name",
+  "DataGrid.Profiles.Help": "Column order, visibility and widths",
+  "DataGrid.Profiles.Save": "Save",
+  "DataGrid.Profiles.InvalidName": "Choose a unique name of 1 to 100 characters without markup or path characters.",
+  "DataGrid.Profiles.StorageError": "Unable to load or save configurations. Check browser storage and try again.",
+  "DataGrid.Profiles.ImportError": "Incompatible file. Choose a valid JSON configuration for this grid (1 MB maximum)."
 }
