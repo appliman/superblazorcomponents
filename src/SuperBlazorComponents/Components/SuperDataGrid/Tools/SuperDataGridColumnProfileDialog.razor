@@ -1,0 +1,76 @@
+@inject SuperDialogService DialogService
+@inject IStringLocalizer Loc
+
+@code {
+    [Parameter] public string InitialName { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public Func<string, Task> Save { get; set; } = default!;
+    private string _name = string.Empty;
+    private string? _error;
+    private bool _busy;
+    private ElementReference _input;
+    private readonly string _inputId = "sdg-profile-name-" + Guid.NewGuid().ToString("N");
+
+    protected override void OnInitialized() => _name = InitialName;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await _input.FocusAsync();
+        }
+    }
+
+    private async Task Submit()
+    {
+        if (_busy)
+        {
+            return;
+        }
+        _busy = true;
+        _error = null;
+        try
+        {
+            await Save(_name);
+            await DialogService.Close(true);
+        }
+        catch (ArgumentException)
+        {
+            _error = Loc["DataGrid.Profiles.InvalidName"];
+        }
+        catch (Exception exception) when (exception is JSException or InvalidOperationException or System.IO.IOException)
+        {
+            _error = Loc["DataGrid.Profiles.StorageError"];
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private async Task OnKeyDown(KeyboardEventArgs args)
+    {
+        if (args.Key == "Escape" && !_busy)
+        {
+            await DialogService.Close(null);
+        }
+    }
+}
+
+<form @onsubmit="Submit" @onsubmit:preventDefault @onkeydown="OnKeyDown">
+    <fieldset disabled="@_busy">
+        <div class="form-floating">
+            <input @ref="_input" id="@_inputId" class="form-control" placeholder="@Loc["DataGrid.Profiles.Name"]"
+                   maxlength="100" required @bind="_name" @bind:event="oninput" aria-describedby="@(_inputId + "-help")" />
+            <label for="@_inputId">@Loc["DataGrid.Profiles.Name"]</label>
+        </div>
+        <p id="@(_inputId + "-help")" class="text-body-secondary mt-2">@Loc["DataGrid.Profiles.Help"]</p>
+        @if (_error is not null)
+        {
+            <div class="alert alert-danger" role="alert">@_error</div>
+        }
+        <div class="d-flex justify-content-end gap-2 border-top pt-3 mt-3">
+            <button type="button" class="btn btn-outline-secondary" @onclick="() => DialogService.Close(null)">@Loc["Dialog.Confirm.Cancel"]</button>
+            <button type="submit" class="btn btn-primary" disabled="@string.IsNullOrWhiteSpace(_name)">@Loc["DataGrid.Profiles.Save"]</button>
+        </div>
+    </fieldset>
+</form>
