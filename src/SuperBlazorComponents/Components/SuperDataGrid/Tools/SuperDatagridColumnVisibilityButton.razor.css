@@ -6,9 +6,18 @@
 .super-datagrid-columns-menu {
     min-width: min(300px, calc(100vw - 1rem));
     max-width: calc(100vw - 1rem);
-    max-height: 320px;
+    max-height: min(720px, calc(100dvh - 5rem));
     overflow-y: auto;
     padding: 0.35rem;
+}
+
+.super-datagrid-profiles {
+    min-width: min(340px, calc(100vw - 2rem));
+}
+
+.super-datagrid-profile-import:focus-within .dropdown-item {
+    outline: 2px solid var(--bs-primary);
+    outline-offset: -2px;
 }
 
 .super-datagrid-columns-title {

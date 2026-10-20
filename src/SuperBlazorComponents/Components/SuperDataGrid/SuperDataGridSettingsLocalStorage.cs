@@ -8,7 +8,7 @@ namespace SuperBlazorComponents.Components.SuperDataGrid;
 /// Default implementation of IDataGridSettingsStorage using browser localStorage.
 /// Suitable for Blazor WebAssembly and Blazor Server applications.
 /// </summary>
-public sealed class SuperDataGridSettingsLocalStorage : ISuperDataGridSettingsStorage
+public sealed class SuperDataGridSettingsLocalStorage : ISuperDataGridSettingsStorage, ISuperDataGridColumnProfilesStorage
 {
     private const string KEY_PREFIX = "vdg_settings_";
     private readonly IJSRuntime _jsRuntime;
@@ -94,6 +94,20 @@ public sealed class SuperDataGridSettingsLocalStorage : ISuperDataGridSettingsSt
         }
     }
 
+    public async Task<SuperDataGridColumnProfiles?> GetProfilesAsync(string gridId, CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(gridId);
+        var json = await _jsRuntime.InvokeAsync<string?>("localStorage.getItem", cancellationToken, $"vdg_profiles_{gridId}");
+        return string.IsNullOrEmpty(json) ? null : JsonSerializer.Deserialize<SuperDataGridColumnProfiles>(json, _jsonOptions);
+    }
+
+    public async Task SaveProfilesAsync(string gridId, SuperDataGridColumnProfiles profiles, CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(gridId);
+        ArgumentNullException.ThrowIfNull(profiles);
+        await _jsRuntime.InvokeVoidAsync("localStorage.setItem", cancellationToken, $"vdg_profiles_{gridId}", JsonSerializer.Serialize(profiles, _jsonOptions));
+    }
+
     private static string GetStorageKey(string gridId)
     {
         return $"{KEY_PREFIX}{gridId}";
@@ -105,9 +119,24 @@ public sealed class SuperDataGridSettingsLocalStorage : ISuperDataGridSettingsSt
 /// Useful for testing or when persistence is not required.
 /// Settings are lost when the application restarts.
 /// </summary>
-public sealed class InMemorySettingsStorage : ISuperDataGridSettingsStorage
+public sealed class InMemorySettingsStorage : ISuperDataGridSettingsStorage, ISuperDataGridColumnProfilesStorage
 {
     private readonly Dictionary<string, List<SuperDataGridColumnSettings>> _storage = [];
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<string, string> _profiles = new(StringComparer.Ordinal);
+
+    public Task<SuperDataGridColumnProfiles?> GetProfilesAsync(string gridId, CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(gridId);
+        return Task.FromResult(_profiles.TryGetValue(gridId, out var json) ? JsonSerializer.Deserialize<SuperDataGridColumnProfiles>(json) : null);
+    }
+
+    public Task SaveProfilesAsync(string gridId, SuperDataGridColumnProfiles profiles, CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(gridId);
+        ArgumentNullException.ThrowIfNull(profiles);
+        _profiles[gridId] = JsonSerializer.Serialize(profiles);
+        return Task.CompletedTask;
+    }
 
     /// <inheritdoc />
     public Task<IEnumerable<SuperDataGridColumnSettings>?> GetSettingsAsync(string gridId, CancellationToken cancellationToken = default)

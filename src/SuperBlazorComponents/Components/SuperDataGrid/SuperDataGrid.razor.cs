@@ -550,16 +550,28 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 	/// </summary>
 	public async Task ResetColumnSettingsAsync()
 	{
-		_columns = [.. _defaultColumns];
-		_loadedColumnSettings = null;
-		foreach (var column in _columns)
+		await _settingsGate.WaitAsync();
+		try
 		{
-			column.ResetToDefaults();
-		}
+			if (SupportsColumnProfiles)
+			{
+				await StoreProfilesAsync(_columnProfiles with { ActiveProfileId = null });
+			}
+			_columns = [.. _defaultColumns];
+			_loadedColumnSettings = null;
+			foreach (var column in _columns)
+			{
+				column.ResetToDefaults();
+			}
 
-		if (!string.IsNullOrEmpty(GridId) && SettingsStorage is not null)
+			if (!string.IsNullOrEmpty(GridId) && SettingsStorage is not null)
+			{
+				await SettingsStorage.ClearSettingsAsync(GridId);
+			}
+		}
+		finally
 		{
-			await SettingsStorage.ClearSettingsAsync(GridId);
+			_settingsGate.Release();
 		}
 
 		InvalidateColumnStyleCache();
@@ -794,7 +806,9 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 			await InvokeAsync(StateHasChanged);
 		}
 
+		await LoadColumnProfilesAsync();
 		_settingsLoaded = true;
+		await InvokeAsync(StateHasChanged);
 	}
 
 	private void ApplyColumnSettings(IEnumerable<SuperDataGridColumnSettings> settings)
@@ -834,7 +848,14 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 	{
 		if (_loadedColumnSettings is { Count: > 0 })
 		{
-			ApplyColumnSettings(_loadedColumnSettings);
+			if (ActiveColumnProfileId is not null)
+			{
+				ApplyProfileColumns(_loadedColumnSettings);
+			}
+			else
+			{
+				ApplyColumnSettings(_loadedColumnSettings);
+			}
 		}
 	}
 
@@ -1596,8 +1617,34 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 			return;
 		}
 
-       var deduplicatedSettings = NormalizeColumnSettings(GetColumnSettings());
-		await SettingsStorage.SaveSettingsAsync(GridId, deduplicatedSettings);
+		var deduplicatedSettings = NormalizeColumnSettings(GetColumnSettings());
+		_loadedColumnSettings = deduplicatedSettings;
+		var profileId = ActiveColumnProfileId;
+		await _settingsGate.WaitAsync();
+		try
+		{
+			await SettingsStorage.SaveSettingsAsync(GridId, deduplicatedSettings);
+			if (SupportsColumnProfiles && profileId is not null && _columnProfiles.Profiles.Any(p => p.Id == profileId))
+			{
+				try
+				{
+					await StoreProfilesAsync(_columnProfiles with
+					{
+						Profiles = _columnProfiles.Profiles.Select(p => p.Id == profileId
+							? p with { Columns = deduplicatedSettings.ToArray() } : p).ToArray()
+					});
+				}
+				catch (Exception exception) when (exception is Microsoft.JSInterop.JSException or InvalidOperationException)
+				{
+					ColumnProfilesStorageFailed = true;
+					Logger.LogWarning("Unable to save column configuration for grid {GridId}: {ErrorType}", GridId, exception.GetType().Name);
+				}
+			}
+		}
+		finally
+		{
+			_settingsGate.Release();
+		}
 	}
 
 	private static List<SuperDataGridColumnSettings> NormalizeColumnSettings(IEnumerable<SuperDataGridColumnSettings> settings)

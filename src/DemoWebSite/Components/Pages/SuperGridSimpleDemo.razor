@@ -14,6 +14,7 @@
     <SuperDataGrid TItem="Personne"
                    ItemsProvider="LoadPersonnesAsync"
                    DisplayRowDeleted="@(personne => personne.IsDeleted)"
+                   GridId="simple-grid-demo"
                    DefaultSettingsName="SimpleGrid">
         <ChildContent>
             <DataGridColumn For="@(p => p.Nom)"     Title="Last Name"   Width="200px" Filterable="true" />
@@ -50,6 +51,7 @@
     <SuperDataGrid TItem="Personne"
                    ItemsProvider="LoadPersonnesAsync"
                    DisplayRowDeleted="@(personne => personne.IsDeleted)"
+                   GridId="footer-grid-demo"
                    DefaultSettingsName="GridWithFooter">
         <ChildContent>
             <DataGridColumn For="@(p => p.Nom)"     Title="Last Name"   Width="200px" />
@@ -85,6 +87,7 @@
         <SuperDataGrid TItem="Personne"
                        ItemsProvider="LoadPersonnesAsync"
                        DisplayRowDeleted="@(personne => personne.IsDeleted)"
+                       GridId="simple-grid-demo"
                        DefaultSettingsName="SimpleGrid">
             <ChildContent>
                 <DataGridColumn For="@(p => p.Nom)" Title="Last Name" Width="200px" Filterable="true" />
@@ -110,6 +113,7 @@
         <SuperDataGrid TItem="Personne"
                        ItemsProvider="LoadPersonnesAsync"
                        DisplayRowDeleted="@(personne => personne.IsDeleted)"
+                       GridId="footer-grid-demo"
                        DefaultSettingsName="GridWithFooter">
             <ChildContent>
                 <DataGridColumn For="@(p => p.Nom)" Title="Last Name" Width="200px" />
