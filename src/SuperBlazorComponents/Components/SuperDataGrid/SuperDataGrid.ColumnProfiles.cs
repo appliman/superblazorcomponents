@@ -148,6 +148,10 @@ public partial class SuperDataGrid<TItem>
         try
         {
             var profiles = await ((ISuperDataGridColumnProfilesStorage)SettingsStorage!).GetProfilesAsync(GridId!);
+            if (_isDisposed)
+            {
+                return;
+            }
             if (profiles is not null)
             {
                 if (profiles.Profiles is null)
