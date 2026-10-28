@@ -29,6 +29,7 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 	private Virtualize<TItem>? _virtualizeRef;
 	private IJSObjectReference? _jsModule;
 	private DotNetObjectReference<SuperDataGrid<TItem>>? _dotNetRef;
+	private bool _isDisposed;
 	private bool _isLoading;
 	private bool _defaultSettingsApplied;
 	private List<DataGridColumn<TItem>> _columns = [];
@@ -745,15 +746,52 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 
 	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
-		if (firstRender)
+		if (!firstRender || _isDisposed)
 		{
-			_dotNetRef = DotNetObjectReference.Create(this);
-			_jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
-				"import", "./_content/SuperBlazorComponents/Components/SuperDataGrid/SuperDataGrid.razor.js");
+			return;
+		}
 
-			await _jsModule.InvokeVoidAsync("initialize", _containerRef, _dotNetRef);
+		var module = await JSRuntime.InvokeAsync<IJSObjectReference>(
+			"import", "./_content/SuperBlazorComponents/Components/SuperDataGrid/SuperDataGrid.razor.js");
+		DotNetObjectReference<SuperDataGrid<TItem>>? dotNetRef = null;
+		var ownershipTransferred = false;
+		try
+		{
+			if (_isDisposed)
+			{
+				return;
+			}
+
+			dotNetRef = DotNetObjectReference.Create(this);
+			await module.InvokeVoidAsync("initialize", _containerRef, dotNetRef);
+			if (_isDisposed)
+			{
+				return;
+			}
+
+			// Keep initialization resources local until disposal can safely take ownership.
+			_jsModule = module;
+			_dotNetRef = dotNetRef;
+			ownershipTransferred = true;
 			await LoadSettingsAsync();
-			GridInstanceReady?.Invoke(this);
+			if (!_isDisposed)
+			{
+				GridInstanceReady?.Invoke(this);
+			}
+		}
+		finally
+		{
+			if (!ownershipTransferred)
+			{
+				try
+				{
+					await DisposeModuleAsync(module);
+				}
+				finally
+				{
+					dotNetRef?.Dispose();
+				}
+			}
 		}
 	}
 
@@ -793,12 +831,16 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 
 	private async Task LoadSettingsAsync()
 	{
-		if (string.IsNullOrEmpty(GridId) || SettingsStorage is null || _settingsLoaded)
+		if (_isDisposed || string.IsNullOrEmpty(GridId) || SettingsStorage is null || _settingsLoaded)
 		{
 			return;
 		}
 
 		var settings = await SettingsStorage.GetSettingsAsync(GridId);
+		if (_isDisposed)
+		{
+			return;
+		}
 		if (settings is not null && settings.Any())
 		{
 			_loadedColumnSettings = NormalizeColumnSettings(settings);
@@ -806,7 +848,17 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 			await InvokeAsync(StateHasChanged);
 		}
 
+		if (_isDisposed)
+		{
+			return;
+		}
+
 		await LoadColumnProfilesAsync();
+		if (_isDisposed)
+		{
+			return;
+		}
+
 		_settingsLoaded = true;
 		await InvokeAsync(StateHasChanged);
 	}
@@ -861,22 +913,48 @@ public partial class SuperDataGrid<TItem> : IAsyncDisposable
 
 	public async ValueTask DisposeAsync()
 	{
+		if (_isDisposed)
+		{
+			return;
+		}
+
+		_isDisposed = true;
 		_rangeDisposed = true;
 		_rangeQueryVersion++;
-		if (_jsModule is not null)
+		var module = _jsModule;
+		var dotNetRef = _dotNetRef;
+		_jsModule = null;
+		_dotNetRef = null;
+		try
+		{
+			if (module is not null)
+			{
+				await DisposeModuleAsync(module);
+			}
+		}
+		finally
+		{
+			dotNetRef?.Dispose();
+		}
+	}
+
+	private async ValueTask DisposeModuleAsync(IJSObjectReference module)
+	{
+		try
 		{
 			try
 			{
-				await _jsModule.InvokeVoidAsync("dispose", _containerRef);
-				await _jsModule.DisposeAsync();
+				await module.InvokeVoidAsync("dispose", _containerRef);
 			}
-			catch (JSDisconnectedException)
+			finally
 			{
-				// Circuit is disconnected, ignore
+				await module.DisposeAsync();
 			}
 		}
-
-		_dotNetRef?.Dispose();
+		catch (JSDisconnectedException)
+		{
+			// The browser can disappear while initialization or cleanup is pending.
+		}
 	}
 
 	internal async Task ApplyFilter(SuperDataGridFilterInfo filterInfo)
