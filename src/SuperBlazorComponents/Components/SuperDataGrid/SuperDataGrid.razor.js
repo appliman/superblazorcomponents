@@ -73,6 +73,7 @@ function installOverflowPreviewStyles() {
             font: inherit;
             white-space: normal;
             z-index: 10000;
+            pointer-events: none;
             scrollbar-gutter: stable;
             scrollbar-width: auto;
             scrollbar-color: var(--bs-secondary, #6c757d) var(--bs-tertiary-bg, #f8f9fa);
@@ -118,7 +119,7 @@ function handleOverflowPreviewPointerOver(e, instance) {
         return;
     }
 
-    if (!hasVerticalOverflow(contentElement)) {
+    if (contentElement.querySelector('button, a, input, select, textarea, summary, [contenteditable], [tabindex], [role="button"], [role="link"], [role="checkbox"], [role="switch"]') || !hasVerticalOverflow(contentElement)) {
         hideOverflowPreview(instance);
         return;
     }
@@ -171,6 +172,7 @@ function showOverflowPreview(instance, contentElement) {
     const contentStyle = window.getComputedStyle(contentElement);
     const preview = document.createElement('div');
     preview.className = 'sdg-overflow-preview';
+    preview.setAttribute('aria-hidden', 'true');
     preview.style.fontSize = contentStyle.fontSize;
     preview.style.lineHeight = contentStyle.lineHeight;
     preview.style.textAlign = contentStyle.textAlign;
