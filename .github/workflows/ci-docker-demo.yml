@@ -48,6 +48,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
         with:
+          pull: true
           context: .
           file: src/DemoWebSite/Dockerfile
           push: true
