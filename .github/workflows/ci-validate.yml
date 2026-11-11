@@ -38,7 +38,8 @@ jobs:
           dotnet build tests/SuperBlazorComponents.Tests/SuperBlazorComponents.Tests.csproj --no-restore
       - name: Install Chromium
         shell: pwsh
-        run: ./tests/SuperBlazorComponents.Tests/bin/Debug/net11.0/playwright.ps1 install --with-deps chromium
+        # GitHub's hosted Ubuntu runner already provides the Chromium system libraries.
+        run: ./tests/SuperBlazorComponents.Tests/bin/Debug/net11.0/playwright.ps1 install chromium
       - name: Test
         run: dotnet test tests/SuperBlazorComponents.Tests/SuperBlazorComponents.Tests.csproj --no-build --no-restore -p:TestTfmsInParallel=false --logger trx --results-directory TestResults
       - name: Upload test results
