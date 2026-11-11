@@ -6,6 +6,9 @@ starts, so it remains exportable even if a later filter hides it.
 
 ## Installation
 
+Starting with version 2.1.0, `SuperBlazorComponents.DataGridExporter` targets
+both .NET 10 (`net10.0`) and .NET 11 (`net11.0`).
+
 Reference both packages/projects:
 
 ~~~bash

@@ -22,10 +22,12 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-      - name: Setup .NET 10
+      - name: Setup .NET 10 and .NET 11
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '10.0.x'
+          dotnet-version: |
+            10.0.x
+            11.0.x
       - name: Restore
         run: |
           dotnet restore src/DemoWebSite/DemoWebSite.csproj
@@ -36,9 +38,9 @@ jobs:
           dotnet build tests/SuperBlazorComponents.Tests/SuperBlazorComponents.Tests.csproj --no-restore
       - name: Install Chromium
         shell: pwsh
-        run: ./tests/SuperBlazorComponents.Tests/bin/Debug/net10.0/playwright.ps1 install --with-deps chromium
+        run: ./tests/SuperBlazorComponents.Tests/bin/Debug/net11.0/playwright.ps1 install --with-deps chromium
       - name: Test
-        run: dotnet test tests/SuperBlazorComponents.Tests/SuperBlazorComponents.Tests.csproj --no-build --no-restore --logger trx --results-directory TestResults
+        run: dotnet test tests/SuperBlazorComponents.Tests/SuperBlazorComponents.Tests.csproj --no-build --no-restore -p:TestTfmsInParallel=false --logger trx --results-directory TestResults
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
