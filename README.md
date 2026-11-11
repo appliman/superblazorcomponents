@@ -2,13 +2,15 @@
 
 [![NuGet](https://img.shields.io/nuget/v/SuperBlazorComponents)](https://www.nuget.org/packages/SuperBlazorComponents)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![.NET 10](https://img.shields.io/badge/.NET-10-purple)](https://dotnet.microsoft.com)
+[![.NET 10 and 11](https://img.shields.io/badge/.NET-10%20%7C%2011-purple)](https://dotnet.microsoft.com)
 
 **High-performance, open-source Blazor component library** for admin and line-of-business applications — built with Bootstrap 5.3 and zero third-party JS dependencies (except Google Charts).
 
 ---
 
 ## 🖼️ Demo
+
+Building and running the demo from source requires the .NET 11 SDK.
 
 ![SuperBlazorComponents demo website home page](docs/screenshots/demo-home.png)
 
@@ -43,6 +45,8 @@
 ---
 
 ## 📦 Installation
+
+Starting with version 2.1.0, `SuperBlazorComponents` and `SuperBlazorComponents.DataGridExporter` target both .NET 10 (`net10.0`) and .NET 11 (`net11.0`).
 
 ```bash
 dotnet add package SuperBlazorComponents
