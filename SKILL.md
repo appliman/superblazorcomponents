@@ -11,7 +11,7 @@
 | | |
 |---|---|
 | **NuGet** | `SuperBlazorComponents` |
-| **Target framework** | .NET 10 / Blazor Server & WebAssembly |
+| **Target framework** | .NET 10 and 11 / Blazor Server & WebAssembly |
 | **Theme** | Bootstrap 5.3 — dark/light supported out of the box |
 
 ### Installation
