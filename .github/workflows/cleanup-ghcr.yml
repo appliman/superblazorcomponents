@@ -1,0 +1,16 @@
+name: Clean up old GHCR images
+
+on:
+  schedule:
+    - cron: '17 4 * * 1'
+  workflow_dispatch:
+
+permissions:
+  packages: write
+
+jobs:
+  cleanup:
+    uses: appliman/.github/.github/workflows/cleanup-ghcr.yml@main
+    with:
+      packages: 'superblazorcomponents-demo'
+      protected-digests: 'sha256:fb89388e77e209e5d5d5c8dbc9dc52c7d47e379acd457cdf0c4f7c97ed85df19'
